@@ -5,6 +5,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace NntpClientLib
 {
@@ -53,7 +54,7 @@ namespace NntpClientLib
             var stream = m_network;
             if( m_useSsl )
             {
-                var sslClient = new SslStream(m_network);
+                var sslClient = new SslStream(m_network, true, CertValidationCallback);
                 sslClient.AuthenticateAsClient(m_sslSslHostName);
                 stream = sslClient;
             }
@@ -61,6 +62,11 @@ namespace NntpClientLib
             m_writer = new StreamWriter(stream, DefaultTextEncoding);
             m_writer.AutoFlush = true;
             m_reader = new NntpStreamReader(stream);
+        }
+
+        private bool CertValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            return true;    //HACK: this should be worked out better, right now we accept all SSL Certs.
         }
 
         internal string ReadLine()

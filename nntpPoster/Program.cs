@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -10,16 +13,27 @@ using NntpClientLib;
 namespace nntpPoster
 {
     class Program
-    {
-        static void Main(string[] args)
+    {    
+        static Int32 Main(string[] args)
         {
+            if(args.Length < 1)
+            {
+                Console.WriteLine("Please supply a filename to upload.");
+                return 1;
+            }
+            FileInfo file = new FileInfo(args[0]);
+            if(!file.Exists)
+            {
+                Console.WriteLine("The supplied file does not exist.");
+                return 2;
+            }
+            FileToPost toPost = new FileToPost(file);
+
             nntpMessagePoster poster = new nntpMessagePoster();
-            FileToPost toPost = new FileToPost(new FileInfo("testFiles\\BG2sizeComp.jpg"));
             PostedFileInfo postInfo = toPost.PostYEncFile(poster, "1/1", "");
             poster.WaitTillCompletion();
             XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.FileName, new List<PostedFileInfo>(new PostedFileInfo[] { postInfo }));
             nzbDoc.Save(toPost.FileName + ".nzb");
-            return;
 
             //using (Rfc977NntpClientWithExtensions client = new Rfc977NntpClientWithExtensions())
             //{
@@ -41,6 +55,8 @@ namespace nntpPoster
 
             //    client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), body);
             //}
+
+            return 0;
         }
 
         private static XDocument GenerateNzbFromPostInfo(String title, List<PostedFileInfo> postedFiles)

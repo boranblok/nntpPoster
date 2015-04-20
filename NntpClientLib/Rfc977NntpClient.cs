@@ -149,7 +149,10 @@ namespace NntpClientLib
         internal NntpProtocolReaderWriter NntpReaderWriter
         {
             get { return m_nntpStream; }
-            set { m_nntpStream = value; }
+            set {
+                Console.WriteLine("nntpReaderWriter set to {0}", value);
+                m_nntpStream = value; 
+            }
         }
 
         private TextWriter m_logger;
@@ -304,7 +307,8 @@ namespace NntpClientLib
             }
             try
             {
-                if (m_connection.Connected)
+                //HACK: the check on null here is added for mono, why is this needed here? To research.
+                if (m_connection.Connected && NntpReaderWriter != null)
                 {
                     NntpReaderWriter.WriteCommand("QUIT");
 
@@ -959,7 +963,7 @@ namespace NntpClientLib
             }
 
             NntpReaderWriter.WriteLine(".");
-            NntpReaderWriter.ReadResponse();
+            Console.WriteLine(NntpReaderWriter.ReadResponse());
             if (NntpReaderWriter.LastResponseCode != Rfc977ResponseCodes.ArticlePostedOk)
             {
                 throw new NntpResponseException(Resource.ErrorMessage07, NntpReaderWriter.LastResponse);
