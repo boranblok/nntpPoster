@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using NntpClientLib;
 using nntpPoster.yEncLib;
 
 namespace nntpPoster
@@ -69,6 +70,7 @@ namespace nntpPoster
             else
                 postedFileInfo.NzbSubjectName = subjectNameBase;
             postedFileInfo.PostedGroups.Add(PostSettings.TargetNewsgroup);
+            postedFileInfo.PostedDateTime = new NntpDateTime(DateTime.Now);
 
             var yEncoder = new YEncEncoder();
             Int32 partNumber = 0;

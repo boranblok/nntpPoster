@@ -214,5 +214,10 @@ namespace NntpClientLib
             }
             throw new ArgumentException(Resource.ErrorMessage46);
         }
+
+        public Int32 GetUnixTimeStamp()
+        {
+            return (Int32)(m_dtime.ToUniversalTime().Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
     }
 }

@@ -12,6 +12,12 @@ namespace nntpPoster
     public class nntpMessagePoster : InntpMessagePoster
     {
         private List<Task> RunningTasks = new List<Task>();
+        public event EventHandler<YEncFilePart> FilePartPosted;
+
+        protected virtual void OnFilePartPosted(YEncFilePart e)
+        {
+            if (FilePartPosted != null) FilePartPosted(this, e);
+        }
 
         public void PostMessage(String subject, List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
         {
@@ -47,7 +53,8 @@ namespace nntpPoster
             }
         }
 
-        private void PostMessageTask(String subject, List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
+        private void PostMessageTask(String subject, 
+            List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
         {
             try
             {
@@ -56,14 +63,16 @@ namespace nntpPoster
                     client.Connect(PostSettings.NewsGroupAddress, PostSettings.NewsGroupUseSsl);
                     client.AuthenticateUser(PostSettings.NewsGroupUsername, PostSettings.NewsGroupPassword);
 
-                    string newsgroup = PostSettings.TargetNewsgroup;
-                    client.SelectNewsgroup(newsgroup);
+                    client.SelectNewsgroup(postInfo.PostedGroups[0]);  //TODO: verify if required.
 
                     ArticleHeadersDictionary headers = new ArticleHeadersDictionary();
                     headers.AddHeader("From", PostSettings.FromAddress);
                     headers.AddHeader("Subject", subject);
-                    headers.AddHeader("Newsgroups", newsgroup);
-                    headers.AddHeader("Date", new NntpDateTime(DateTime.Now).ToString());
+                    foreach (var newsGroup in postInfo.PostedGroups)
+                    {
+                        headers.AddHeader("Newsgroups", newsGroup);
+                    }
+                    headers.AddHeader("Date", postInfo.PostedDateTime.ToString());
 
                     String partMessageId = 
                         client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), prefix, yEncPart.EncodedLines, suffix);
@@ -77,6 +86,7 @@ namespace nntpPoster
                         });
                     }
                 }
+                OnFilePartPosted(yEncPart);
             }
             catch(Exception ex)
             {
