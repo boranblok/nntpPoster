@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="testFiles\BG2sizeCom.jpg.sha1" />
+    <None Include="testFiles\BG2sizeComp.jpg.sha1" />
     <None Include="testFiles\TestFile.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
