@@ -12,47 +12,6 @@ namespace nntpPoster.yEncLib
         const Byte dot = 46;
         Byte[] escapeBytes = new Byte[] { 10, 13, 0, escapeByte };
 
-        public Byte[] EncodeLine(Byte[] source, Int32 offset, Int32 count)
-        {
-            Byte[] buffer = new Byte[source.Length * 2];
-            Int32 bufferPos = 0;
-            for(Int32 i = 0; i < count; i++)
-            {
-                Byte b = source[offset + i];
-                Boolean escape = false;
-                Byte e = EncodeByte(b, out escape);
-                if (escape)
-				{
-					buffer[bufferPos] = escapeByte;
-					bufferPos++;
-				}
-                
-                buffer[bufferPos] = e;
-                bufferPos++;
-            }
-
-            buffer[bufferPos] = 13;
-            bufferPos++;
-
-            buffer[bufferPos] = 10;
-            bufferPos++;
-
-            Boolean addDotPrefix = buffer[0] == 46;
-            Byte[] output;
-            if(addDotPrefix)
-            {
-                output = new Byte[bufferPos + 1];
-                output[0] = 46;
-                Buffer.BlockCopy(buffer, 0, output, 1, bufferPos);
-            }
-            else
-            {
-                output = new Byte[bufferPos];
-                Buffer.BlockCopy(buffer, 0, output, 0, bufferPos);
-            }
-            return output;
-        }
-
         /// <summary>
         /// Encodes an entire block of bytes into yEnc format splitting the output every lineLength bytes into a new line.
         /// It is reccomended to pass in a multiple of linelength as source as long as the input file can provide this.
