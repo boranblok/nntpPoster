@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NntpClientLib;
+using nntpPoster.yEncLib;
 
 namespace nntpPoster
 {
@@ -12,7 +13,7 @@ namespace nntpPoster
     {
         private List<Task> RunningTasks = new List<Task>();
 
-        public void PostMessage(String subject, List<String> prefix, Byte[] yEncBody, List<String> suffix)
+        public void PostMessage(String subject, List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
         {
             Boolean waitForFreeThread = true;
             while(waitForFreeThread)
@@ -21,7 +22,7 @@ namespace nntpPoster
                 {
                     if (RunningTasks.Count < PostSettings.MaxConnectionCount)
                     {
-                        Task task = new Task(() => PostMessageTask(subject, prefix, yEncBody, suffix));
+                        Task task = new Task(() => PostMessageTask(subject, prefix, yEncPart, suffix, postInfo));
                         task.ContinueWith(t => CleanupTask(t));
                         RunningTasks.Add(task);
                         task.Start();
@@ -46,7 +47,7 @@ namespace nntpPoster
             }
         }
 
-        private void PostMessageTask(String subject, List<String> prefix, Byte[] yEncBody, List<String> suffix)
+        private void PostMessageTask(String subject, List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
         {
             try
             {
@@ -64,7 +65,17 @@ namespace nntpPoster
                     headers.AddHeader("Newsgroups", newsgroup);
                     headers.AddHeader("Date", new NntpDateTime(DateTime.Now).ToString());
 
-                    client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), prefix, yEncBody, suffix);
+                    String partMessageId = 
+                        client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), prefix, yEncPart.EncodedLines, suffix);
+                    lock (postInfo.Segments)
+                    {
+                        postInfo.Segments.Add(new PostedFileSegment
+                        {
+                            MessageId = partMessageId,
+                            Bytes = yEncPart.Size,
+                            SegmentNumber = yEncPart.Number
+                        });
+                    }
                 }
             }
             catch(Exception ex)

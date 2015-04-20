@@ -45,9 +45,11 @@
     <Compile Include="FileToPost.cs" />
     <Compile Include="InntpMessagePoster.cs" />
     <Compile Include="nntpMessagePoster.cs" />
+    <Compile Include="PostedFileInfo.cs" />
     <Compile Include="PostSettings.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PostedFileSegment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

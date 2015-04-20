@@ -17,8 +17,6 @@ namespace nntpPoster
         public String FileName { get; private set; }
         public Int32 TotalParts { get; private set; }
 
-
-
         public FileToPost(FileInfo fileToPost)
         {
             partSize = PostSettings.YEncLineSize * PostSettings.YEncLinesPerMessage;
@@ -34,6 +32,27 @@ namespace nntpPoster
             FileName = FileName.Replace(' ', '.');
         }
 
+
+        private string ConstructSubjectNameBase(String comment1, String comment2)
+        {
+            StringBuilder subject = new StringBuilder();
+            if (!String.IsNullOrWhiteSpace(comment1))
+                subject.AppendFormat("[{0}] ", comment1);
+            subject.AppendFormat("\"" + FileName + "\"");
+            subject.Append(" yEnc ");
+            if (TotalParts > 1)
+            {
+                subject.Append("({0}/");    //The {0}  placeholder here is for the format statement later.
+                subject.Append(TotalParts);
+                subject.Append(") ");
+            }
+            subject.Append(file.Length);
+            if (!String.IsNullOrWhiteSpace(comment2))
+                subject.AppendFormat(" [{0}]", comment2);
+
+            return subject.ToString();
+        }
+
         private void DetermineTotalParts()
         {
             TotalParts = (Int32)(file.Length / partSize);
@@ -41,8 +60,16 @@ namespace nntpPoster
                 TotalParts += 1;
         }
 
-        public void PostYEncFile(InntpMessagePoster poster, String comment1, String comment2)
+        public PostedFileInfo PostYEncFile(InntpMessagePoster poster, String comment1, String comment2)
         {
+            PostedFileInfo postedFileInfo = new PostedFileInfo();
+            String subjectNameBase = ConstructSubjectNameBase(comment1, comment2);
+            if (partSize > 1)
+                postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
+            else
+                postedFileInfo.NzbSubjectName = subjectNameBase;
+            postedFileInfo.PostedGroups.Add(PostSettings.TargetNewsgroup);
+
             var yEncoder = new YEncEncoder();
             Int32 partNumber = 0;
 
@@ -74,23 +101,21 @@ namespace nntpPoster
 
                     part.End = fileStream.Position;
 
-                    PostPart(poster, part, comment1, comment2);
+                    PostPart(poster, postedFileInfo, part, subjectNameBase);
                 }
             }
+
+            return postedFileInfo;
         }
 
-        private void PostPart(InntpMessagePoster poster, YEncFilePart part, String comment1, String comment2)
+        private void PostPart(InntpMessagePoster poster, PostedFileInfo postedFileInfo, YEncFilePart part, String subjectNameBase)
         {
-            StringBuilder subject = new StringBuilder();
-            if (!String.IsNullOrWhiteSpace(comment1))
-                subject.AppendFormat("[{0}] ", comment1);
-            subject.AppendFormat("\"" + FileName + "\"");
-            subject.Append(" yEnc ");
-            if (TotalParts > 1)
-                subject.AppendFormat("({0}/{1}) ", part.Number, TotalParts);
-            subject.Append(file.Length);
-            if (!String.IsNullOrWhiteSpace(comment2))
-                subject.AppendFormat(" [{0}]", comment2);
+            String subject;
+            
+            if(TotalParts > 1)
+                subject = String.Format(subjectNameBase, part.Number);
+            else
+                subject = subjectNameBase;
 
             List<String> yEncPrefix = new List<String>();
             List<String> yEncSuffix = new List<String>();
@@ -116,7 +141,7 @@ namespace nntpPoster
                     file.Length, part.CRC32));
             }
 
-            poster.PostMessage(subject.ToString(), yEncPrefix, part.EncodedLines, yEncSuffix);
+            poster.PostMessage(subject, yEncPrefix, part, yEncSuffix, postedFileInfo);
         }
     }
 }

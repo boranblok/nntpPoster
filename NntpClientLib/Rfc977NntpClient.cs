@@ -891,6 +891,7 @@ namespace NntpClientLib
         /// <param name="prefix">String data that has to be put before the binary body</param>
         /// <param name="body">The binary body, keep in mind that this has to be valid nntp data, double dots at line beginnings etc...</param>
         /// <param name="suffix">String data that has to be put after the binary body</param>
+        /// <returns>The posted Message ID</returns>
         public virtual string PostArticle(IArticleHeaderEnumerator header, IEnumerable<String> prefix, Byte[] body, IEnumerable<String> suffix)
         {
             if (header == null)

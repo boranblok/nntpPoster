@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace nntpPoster
 {
+    //TODO: this entire thing could be more context dependent instead of from appconfig.
     public class PostSettings
     {
         public static String FromAddress { get; set; }
@@ -14,7 +15,7 @@ namespace nntpPoster
         public static String NewsGroupUsername { get; set; }
         public static String NewsGroupPassword { get; set; }
         public static Boolean NewsGroupUseSsl { get; set; }
-        public static String TargetNewsgroup { get; set; }
+        public static String TargetNewsgroup { get; set; }  //TODO: make multiple value
 
         public static Int32 MaxConnectionCount { get; set; }
 
