@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nntpPoster", "nntpPoster\nntpPoster.csproj", "{52EDE790-8BC6-4CF3-AAF5-A2EA7A281F30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NntpClientLib", "NntpClientLib\NntpClientLib.csproj", "{123ED440-DEF1-4D2C-AAB5-08193E1EFA0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yEncLib", "yEncLib\yEncLib.csproj", "{F2A8ED8B-794C-4501-B128-D3C30E953EC9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{52EDE790-8BC6-4CF3-AAF5-A2EA7A281F30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52EDE790-8BC6-4CF3-AAF5-A2EA7A281F30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52EDE790-8BC6-4CF3-AAF5-A2EA7A281F30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52EDE790-8BC6-4CF3-AAF5-A2EA7A281F30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{123ED440-DEF1-4D2C-AAB5-08193E1EFA0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{123ED440-DEF1-4D2C-AAB5-08193E1EFA0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{123ED440-DEF1-4D2C-AAB5-08193E1EFA0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{123ED440-DEF1-4D2C-AAB5-08193E1EFA0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2A8ED8B-794C-4501-B128-D3C30E953EC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2A8ED8B-794C-4501-B128-D3C30E953EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2A8ED8B-794C-4501-B128-D3C30E953EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2A8ED8B-794C-4501-B128-D3C30E953EC9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
