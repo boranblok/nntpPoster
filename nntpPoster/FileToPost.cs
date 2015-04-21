@@ -12,15 +12,17 @@ namespace nntpPoster
 {
     public class FileToPost
     {
+        private UsenetPosterConfig configuration;
         private Int32 partSize;
         private FileInfo file;
 
         public String FileName { get; private set; }
         public Int32 TotalParts { get; private set; }
 
-        public FileToPost(FileInfo fileToPost)
+        public FileToPost(UsenetPosterConfig configuration, FileInfo fileToPost)
         {
-            partSize = PostSettings.YEncLineSize * PostSettings.YEncLinesPerMessage;
+            this.configuration = configuration;
+            partSize = configuration.YEncLineSize * configuration.YEncLinesPerMessage;
 
             file = fileToPost;
             DetermineFileName();
@@ -69,7 +71,7 @@ namespace nntpPoster
                 postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
             else
                 postedFileInfo.NzbSubjectName = subjectNameBase;
-            postedFileInfo.PostedGroups.Add(PostSettings.TargetNewsgroup);
+            postedFileInfo.PostedGroups.AddRange(configuration.TargetNewsgroups);
             postedFileInfo.PostedDateTime = new NntpDateTime(DateTime.Now);
 
             var yEncoder = new YEncEncoder();
@@ -96,7 +98,7 @@ namespace nntpPoster
                     }
 
                     //TODO: this can be split in 2 threads to spread out CPU usage.
-                    part.EncodedLines = yEncoder.EncodeBlock(PostSettings.YEncLineSize, partBuffer, 0, partBufferPos);
+                    part.EncodedLines = yEncoder.EncodeBlock(configuration.YEncLineSize, partBuffer, 0, partBufferPos);
 
                     partCRCCalculator.TransformFinalBlock(partBuffer, 0, partBufferPos);
                     part.CRC32 = partCRCCalculator.HashAsHexString;
@@ -125,7 +127,7 @@ namespace nntpPoster
             if (TotalParts > 1)
             {
                 yEncPrefix.Add(String.Format("=ybegin part={0} total={1} line={2} size={3} name={4}",
-                    part.Number, TotalParts, PostSettings.YEncLineSize, file.Length, FileName));
+                    part.Number, TotalParts, configuration.YEncLineSize, file.Length, FileName));
 
                 yEncPrefix.Add(String.Format("=ypart begin={0} end={1}",
                     part.Begin, part.End));
@@ -137,7 +139,7 @@ namespace nntpPoster
             else
             {
                 yEncPrefix.Add(String.Format("=ybegin line={0} size={1} name={2}",
-                    PostSettings.YEncLineSize, file.Length, FileName));
+                    configuration.YEncLineSize, file.Length, FileName));
 
                 yEncSuffix.Add(String.Format("=yend size={0} crc32={1}",
                     file.Length, part.CRC32));

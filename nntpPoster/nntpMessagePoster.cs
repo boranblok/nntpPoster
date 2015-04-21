@@ -11,6 +11,11 @@ namespace nntpPoster
 {
     public class nntpMessagePoster : InntpMessagePoster
     {
+        private UsenetPosterConfig configuration;
+        public nntpMessagePoster(UsenetPosterConfig configuration)
+        {
+            this.configuration = configuration;
+        }
         private List<Task> RunningTasks = new List<Task>();
         public event EventHandler<YEncFilePart> FilePartPosted;
 
@@ -26,7 +31,7 @@ namespace nntpPoster
             {
                 lock (RunningTasks)
                 {
-                    if (RunningTasks.Count < PostSettings.MaxConnectionCount)
+                    if (RunningTasks.Count < configuration.MaxConnectionCount)
                     {
                         Task task = new Task(() => PostMessageTask(subject, prefix, yEncPart, suffix, postInfo));
                         task.ContinueWith(t => CleanupTask(t));
@@ -60,13 +65,13 @@ namespace nntpPoster
             {
                 using (Rfc977NntpClientWithExtensions client = new Rfc977NntpClientWithExtensions())
                 {
-                    client.Connect(PostSettings.NewsGroupAddress, PostSettings.NewsGroupUseSsl);
-                    client.AuthenticateUser(PostSettings.NewsGroupUsername, PostSettings.NewsGroupPassword);
+                    client.Connect(configuration.NewsGroupAddress, configuration.NewsGroupUseSsl);
+                    client.AuthenticateUser(configuration.NewsGroupUsername, configuration.NewsGroupPassword);
 
                     client.SelectNewsgroup(postInfo.PostedGroups[0]);  //TODO: verify if required.
 
                     ArticleHeadersDictionary headers = new ArticleHeadersDictionary();
-                    headers.AddHeader("From", PostSettings.FromAddress);
+                    headers.AddHeader("From", configuration.FromAddress);
                     headers.AddHeader("Subject", subject);
                     foreach (var newsGroup in postInfo.PostedGroups)
                     {

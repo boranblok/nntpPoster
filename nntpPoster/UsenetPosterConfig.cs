@@ -8,21 +8,21 @@ using System.Threading.Tasks;
 namespace nntpPoster
 {
     //TODO: this entire thing could be more context dependent instead of from appconfig.
-    public class PostSettings
+    public class UsenetPosterConfig
     {
-        public static String FromAddress { get; set; }
-        public static String NewsGroupAddress { get; set; }
-        public static String NewsGroupUsername { get; set; }
-        public static String NewsGroupPassword { get; set; }
-        public static Boolean NewsGroupUseSsl { get; set; }
-        public static String TargetNewsgroup { get; set; }  //TODO: make multiple value
+        public String FromAddress { get; set; }
+        public String NewsGroupAddress { get; set; }
+        public String NewsGroupUsername { get; set; }
+        public String NewsGroupPassword { get; set; }
+        public Boolean NewsGroupUseSsl { get; set; }
+        public String[] TargetNewsgroups { get; set; }  //TODO: make multiple value
 
-        public static Int32 MaxConnectionCount { get; set; }
+        public Int32 MaxConnectionCount { get; set; }
 
-        public static Int32 YEncLineSize { get; set; }
-        public static Int32 YEncLinesPerMessage { get; set; }
+        public Int32 YEncLineSize { get; set; }
+        public Int32 YEncLinesPerMessage { get; set; }
 
-        static PostSettings()
+        public UsenetPosterConfig()
         {
             FromAddress = ConfigurationManager.AppSettings["FromAddress"];
 
@@ -30,7 +30,8 @@ namespace nntpPoster
             NewsGroupUsername = ConfigurationManager.AppSettings["NewsGroupUsername"];
             NewsGroupPassword = ConfigurationManager.AppSettings["NewsGroupPassword"];
             NewsGroupUseSsl = Boolean.Parse(ConfigurationManager.AppSettings["NewsGroupUseSsl"]);
-            TargetNewsgroup = ConfigurationManager.AppSettings["TargetNewsgroup"];
+            TargetNewsgroups = ConfigurationManager.AppSettings["TargetNewsgroup"]
+                .Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
             MaxConnectionCount = Int32.Parse(ConfigurationManager.AppSettings["MaxConnectionCount"]);
 
