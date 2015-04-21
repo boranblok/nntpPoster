@@ -868,7 +868,7 @@ namespace NntpClientLib
                 NntpReaderWriter.WriteLine(s);
             }
             NntpReaderWriter.WriteLine(".");
-            NntpReaderWriter.ReadResponse();
+            Console.WriteLine(NntpReaderWriter.ReadResponse());
             if (NntpReaderWriter.LastResponseCode != Rfc977ResponseCodes.ArticlePostedOk)
             {
                 throw new NntpResponseException(Resource.ErrorMessage07, NntpReaderWriter.LastResponse);

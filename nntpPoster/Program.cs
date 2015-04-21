@@ -16,13 +16,13 @@ namespace nntpPoster
     {    
         static Int32 Main(string[] args)
         {
-            if(args.Length < 1)
+            if (args.Length < 1)
             {
                 Console.WriteLine("Please supply a filename to upload.");
                 return 1;
             }
             FileInfo file = new FileInfo(args[0]);
-            if(!file.Exists)
+            if (!file.Exists)
             {
                 Console.WriteLine("The supplied file does not exist.");
                 return 2;
@@ -37,6 +37,8 @@ namespace nntpPoster
 
             //using (Rfc977NntpClientWithExtensions client = new Rfc977NntpClientWithExtensions())
             //{
+            //    client.ProtocolLogger = Console.Out;
+
             //    client.Connect(PostSettings.NewsGroupAddress, PostSettings.NewsGroupUseSsl);
             //    client.AuthenticateUser(PostSettings.NewsGroupUsername, PostSettings.NewsGroupPassword);
 
@@ -53,7 +55,7 @@ namespace nntpPoster
             //    List<String> body = new List<String>();
             //    body.Add("A single line message to test retrieval of message ID");
 
-            //    client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), body);
+            //    Console.WriteLine(client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), body));
             //}
 
             return 0;

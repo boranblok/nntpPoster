@@ -60,6 +60,7 @@ namespace NntpClientLib
             }
 
             m_writer = new StreamWriter(stream, DefaultTextEncoding);
+            m_writer.NewLine = "\r\n";  //Added for mono compatibility, nntp requires \r\n as newline char, not just \n as used by mono.
             m_writer.AutoFlush = true;
             m_reader = new NntpStreamReader(stream);
         }
