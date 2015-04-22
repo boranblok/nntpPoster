@@ -22,7 +22,7 @@ namespace nntpPoster
         public FileToPost(UsenetPosterConfig configuration, FileInfo fileToPost)
         {
             this.configuration = configuration;
-            partSize = configuration.YEncLineSize * configuration.YEncLinesPerMessage;
+            partSize = configuration.YEncPartSize;
 
             file = fileToPost;
             DetermineFileName();

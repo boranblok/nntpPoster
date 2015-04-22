@@ -47,7 +47,7 @@
     <Compile Include="InntpMessagePoster.cs" />
     <Compile Include="nntpMessagePoster.cs" />
     <Compile Include="PostedFileInfo.cs" />
-    <Compile Include="RarSizeReccomendation.cs" />
+    <Compile Include="RarAndRecoveryRecommendation.cs" />
     <Compile Include="UsenetPosterConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,6 +67,10 @@
       <Project>{123ed440-def1-4d2c-aab5-08193e1efa0b}</Project>
       <Name>NntpClientLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\par2Lib\par2Lib.csproj">
+      <Project>{e34e8477-5ed3-45c6-95a9-7c79efc9a1db}</Project>
+      <Name>par2Lib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\rarLib\rarLib.csproj">
       <Project>{4d750f87-f6eb-4e0f-a9db-895fde20362d}</Project>
       <Name>rarLib</Name>
@@ -80,6 +84,9 @@
     <Content Include="testFiles\BG2sizeComp.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

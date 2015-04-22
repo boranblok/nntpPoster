@@ -25,8 +25,17 @@ namespace nntpPoster
 
         public DirectoryInfo WorkingFolder { get; set; }
 
-        public List<RarSizeReccomendation> RarFileSizeMap { get; set; }
+        public List<RarAndRecoveryRecommendation> RecommendationMap { get; set; }
         public String RarToolLocation { get; set; }
+        public String ParToolLocation { get; set; }
+
+        public Int32 YEncPartSize 
+        { 
+            get
+            {
+                return YEncLineSize * YEncLinesPerMessage;
+            }
+        }
 
         public UsenetPosterConfig()
         {
@@ -48,18 +57,20 @@ namespace nntpPoster
             if(!WorkingFolder.Exists)
                 WorkingFolder.Create();
 
-            RarFileSizeMap = LoadRarFileSizeMap(ConfigurationManager.AppSettings["RarFileSizeMap"]);
+            RecommendationMap = LoadReccomendationMap(ConfigurationManager.AppSettings["OptimalSizeRarAndPar"]);
             RarToolLocation = ConfigurationManager.AppSettings["RarToolLocation"];
+            ParToolLocation = ConfigurationManager.AppSettings["ParToolLocation"];
         }
 
-        private List<RarSizeReccomendation> LoadRarFileSizeMap(String configValue)
+        private List<RarAndRecoveryRecommendation> LoadReccomendationMap(String configValue)
         {
             return configValue.Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries)
                 .Select(sizeMapping => sizeMapping.Split(new char[] {'|'}, StringSplitOptions.RemoveEmptyEntries))
-                .Select(configEntry => new RarSizeReccomendation
+                .Select(configEntry => new RarAndRecoveryRecommendation
             {
                 FromFileSize = Int32.Parse(configEntry[0]) * 1024 * 1024, 
-                ReccomendedRarSize = DetermineOpticalRarSize(Int32.Parse(configEntry[1]))
+                ReccomendedRarSize = DetermineOpticalRarSize(Int32.Parse(configEntry[1])),
+                ReccomendedRecoveryPercentage = Int32.Parse(configEntry[2])
             }).ToList();
         }
 

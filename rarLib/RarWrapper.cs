@@ -26,7 +26,6 @@ namespace rarLib
 
         public RarWrapper()
         {
-
         }
 
         public RarWrapper(String rarToolLocation)
