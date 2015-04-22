@@ -19,7 +19,8 @@ namespace rarLib
             {
                 if (String.IsNullOrWhiteSpace(value))
                     _rarToolLocation = "rar";   //Assume rar is accessible via the PATH environment variable.
-                _rarToolLocation = value; 
+                else
+                    _rarToolLocation = value; 
             }
         }
 
