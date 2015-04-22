@@ -54,6 +54,11 @@ namespace nntpPoster
             //    Console.WriteLine(client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), body));
             //}
 
+#if DEBUG       //VS does not halt after execution in debug mode.
+            Console.WriteLine("Finished");
+            Console.ReadKey();
+#endif
+
             return 0;
         }
     }
