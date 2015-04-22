@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NntpClientLib", "NntpClient
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yEncLib", "yEncLib\yEncLib.csproj", "{F2A8ED8B-794C-4501-B128-D3C30E953EC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rarLib", "rarLib\rarLib.csproj", "{4D750F87-F6EB-4E0F-A9DB-895FDE20362D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rarTester", "rarTester\rarTester.csproj", "{0D5C7128-F9D9-4505-B0DE-64980BE03591}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{F2A8ED8B-794C-4501-B128-D3C30E953EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2A8ED8B-794C-4501-B128-D3C30E953EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2A8ED8B-794C-4501-B128-D3C30E953EC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D750F87-F6EB-4E0F-A9DB-895FDE20362D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D750F87-F6EB-4E0F-A9DB-895FDE20362D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D750F87-F6EB-4E0F-A9DB-895FDE20362D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D750F87-F6EB-4E0F-A9DB-895FDE20362D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D5C7128-F9D9-4505-B0DE-64980BE03591}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D5C7128-F9D9-4505-B0DE-64980BE03591}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D5C7128-F9D9-4505-B0DE-64980BE03591}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D5C7128-F9D9-4505-B0DE-64980BE03591}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

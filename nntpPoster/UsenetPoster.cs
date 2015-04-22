@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using rarLib;
 
 namespace nntpPoster
 {
@@ -37,7 +38,32 @@ namespace nntpPoster
 
         private List<FileToPost> PrepareFileToPost(UsenetPosterConfig configuration, FileInfo file)
         {
-            throw new NotImplementedException();
+            DirectoryInfo fileWorkingfolder = new DirectoryInfo(
+                Path.Combine(configuration.WorkingFolder.FullName, file.NameWithoutExtension()));
+            if (!fileWorkingfolder.Exists)
+                fileWorkingfolder.Create();
+            
+            //TODO: if we obscufate it will be at this point
+            file.CopyTo(Path.Combine(fileWorkingfolder.FullName, file.Name)); //Copy the file into a folder with the filename.
+            DirectoryInfo compressedFiles = MakeRarFiles(fileWorkingfolder, file.NameWithoutExtension());
+            return compressedFiles.GetFiles().Select(f => new FileToPost(configuration, f)).ToList();
+        }
+
+        private DirectoryInfo MakeRarFiles(DirectoryInfo workingFolder, String fileNameWithoutExtension)
+        {
+            Int64 directorySize = workingFolder.Size();
+            var rarSizeRecommendation = configuration.RarFileSizeMap
+                .Where(rr => rr.FromFileSize < directorySize)
+                .OrderByDescending(rr => rr.FromFileSize)
+                .First();
+            DirectoryInfo targetDirectory = new DirectoryInfo(Path.Combine(
+                workingFolder.Parent.FullName, fileNameWithoutExtension + "_proc"));
+            targetDirectory.Create();
+            var rarWrapper = new RarWrapper(configuration.RarToolLocation);
+            rarWrapper.CompressDirectory(
+                workingFolder, targetDirectory, fileNameWithoutExtension, rarSizeRecommendation.ReccomendedRarSize);
+
+            return targetDirectory;
         }
 
         private XDocument GenerateNzbFromPostInfo(String title, List<PostedFileInfo> postedFiles)
