@@ -29,7 +29,7 @@ namespace nntpPoster
         {
             Int32 extensionPosition = f.Name.LastIndexOf(f.Extension);
             if (extensionPosition > 0)
-                return f.Name.Substring(0, extensionPosition - 1);
+                return f.Name.Substring(0, extensionPosition);
             return f.Name;
         }
     }
