@@ -29,6 +29,8 @@ namespace nntpPoster
         public String RarToolLocation { get; set; }
         public String ParToolLocation { get; set; }
 
+        public Boolean UseHashing { get; set; }
+
         public Int32 YEncPartSize 
         { 
             get
@@ -60,6 +62,8 @@ namespace nntpPoster
             RecommendationMap = LoadReccomendationMap(ConfigurationManager.AppSettings["OptimalSizeRarAndPar"]);
             RarToolLocation = ConfigurationManager.AppSettings["RarToolLocation"];
             ParToolLocation = ConfigurationManager.AppSettings["ParToolLocation"];
+
+            UseHashing = Boolean.Parse(ConfigurationManager.AppSettings["UseHashing"]);
         }
 
         private List<RarAndRecoveryRecommendation> LoadReccomendationMap(String configValue)
