@@ -150,7 +150,6 @@ namespace NntpClientLib
         {
             get { return m_nntpStream; }
             set {
-                Console.WriteLine("nntpReaderWriter set to {0}", value);
                 m_nntpStream = value; 
             }
         }
@@ -868,7 +867,7 @@ namespace NntpClientLib
                 NntpReaderWriter.WriteLine(s);
             }
             NntpReaderWriter.WriteLine(".");
-            Console.WriteLine(NntpReaderWriter.ReadResponse());
+            NntpReaderWriter.ReadResponse();    //TODO: better response handling in general.
             if (NntpReaderWriter.LastResponseCode != Rfc977ResponseCodes.ArticlePostedOk)
             {
                 throw new NntpResponseException(Resource.ErrorMessage07, NntpReaderWriter.LastResponse);
@@ -963,7 +962,7 @@ namespace NntpClientLib
             }
 
             NntpReaderWriter.WriteLine(".");
-            Console.WriteLine(NntpReaderWriter.ReadResponse());
+            NntpReaderWriter.ReadResponse();
             if (NntpReaderWriter.LastResponseCode != Rfc977ResponseCodes.ArticlePostedOk)
             {
                 throw new NntpResponseException(Resource.ErrorMessage07, NntpReaderWriter.LastResponse);

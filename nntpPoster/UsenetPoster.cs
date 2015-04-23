@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using nntpPoster.yEncLib;
 using par2Lib;
 using rarLib;
 
@@ -12,17 +13,33 @@ namespace nntpPoster
 {
     public class UsenetPoster
     {
+        public event EventHandler<UploadSpeedReport> newUploadSpeedReport;
+
         private UsenetPosterConfig configuration;
         public UsenetPoster(UsenetPosterConfig configuration)
         {
             this.configuration = configuration;
         }
 
+        
+        private Int32 TotalPartCount { get; set; }
+        private Object UploadLock = new Object();
+        private Int32 UploadedPartCount { get; set; }
+        private Int64 TotalUploadedBytes { get; set; }
+        private DateTime UploadStartTime { get; set; }
+
         public void PostFileToUsenet(FileInfo file)
         {
             nntpMessagePoster poster = new nntpMessagePoster(configuration);
+            poster.FilePartPosted += poster_FilePartPosted;
             List<FileToPost> filesToPost = PrepareFileToPost(configuration, file);
+
+            
             List<PostedFileInfo> postedFiles = new List<PostedFileInfo>();
+            TotalPartCount = filesToPost.Sum(f => f.TotalParts);
+            UploadedPartCount = 0;
+            TotalUploadedBytes = 0;
+            UploadStartTime = DateTime.Now;
 
             Int32 fileCount = 1;
             foreach (var fileToPost in filesToPost)
@@ -35,6 +52,34 @@ namespace nntpPoster
             poster.WaitTillCompletion();
             XDocument nzbDoc = GenerateNzbFromPostInfo(file.Name, postedFiles);
             nzbDoc.Save(file.Name + ".nzb");
+        }
+
+        void poster_FilePartPosted(object sender, YEncFilePart e)
+        {
+            Int32 _uploadedPartCount;
+            Int64 _totalUploadedBytes;
+            lock (UploadLock)
+            {
+                UploadedPartCount++;
+                _uploadedPartCount = UploadedPartCount;
+                TotalUploadedBytes += e.Size;
+                _totalUploadedBytes = TotalUploadedBytes;
+            }
+
+            TimeSpan timeElapsed = DateTime.Now - UploadStartTime;
+            Double speed = (Double) _totalUploadedBytes/timeElapsed.TotalSeconds;
+
+            OnNewUploadSpeedReport(new UploadSpeedReport{
+                    TotalParts = TotalPartCount,
+                    UploadedParts = _uploadedPartCount,
+                    BytesPerSecond = speed
+                });
+        }
+
+        protected virtual void OnNewUploadSpeedReport(UploadSpeedReport e)
+        {
+            EventHandler<UploadSpeedReport> handler = newUploadSpeedReport;
+            if (handler != null) handler(this, e);
         }
 
         private List<FileToPost> PrepareFileToPost(UsenetPosterConfig configuration, FileInfo file)

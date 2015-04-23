@@ -48,6 +48,7 @@
     <Compile Include="nntpMessagePoster.cs" />
     <Compile Include="PostedFileInfo.cs" />
     <Compile Include="RarAndRecoveryRecommendation.cs" />
+    <Compile Include="UploadSpeedReport.cs" />
     <Compile Include="UsenetPosterConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
