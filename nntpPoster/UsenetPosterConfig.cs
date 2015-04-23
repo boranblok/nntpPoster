@@ -11,12 +11,13 @@ namespace nntpPoster
     //TODO: this entire thing could be more context dependent instead of from appconfig.
     public class UsenetPosterConfig
     {
+        public String PostTag { get; set; }
         public String FromAddress { get; set; }
         public String NewsGroupAddress { get; set; }
         public String NewsGroupUsername { get; set; }
         public String NewsGroupPassword { get; set; }
         public Boolean NewsGroupUseSsl { get; set; }
-        public String[] TargetNewsgroups { get; set; } //TODO: make multiple value
+        public String[] TargetNewsgroups { get; set; }
 
         public Int32 MaxConnectionCount { get; set; }
 
@@ -24,12 +25,14 @@ namespace nntpPoster
         public Int32 YEncLinesPerMessage { get; set; }
 
         public DirectoryInfo WorkingFolder { get; set; }
+        public DirectoryInfo NzbOutputFolder { get; set; }
 
         public List<RarAndRecoveryRecommendation> RecommendationMap { get; set; }
         public String RarToolLocation { get; set; }
         public String ParToolLocation { get; set; }
 
         public Boolean UseHashing { get; set; }
+        public String HashedReleaseNotificationUrl { get; set; }
 
         public Int32 YEncPartSize 
         { 
@@ -41,13 +44,15 @@ namespace nntpPoster
 
         public UsenetPosterConfig()
         {
+            PostTag = ConfigurationManager.AppSettings["PostTag"];
+
             FromAddress = ConfigurationManager.AppSettings["FromAddress"];
 
             NewsGroupAddress = ConfigurationManager.AppSettings["NewsGroupAddress"];
             NewsGroupUsername = ConfigurationManager.AppSettings["NewsGroupUsername"];
             NewsGroupPassword = ConfigurationManager.AppSettings["NewsGroupPassword"];
             NewsGroupUseSsl = Boolean.Parse(ConfigurationManager.AppSettings["NewsGroupUseSsl"]);
-            TargetNewsgroups = ConfigurationManager.AppSettings["TargetNewsgroup"]
+            TargetNewsgroups = ConfigurationManager.AppSettings["TargetNewsgroups"]
                 .Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
 
             MaxConnectionCount = Int32.Parse(ConfigurationManager.AppSettings["MaxConnectionCount"]);
@@ -59,11 +64,13 @@ namespace nntpPoster
             if(!WorkingFolder.Exists)
                 WorkingFolder.Create();
 
+            NzbOutputFolder = new DirectoryInfo(ConfigurationManager.AppSettings["NzbOutputFolder"]);
+            if (!NzbOutputFolder.Exists)
+                NzbOutputFolder.Create();
+
             RecommendationMap = LoadReccomendationMap(ConfigurationManager.AppSettings["OptimalSizeRarAndPar"]);
             RarToolLocation = ConfigurationManager.AppSettings["RarToolLocation"];
             ParToolLocation = ConfigurationManager.AppSettings["ParToolLocation"];
-
-            UseHashing = Boolean.Parse(ConfigurationManager.AppSettings["UseHashing"]);
         }
 
         private List<RarAndRecoveryRecommendation> LoadReccomendationMap(String configValue)

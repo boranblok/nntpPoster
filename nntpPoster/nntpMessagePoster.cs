@@ -41,7 +41,7 @@ namespace nntpPoster
                     }
                 }
                 if(waitForFreeThread)
-                    Thread.Sleep(2000);     //TODO: optimize sleep value here.
+                    Thread.Sleep(10);     //TODO: optimize sleep value here.
             }
         }
 
@@ -67,8 +67,6 @@ namespace nntpPoster
                 {
                     client.Connect(configuration.NewsGroupAddress, configuration.NewsGroupUseSsl);
                     client.AuthenticateUser(configuration.NewsGroupUsername, configuration.NewsGroupPassword);
-
-                    client.SelectNewsgroup(postInfo.PostedGroups[0]);  //TODO: verify if required.
 
                     ArticleHeadersDictionary headers = new ArticleHeadersDictionary();
                     headers.AddHeader("From", configuration.FromAddress);

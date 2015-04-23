@@ -28,30 +28,44 @@ namespace nntpPoster
         private Int64 TotalUploadedBytes { get; set; }
         private DateTime UploadStartTime { get; set; }
 
-        public void PostFileToUsenet(FileInfo file)
+        public XDocument PostFileToUsenet(FileInfo file)
         {
             nntpMessagePoster poster = new nntpMessagePoster(configuration);
             poster.FilePartPosted += poster_FilePartPosted;
-            List<FileToPost> filesToPost = PrepareFileToPost(configuration, file);
-
-            
-            List<PostedFileInfo> postedFiles = new List<PostedFileInfo>();
-            TotalPartCount = filesToPost.Sum(f => f.TotalParts);
-            UploadedPartCount = 0;
-            TotalUploadedBytes = 0;
-            UploadStartTime = DateTime.Now;
-
-            Int32 fileCount = 1;
-            foreach (var fileToPost in filesToPost)
+            DirectoryInfo processedFiles = PrepareFileToPost(file);
+            try
             {
-                String comment1 = String.Format("{0}/{1}", fileCount++, filesToPost.Count);
-                PostedFileInfo postInfo = fileToPost.PostYEncFile(poster, comment1, "");
-                postedFiles.Add(postInfo);
+                List<FileToPost> filesToPost = processedFiles.GetFiles()
+                    .Select(f => new FileToPost(configuration, f)).ToList();
+
+                List < PostedFileInfo > postedFiles = new List<PostedFileInfo>();
+                TotalPartCount = filesToPost.Sum(f => f.TotalParts);
+                UploadedPartCount = 0;
+                TotalUploadedBytes = 0;
+                UploadStartTime = DateTime.Now;
+
+                Int32 fileCount = 1;
+                foreach (var fileToPost in filesToPost)
+                {
+                    String comment1 = String.Format("{0}/{1}", fileCount++, filesToPost.Count);
+                    PostedFileInfo postInfo = fileToPost.PostYEncFile(poster, comment1, "");
+                    postedFiles.Add(postInfo);
+                }
+
+                poster.WaitTillCompletion();
+
+                XDocument nzbDoc = GenerateNzbFromPostInfo(file.Name, postedFiles);
+                nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder.FullName, file.NameWithoutExtension() + ".nzb"));
+                return nzbDoc;
             }
-            
-            poster.WaitTillCompletion();
-            XDocument nzbDoc = GenerateNzbFromPostInfo(file.Name, postedFiles);
-            nzbDoc.Save(file.Name + ".nzb");
+            finally
+            {
+                if (processedFiles.Exists)
+                {
+                    Console.WriteLine("Deleting processed folder");
+                    processedFiles.Delete(true);
+                }
+            }
         }
 
         void poster_FilePartPosted(object sender, YEncFilePart e)
@@ -82,17 +96,36 @@ namespace nntpPoster
             if (handler != null) handler(this, e);
         }
 
-        private List<FileToPost> PrepareFileToPost(UsenetPosterConfig configuration, FileInfo file)
+        private DirectoryInfo PrepareFileToPost(FileInfo file)
         {
-            DirectoryInfo fileWorkingfolder = new DirectoryInfo(
+            DirectoryInfo fileWorkingFolder = new DirectoryInfo(
                 Path.Combine(configuration.WorkingFolder.FullName, file.NameWithoutExtension()));
-            if (!fileWorkingfolder.Exists)
-                fileWorkingfolder.Create();
-            
-            //TODO: if we obscufate it will be at this point
-            file.CopyTo(Path.Combine(fileWorkingfolder.FullName, file.Name)); //Copy the file into a folder with the filename.
-            DirectoryInfo compressedFiles = MakeRarAndParFiles(fileWorkingfolder, file.NameWithoutExtension());
-            return compressedFiles.GetFiles().Select(f => new FileToPost(configuration, f)).ToList();
+            DirectoryInfo processedFolder = null;
+            try
+            {
+                fileWorkingFolder.Create();
+
+                file.CopyTo(Path.Combine(fileWorkingFolder.FullName, file.Name)); //Copy the file into a folder with the filename.
+                processedFolder = MakeRarAndParFiles(fileWorkingFolder, file.NameWithoutExtension());
+                return processedFolder;
+            }
+            catch(Exception)
+            {
+                if (processedFolder != null && processedFolder.Exists)
+                {
+                    Console.WriteLine("Error occurred deleting processed folder");
+                    processedFolder.Delete(true);
+                }
+                throw;
+            }
+            finally
+            {
+                if (fileWorkingFolder.Exists)
+                {
+                    Console.WriteLine("Deleting working folder");
+                    fileWorkingFolder.Delete(true);
+                }
+            }
         }
 
         private DirectoryInfo MakeRarAndParFiles(DirectoryInfo workingFolder, String fileNameWithoutExtension)
