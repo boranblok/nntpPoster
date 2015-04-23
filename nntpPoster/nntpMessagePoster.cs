@@ -91,7 +91,7 @@ namespace nntpPoster
                 }
                 OnFilePartPosted(yEncPart);
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 throw;
             }

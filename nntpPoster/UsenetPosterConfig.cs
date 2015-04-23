@@ -25,7 +25,7 @@ namespace nntpPoster
         public Int32 YEncLinesPerMessage { get; set; }
 
         public DirectoryInfo WorkingFolder { get; set; }
-        public DirectoryInfo NzbOutputFolder { get; set; }
+        public String NzbOutputFolder { get; set; }
 
         public List<RarAndRecoveryRecommendation> RecommendationMap { get; set; }
         public String RarToolLocation { get; set; }
@@ -64,9 +64,14 @@ namespace nntpPoster
             if(!WorkingFolder.Exists)
                 WorkingFolder.Create();
 
-            NzbOutputFolder = new DirectoryInfo(ConfigurationManager.AppSettings["NzbOutputFolder"]);
-            if (!NzbOutputFolder.Exists)
-                NzbOutputFolder.Create();
+            NzbOutputFolder = ConfigurationManager.AppSettings["NzbOutputFolder"];
+            if(!String.IsNullOrWhiteSpace(NzbOutputFolder))
+            {
+                DirectoryInfo nzbFolder = new DirectoryInfo(NzbOutputFolder);
+                if (!nzbFolder.Exists)
+                    nzbFolder.Create();
+            }
+
 
             RecommendationMap = LoadReccomendationMap(ConfigurationManager.AppSettings["OptimalSizeRarAndPar"]);
             RarToolLocation = ConfigurationManager.AppSettings["RarToolLocation"];

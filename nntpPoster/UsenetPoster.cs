@@ -55,7 +55,8 @@ namespace nntpPoster
                 poster.WaitTillCompletion();
 
                 XDocument nzbDoc = GenerateNzbFromPostInfo(file.Name, postedFiles);
-                nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder.FullName, file.NameWithoutExtension() + ".nzb"));
+                if (!String.IsNullOrWhiteSpace(configuration.NzbOutputFolder))
+                    nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder, file.NameWithoutExtension() + ".nzb"));
                 return nzbDoc;
             }
             finally
