@@ -124,7 +124,7 @@ namespace nntpPoster
                 .OrderByDescending(rr => rr.FromFileSize)
                 .First();
             DirectoryInfo targetDirectory = new DirectoryInfo(Path.Combine(
-                configuration.WorkingFolder.FullName, nameWithoutExtension));
+                configuration.WorkingFolder.FullName, nameWithoutExtension + "_readyToPost"));
             targetDirectory.Create();
             var rarWrapper = new RarWrapper(configuration.RarToolLocation);
             rarWrapper.Compress(
