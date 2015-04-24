@@ -30,7 +30,7 @@ namespace nntpPoster
             UsenetPosterConfig config = new UsenetPosterConfig();
             UsenetPoster poster = new UsenetPoster(config);
             poster.newUploadSpeedReport += poster_newUploadSpeedReport;
-            poster.PostFileToUsenet(file);
+            poster.PostToUsenet(file);
 
             //using (Rfc977NntpClientWithExtensions client = new Rfc977NntpClientWithExtensions())
             //{

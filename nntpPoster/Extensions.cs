@@ -9,6 +9,15 @@ namespace nntpPoster
 {
     public static class Extensions
     {
+        public static Int64 Size(this FileSystemInfo fsi)
+        {
+            FileAttributes attributes = File.GetAttributes(fsi.FullName);
+            if (attributes.HasFlag(FileAttributes.Directory))
+                return new DirectoryInfo(fsi.FullName).Size();
+            else
+                return new FileInfo(fsi.FullName).Length;
+        }
+
         public static Int64 Size(this DirectoryInfo d)
         {
             Int64 Size = 0;   
@@ -23,6 +32,15 @@ namespace nntpPoster
             }
 
             return(Size);  
+        }
+
+        public static String NameWithoutExtension(this FileSystemInfo fsi)
+        {
+            FileAttributes attributes = File.GetAttributes(fsi.FullName);
+            if (attributes.HasFlag(FileAttributes.Directory))
+                return new DirectoryInfo(fsi.FullName).Name;
+            else
+                return new FileInfo(fsi.FullName).NameWithoutExtension();
         }
 
         public static String NameWithoutExtension(this FileInfo f)

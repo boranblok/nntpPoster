@@ -28,11 +28,11 @@ namespace nntpPoster
         private Int64 TotalUploadedBytes { get; set; }
         private DateTime UploadStartTime { get; set; }
 
-        public XDocument PostFileToUsenet(FileInfo file)
+        public XDocument PostToUsenet(FileSystemInfo toPost)
         {
             nntpMessagePoster poster = new nntpMessagePoster(configuration);
-            poster.FilePartPosted += poster_FilePartPosted;
-            DirectoryInfo processedFiles = PrepareFileToPost(file);
+            poster.PartPosted += poster_PartPosted;
+            DirectoryInfo processedFiles = PrepareToPost(toPost);
             try
             {
                 List<FileToPost> filesToPost = processedFiles.GetFiles()
@@ -54,9 +54,9 @@ namespace nntpPoster
 
                 poster.WaitTillCompletion();
 
-                XDocument nzbDoc = GenerateNzbFromPostInfo(file.Name, postedFiles);
+                XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles);
                 if (!String.IsNullOrWhiteSpace(configuration.NzbOutputFolder))
-                    nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder, file.NameWithoutExtension() + ".nzb"));
+                    nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder, toPost.NameWithoutExtension() + ".nzb"));
                 return nzbDoc;
             }
             finally
@@ -69,7 +69,7 @@ namespace nntpPoster
             }
         }
 
-        void poster_FilePartPosted(object sender, YEncFilePart e)
+        void poster_PartPosted(object sender, YEncFilePart e)
         {
             Int32 _uploadedPartCount;
             Int64 _totalUploadedBytes;
@@ -97,51 +97,38 @@ namespace nntpPoster
             if (handler != null) handler(this, e);
         }
 
-        private DirectoryInfo PrepareFileToPost(FileInfo file)
+        private DirectoryInfo PrepareToPost(FileSystemInfo toPost)
         {
-            DirectoryInfo fileWorkingFolder = new DirectoryInfo(
-                Path.Combine(configuration.WorkingFolder.FullName, file.NameWithoutExtension()));
             DirectoryInfo processedFolder = null;
             try
             {
-                fileWorkingFolder.Create();
-
-                file.CopyTo(Path.Combine(fileWorkingFolder.FullName, file.Name)); //Copy the file into a folder with the filename.
-                processedFolder = MakeRarAndParFiles(fileWorkingFolder, file.NameWithoutExtension());
+                processedFolder = MakeRarAndParFiles(toPost, toPost.NameWithoutExtension());
                 return processedFolder;
             }
             catch(Exception)
             {
                 if (processedFolder != null && processedFolder.Exists)
                 {
-                    Console.WriteLine("Error occurred deleting processed folder");
+                    Console.WriteLine("Error occurred, deleting processed folder");
                     processedFolder.Delete(true);
                 }
                 throw;
             }
-            finally
-            {
-                if (fileWorkingFolder.Exists)
-                {
-                    Console.WriteLine("Deleting working folder");
-                    fileWorkingFolder.Delete(true);
-                }
-            }
         }
 
-        private DirectoryInfo MakeRarAndParFiles(DirectoryInfo workingFolder, String fileNameWithoutExtension)
+        private DirectoryInfo MakeRarAndParFiles(FileSystemInfo toPost, String nameWithoutExtension)
         {
-            Int64 directorySize = workingFolder.Size();
+            Int64 size = toPost.Size();
             var rarSizeRecommendation = configuration.RecommendationMap
-                .Where(rr => rr.FromFileSize < directorySize)
+                .Where(rr => rr.FromFileSize < size)
                 .OrderByDescending(rr => rr.FromFileSize)
                 .First();
             DirectoryInfo targetDirectory = new DirectoryInfo(Path.Combine(
-                workingFolder.Parent.FullName, fileNameWithoutExtension + "_proc"));
+                configuration.WorkingFolder.FullName, nameWithoutExtension));
             targetDirectory.Create();
             var rarWrapper = new RarWrapper(configuration.RarToolLocation);
-            rarWrapper.CompressDirectory(
-                workingFolder, targetDirectory, fileNameWithoutExtension, rarSizeRecommendation.ReccomendedRarSize);
+            rarWrapper.Compress(
+                toPost, targetDirectory, nameWithoutExtension, rarSizeRecommendation.ReccomendedRarSize);
 
             var parWrapper = new ParWrapper(configuration.ParToolLocation);
             parWrapper.CreateParFilesInDirectory(

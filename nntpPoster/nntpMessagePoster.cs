@@ -17,11 +17,11 @@ namespace nntpPoster
             this.configuration = configuration;
         }
         private List<Task> RunningTasks = new List<Task>();
-        public event EventHandler<YEncFilePart> FilePartPosted;
+        public event EventHandler<YEncFilePart> PartPosted;
 
         protected virtual void OnFilePartPosted(YEncFilePart e)
         {
-            if (FilePartPosted != null) FilePartPosted(this, e);
+            if (PartPosted != null) PartPosted(this, e);
         }
 
         public void PostMessage(String subject, List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
