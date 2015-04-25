@@ -11,7 +11,6 @@ namespace nntpPoster
     //TODO: this entire thing could be more context dependent instead of from appconfig.
     public class UsenetPosterConfig
     {
-        public String PostTag { get; set; }
         public String FromAddress { get; set; }
         public String NewsGroupAddress { get; set; }
         public String NewsGroupUsername { get; set; }
@@ -30,9 +29,6 @@ namespace nntpPoster
         public List<RarAndRecoveryRecommendation> RecommendationMap { get; set; }
         public String RarToolLocation { get; set; }
         public String ParToolLocation { get; set; }
-
-        public Boolean UseHashing { get; set; }
-        public String HashedReleaseNotificationUrl { get; set; }
 
         public Int32 YEncPartSize 
         { 
