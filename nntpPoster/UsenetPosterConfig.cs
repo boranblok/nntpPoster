@@ -40,8 +40,6 @@ namespace nntpPoster
 
         public UsenetPosterConfig()
         {
-            PostTag = ConfigurationManager.AppSettings["PostTag"];
-
             FromAddress = ConfigurationManager.AppSettings["FromAddress"];
 
             NewsGroupAddress = ConfigurationManager.AppSettings["NewsGroupAddress"];
