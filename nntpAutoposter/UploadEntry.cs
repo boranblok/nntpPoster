@@ -13,6 +13,7 @@ namespace nntpAutoposter
         public String CleanedName { get; set; }
         public String HashedName { get; set; }
         public Boolean RemoveAfterVerify { get; set; }
+        public DateTime CreatedAt { get; set; }
         public Nullable<DateTime> UploadedAt { get; set; }
         public Nullable<DateTime> SentToIndexAt { get; set; }
         public Nullable<DateTime> SeenOnIndexAt { get; set; }

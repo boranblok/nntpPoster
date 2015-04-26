@@ -55,6 +55,7 @@ namespace nntpAutoposter
                                             CleanedName TEXT, 
                                             HashedName TEXT, 
                                             RemoveAfterVerify INTEGER,
+                                            CreatedAt TEXT,
                                             UploadedAt TEXT,
                                             SentToIndexerAt TEXT,
                                             SeenOnIndexerAt TEXT,
@@ -94,6 +95,93 @@ namespace nntpAutoposter
             }
         }
 
+        public UploadEntry AddNewUploadEntry(UploadEntry newUploadEntry)
+        {
+            using (SqliteConnection conn = GetConnection())
+            {
+                conn.Open();
+                using (SqliteTransaction trans = conn.BeginTransaction())
+                {
+                    using (SqliteCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.Transaction = trans;
+                        cmd.CommandText = @"UPDATE UploadEntries SET Cancelled = 1 WHERE Name = @name";
+                        cmd.Parameters.Add(new SqliteParameter("@name", newUploadeEntry.Name));
+                        cmd.ExecuteNonQuery(); //TODO: log here how many other entries were cancelled.
+
+                        cmd.CommandText = @"INSERT INTO UploadEntries(
+                                                            Name, 
+                                                            CleanedName,
+                                                            HashedName,
+                                                            RemoveAfterVerify, 
+                                                            CreatedAt,
+                                                            UploadedAt,
+                                                            SentToIndexerAt,
+                                                            SeenOnIndexerAt
+                                                            Cancelled)
+                                                    VALUES(
+                                                            @name,
+                                                            @cleanedName,
+                                                            @hashedName,
+                                                            @removeAfterVerify,
+                                                            @createdAt, 
+                                                            @uploadedAt,
+                                                            @sentToIndexerAt
+                                                            @seenOnIndexerAt
+                                                            @cancelled)";
+                        cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
+                        cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
+                        cmd.Parameters.Add(new SqliteParameter("@hashedName", uploadEntry.HashedName));
+                        cmd.Parameters.Add(new SqliteParameter("@removeAfterVerify", uploadEntry.RemoveAfterVerify));
+                        cmd.Parameters.Add(new SqliteParameter("@createdAt", GetDbValue(newUploadeEntry.CreatedAt)));
+                        cmd.Parameters.Add(new SqliteParameter("@uploadedAt", GetDbValue(uploadEntry.UploadedAt)));
+                        cmd.Parameters.Add(new SqliteParameter("@sentToIndexerAt", GetDbValue(uploadEntry.SentToIndexAt)));
+                        cmd.Parameters.Add(new SqliteParameter("@seenOnIndexerAt", GetDbValue(uploadEntry.SeenOnIndexAt)));
+                        cmd.Parameters.Add(new SqliteParameter("@cancelled", GetDbValue(uploadEntry.Cancelled)));
+                        cmd.ExecuteNonQuery();
+
+                        cmd.CommandText = "select last_insert_rowid()";
+                        cmd.Parameters.Clear();
+                        newUploadeEntry.ID = (Int64)cmd.ExecuteScalar();                        
+                    }
+                    trans.Commit();
+                }
+            }
+
+            return newUploadeEntry;
+        }
+
+        public void UpdateUploadEntry(UploadEntry uploadEntry)
+        {
+            using (SqliteConnection conn = GetConnection())
+            {
+                conn.Open();
+                using (SqliteCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE UploadEntries SET 
+                                            Name = @name,
+                                            CleanedName = @cleanedName,
+                                            HashedName = @hashedName,
+                                            RemoveAfterVerify = @removeAfterVerify,
+                                            UploadedAt = @uploadedAt,
+                                            SentToIndexerAt = @sentToIndexerAt,
+                                            SeenOnIndexerAt = @seenOnIndexerAt,
+                                            Cancelled = @cancelled
+                                        WHERE ROWID = @rowId";
+                    cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
+                    cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
+                    cmd.Parameters.Add(new SqliteParameter("@hashedName", uploadEntry.HashedName));                    
+                    cmd.Parameters.Add(new SqliteParameter("@removeAfterVerify", uploadEntry.RemoveAfterVerify));
+                    cmd.Parameters.Add(new SqliteParameter("@uploadedAt", GetDbValue(uploadEntry.UploadedAt)));
+                    cmd.Parameters.Add(new SqliteParameter("@sentToIndexerAt", GetDbValue(uploadEntry.SentToIndexAt)));
+                    cmd.Parameters.Add(new SqliteParameter("@seenOnIndexerAt", GetDbValue(uploadEntry.SeenOnIndexAt)));
+                    cmd.Parameters.Add(new SqliteParameter("@cancelled", GetDbValue(uploadEntry.Cancelled)));
+                    
+                    cmd.ExecuteNonQuery();                   
+                }
+            }
+        }
+
         private static UploadEntry GetUploadEntryFromReader(SqliteDataReader reader)
         {
             UploadEntry uploadEntry = new UploadEntry();
@@ -103,12 +191,25 @@ namespace nntpAutoposter
             uploadEntry.CleanedName = reader["CleanedName"] as String;
             uploadEntry.HashedName = reader["HashedName"] as String;
             uploadEntry.RemoveAfterVerify = GetBoolean(reader["RemoveAfterVerify"]);
-            uploadEntry.UploadedAt = GetDateTime(reader["UploadedAt"]);
-            uploadEntry.SentToIndexAt = GetDateTime(reader["SentToIndexAt"]);
-            uploadEntry.SeenOnIndexAt = GetDateTime(reader["SeenOnIndexAt"]);
+            uploadEntry.CreatedAt = GetDateTime(reader["CreatedAt"]);
+            uploadEntry.UploadedAt = GetNullableDateTime(reader["UploadedAt"]);
+            uploadEntry.SentToIndexAt = GetNullableDateTime(reader["SentToIndexAt"]);
+            uploadEntry.SeenOnIndexAt = GetNullableDateTime(reader["SeenOnIndexAt"]);
             uploadEntry.Cancelled = GetBoolean(reader["Cancelled"]);
 
             return uploadEntry;
+        }
+
+        private static Object GetDbValue(Boolean boolean)
+        {
+            return boolean ? 1 : 0;
+        }
+
+        private static Object GetDbValue(Nullable<DateTime> dateTime)
+        {
+            if (!dateTime.HasValue)
+                return DBNull.Value;
+            return dateTime.Value.ToString("o");
         }
 
         private static Boolean GetBoolean(Object dbValue)
@@ -117,7 +218,13 @@ namespace nntpAutoposter
             return boolValue == 1;
         }
 
-        private static Nullable<DateTime> GetDateTime(Object dbValue)
+        private static DateTime GetDateTime(Object dbValue)
+        {
+            String dateTimeStr = dbValue as String;
+            return DateTime.Parse(dateTimeStr, null, DateTimeStyles.RoundtripKind);
+        }
+
+        private static Nullable<DateTime> GetNullableDateTime(Object dbValue)
         {
             String dateTimeStr = dbValue as String;
             DateTime result;
