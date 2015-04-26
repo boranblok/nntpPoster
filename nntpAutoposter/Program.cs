@@ -13,15 +13,9 @@ namespace nntpAutoposter
     class Program
     {
         static AutoPosterConfig autoPosterconfig;
-        static UsenetPosterConfig posterConfig;
-        static UsenetPoster poster;
         static void Main(string[] args)
         {
             autoPosterconfig = new AutoPosterConfig();
-            posterConfig = new UsenetPosterConfig();
-            
-            poster = new UsenetPoster(posterConfig);
-            poster.newUploadSpeedReport += poster_newUploadSpeedReport;
 
             foreach (FileSystemInfo toPost in autoPosterconfig.WatchFolder.EnumerateFileSystemInfos())
             {
@@ -33,14 +27,17 @@ namespace nntpAutoposter
             watcher.IncludeSubdirectories = false;
             watcher.EnableRaisingEvents = true;
 
-            Console.WriteLine("Monitoring '{0}' for new files or folders to post press any key to stop.",
+            Console.WriteLine("Monitoring '{0}' for new files or folders to post.",
                 autoPosterconfig.WatchFolder.FullName);
-            Console.ReadKey();
-        }
 
-        private static void poster_newUploadSpeedReport(object sender, UploadSpeedReport e)
-        {
-            Console.Write("\r" + e.ToString() + "          ");
+            AutoPoster poster = new AutoPoster(autoPosterconfig);
+            poster.Start();
+            Console.WriteLine("Autoposter started");
+
+            Console.WriteLine("Press any key to stop after the current operations have finished.");
+            Console.ReadKey();
+            poster.Stop();
+            Console.WriteLine("Autoposter stopped");
         }
 
         static void watcher_Error(object sender, ErrorEventArgs e)
@@ -68,7 +65,7 @@ namespace nntpAutoposter
                 backup = MoveFileToBackup(fullPath);
             }
 
-            AutoPostItem(backup);
+            AddItemToPostingDb(backup);
         }
 
         private static FileSystemInfo MoveFolderToBackup(String fullPath)
@@ -116,7 +113,7 @@ namespace nntpAutoposter
                 }
                 catch (IOException ex)
                 {
-                    if (ex.HResult == -2147024891)  //Only handle file locked events.
+                    if (ex.HResult == -2147024864)  //Only handle file locked events.
                         Thread.Sleep(500);  //Sleep for half a second before retry.
                     else
                         throw;
@@ -125,13 +122,14 @@ namespace nntpAutoposter
             return backup;
         }
 
-        private static void AutoPostItem(FileSystemInfo toPost)
+        private static void AddItemToPostingDb(FileSystemInfo toPost)
         {
-            Console.WriteLine("Autoposter is posting '{0}' to usenet", toPost.FullName);
-
-
-
-            poster.PostToUsenet(toPost);
+            UploadEntry newUploadentry = new UploadEntry();
+            newUploadentry.CreatedAt = DateTime.UtcNow;
+            newUploadentry.Name = toPost.Name;
+            newUploadentry.RemoveAfterVerify = autoPosterconfig.RemoveAfterVerify;
+            newUploadentry.Cancelled = false;
+            DBHandler.Instance.AddNewUploadEntry(newUploadentry);
         }
     }
 }

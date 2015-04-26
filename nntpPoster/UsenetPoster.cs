@@ -53,6 +53,7 @@ namespace nntpPoster
                 }
 
                 poster.WaitTillCompletion();
+                Console.WriteLine();
 
                 XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles);
                 if (!String.IsNullOrWhiteSpace(configuration.NzbOutputFolder))
@@ -93,6 +94,8 @@ namespace nntpPoster
 
         protected virtual void OnNewUploadSpeedReport(UploadSpeedReport e)
         {
+            Console.Write("\r" + e.ToString() + "   ");
+
             EventHandler<UploadSpeedReport> handler = newUploadSpeedReport;
             if (handler != null) handler(this, e);
         }
