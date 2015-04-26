@@ -120,6 +120,36 @@ namespace nntpAutoposter
             return uploadEntries;
         }
 
+        public List<UploadEntry> GetUploadEntriesToVerify()
+        {
+            List<UploadEntry> uploadEntries = new List<UploadEntry>();
+            using (SqliteConnection conn = GetConnection())
+            {
+                conn.Open();
+                using (SqliteCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
+                                        WHERE UploadedAt IS NOT NULL
+                                          AND Cancelled = 0
+                                          AND (
+                                            HashedName IS NULL
+                                            OR 
+                                            (HashedName IS NOT NULL AND NotifiedIndexerAt IS NOT NULL)
+                                          )
+                                        ORDER BY CreatedAt ASC";
+                    using (SqliteDataReader reader = cmd.ExecuteReader())
+                    {
+                        UploadEntry uploadEntry = null;
+                        while (reader.Read())
+                        {
+                            uploadEntries.Add(GetUploadEntryFromReader(reader));
+                        }
+                    }
+                }
+            }
+            return uploadEntries;
+        }
+
         public UploadEntry GetActiveUploadEntry(String name)
         {
             using (SqliteConnection conn = GetConnection())
