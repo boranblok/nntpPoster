@@ -18,8 +18,8 @@ namespace nntpAutoposter
         public Boolean RemoveAfterVerify { get; set; }
 
         public Int32 AutoposterIntervalMillis { get; set; }
-        public Int32 NotifierIntervalSeconds { get; set; }
-        public Int32 VerifierIntervalSeconds { get; set; }
+        public Int32 NotifierIntervalMinutes { get; set; }
+        public Int32 VerifierIntervalMinutes { get; set; }
 
         public Boolean UseHashing { get; set; }
         public String HashedNotificationUrl { get; set; }
@@ -38,8 +38,8 @@ namespace nntpAutoposter
             RemoveAfterVerify = Boolean.Parse(ConfigurationManager.AppSettings["RemoveAfterVerify"]);
 
             AutoposterIntervalMillis = Int32.Parse(ConfigurationManager.AppSettings["AutoposterIntervalMillis"]);
-            NotifierIntervalSeconds = Int32.Parse(ConfigurationManager.AppSettings["NotifierIntervalSeconds"]);
-            VerifierIntervalSeconds = Int32.Parse(ConfigurationManager.AppSettings["VerifierIntervalSeconds"]);
+            NotifierIntervalMinutes = Int32.Parse(ConfigurationManager.AppSettings["NotifierIntervalMinutes"]);
+            VerifierIntervalMinutes = Int32.Parse(ConfigurationManager.AppSettings["VerifierIntervalMinutes"]);
 
             UseHashing = Boolean.Parse(ConfigurationManager.AppSettings["UseHashing"]);
             HashedNotificationUrl = ConfigurationManager.AppSettings["HashedNotificationUrl"];

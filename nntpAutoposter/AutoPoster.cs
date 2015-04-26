@@ -49,7 +49,7 @@ namespace nntpAutoposter
 
         private void UploadNextItemInQueue()
         {
-            UploadEntry nextItemInQueue = DBHandler.Instance.GetNextUploadEntryToProcess();
+            UploadEntry nextItemInQueue = DBHandler.Instance.GetNextUploadEntryToUpload();
             if (nextItemInQueue != null)
             {
                 FileSystemInfo toPost;
