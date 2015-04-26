@@ -42,7 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions.cs" />
     <Compile Include="FileToPost.cs" />
     <Compile Include="InntpMessagePoster.cs" />
     <Compile Include="nntpMessagePoster.cs" />
@@ -83,6 +82,10 @@
     <ProjectReference Include="..\rarLib\rarLib.csproj">
       <Project>{4d750f87-f6eb-4e0f-a9db-895fde20362d}</Project>
       <Name>rarLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Util\Util.csproj">
+      <Project>{f9427f11-11d3-4157-8876-c8dd1f62d009}</Project>
+      <Name>Util</Name>
     </ProjectReference>
     <ProjectReference Include="..\yEncLib\yEncLib.csproj">
       <Project>{f2a8ed8b-794c-4501-b128-d3c30e953ec9}</Project>

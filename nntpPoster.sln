@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "par2Lib", "par2Lib\par2Lib.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nntpAutoposter", "nntpAutoposter\nntpAutoposter.csproj", "{DF3F2C45-6232-41FA-A214-6A1EBC3CA2D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Util", "Util\Util.csproj", "{F9427F11-11D3-4157-8876-C8DD1F62D009}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{DF3F2C45-6232-41FA-A214-6A1EBC3CA2D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF3F2C45-6232-41FA-A214-6A1EBC3CA2D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF3F2C45-6232-41FA-A214-6A1EBC3CA2D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9427F11-11D3-4157-8876-C8DD1F62D009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9427F11-11D3-4157-8876-C8DD1F62D009}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9427F11-11D3-4157-8876-C8DD1F62D009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9427F11-11D3-4157-8876-C8DD1F62D009}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

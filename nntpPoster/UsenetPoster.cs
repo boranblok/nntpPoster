@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using nntpPoster.yEncLib;
 using par2Lib;
 using rarLib;
+using Util;
 
 namespace nntpPoster
 {
@@ -20,7 +21,6 @@ namespace nntpPoster
         {
             this.configuration = configuration;
         }
-
         
         private Int32 TotalPartCount { get; set; }
         private Object UploadLock = new Object();
