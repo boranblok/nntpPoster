@@ -23,6 +23,7 @@ namespace nntpAutoposter
 
         public Boolean UseHashing { get; set; }
         public String HashedNotificationUrl { get; set; }
+        public String SearchUrl { get; set; }
 
         public AutoPosterConfig()
         {
@@ -43,6 +44,7 @@ namespace nntpAutoposter
 
             UseHashing = Boolean.Parse(ConfigurationManager.AppSettings["UseHashing"]);
             HashedNotificationUrl = ConfigurationManager.AppSettings["HashedNotificationUrl"];
+            SearchUrl = ConfigurationManager.AppSettings["SearchUrl"];
         }
     }
 }

@@ -49,6 +49,7 @@
     <Compile Include="AutoPoster.cs" />
     <Compile Include="DBHandler.cs" />
     <Compile Include="IndexerNotifier.cs" />
+    <Compile Include="IndexerVerifier.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AutoPosterConfig.cs" />
