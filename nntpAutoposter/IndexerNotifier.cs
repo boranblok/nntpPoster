@@ -56,7 +56,9 @@ namespace nntpAutoposter
         private void NotifyIndexerOfHashedUpload(UploadEntry upload)
         {
             String notificationGetUrl = String.Format(
-                configuration.HashedNotificationUrl, upload.HashedName, upload.CleanedName);
+                configuration.HashedNotificationUrl, 
+                Uri.EscapeDataString(upload.HashedName), 
+                Uri.EscapeDataString(upload.CleanedName));
             using (HttpClient client = new HttpClient())
             {
                 Task<HttpResponseMessage> getTask = null;
