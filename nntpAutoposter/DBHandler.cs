@@ -52,6 +52,7 @@ namespace nntpAutoposter
                         ddlCmd.CommandText = @"CREATE TABLE IF NOT EXISTS 
                                            UploadEntries(
                                             Name TEXT, 
+                                            Size INTEGER,
                                             CleanedName TEXT, 
                                             HashedName TEXT, 
                                             RemoveAfterVerify INTEGER,
@@ -193,6 +194,7 @@ namespace nntpAutoposter
 
                         cmd.CommandText = @"INSERT INTO UploadEntries(
                                                             Name, 
+                                                            Size,
                                                             CleanedName,
                                                             HashedName,
                                                             RemoveAfterVerify, 
@@ -203,6 +205,7 @@ namespace nntpAutoposter
                                                             Cancelled)
                                                     VALUES(
                                                             @name,
+                                                            @size,
                                                             @cleanedName,
                                                             @hashedName,
                                                             @removeAfterVerify,
@@ -212,6 +215,7 @@ namespace nntpAutoposter
                                                             @seenOnIndexerAt,
                                                             @cancelled)";
                         cmd.Parameters.Add(new SqliteParameter("@name", uploadentry.Name));
+                        cmd.Parameters.Add(new SqliteParameter("@size", uploadentry.Size));
                         cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadentry.CleanedName));
                         cmd.Parameters.Add(new SqliteParameter("@hashedName", uploadentry.HashedName));
                         cmd.Parameters.Add(new SqliteParameter("@removeAfterVerify", uploadentry.RemoveAfterVerify));
@@ -269,6 +273,7 @@ namespace nntpAutoposter
 
             uploadEntry.ID = (Int64)reader["ROWID"];
             uploadEntry.Name = reader["Name"] as String;
+            uploadEntry.Size = (Int64)reader["Size"];
             uploadEntry.CleanedName = reader["CleanedName"] as String;
             uploadEntry.HashedName = reader["HashedName"] as String;
             uploadEntry.RemoveAfterVerify = GetBoolean(reader["RemoveAfterVerify"]);

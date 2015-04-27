@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.ServiceModel.Syndication;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
+using Util;
 
 namespace nntpAutoposter
 {
@@ -38,7 +41,7 @@ namespace nntpAutoposter
             {
                 try
                 {
-                    if (FileIsOnIndexer(upload))
+                    if (UploadIsOnIndexer(upload))
                     {
                         upload.SeenOnIndexAt = DateTime.UtcNow;
                         DBHandler.Instance.UpdateUploadEntry(upload);
@@ -68,7 +71,7 @@ namespace nntpAutoposter
             }
         }
 
-        private Boolean FileIsOnIndexer(UploadEntry upload)
+        private Boolean UploadIsOnIndexer(UploadEntry upload)
         {
             String notificationGetUrl = String.Format(
                 configuration.SearchUrl,
@@ -80,21 +83,8 @@ namespace nntpAutoposter
                 try
                 {
                     getTask = client.GetAsync(notificationGetUrl, HttpCompletionOption.ResponseContentRead);
-                    getTask.Start();
-                    getTask.Wait(60 * 1000);
-                    if (getTask.IsCompleted)
-                    {
-                        if (getTask.IsFaulted)
-                            throw getTask.Exception;
-                        if (getTask.Result == null)
-                            throw new Exception("No valid HttpResponse received.");
-
-                        if (!getTask.Result.IsSuccessStatusCode)
-                            throw new Exception("Error when notifying indexer: "
-                                + getTask.Result.StatusCode + " " + getTask.Result.ReasonPhrase);
-
-                        return FindReleaseInResponse(getTask.Result);
-                    }
+                    //getTask.Start();
+                    return FindUploadInResponse(upload, getTask.Result);   //This blocks until the result is available.
                 }
                 finally
                 {
@@ -104,14 +94,57 @@ namespace nntpAutoposter
             }
         }
 
-        private Boolean FindReleaseInResponse(HttpResponseMessage httpResponseMessage)
+        private Boolean FindUploadInResponse(UploadEntry upload, HttpResponseMessage httpResponseMessage)
         {
-            throw new NotImplementedException();
+            Task<Stream> responseStreamTask = null;
+            try
+            {
+                responseStreamTask = httpResponseMessage.Content.ReadAsStreamAsync();
+                using(XmlReader xmlReader = XmlReader.Create(responseStreamTask.Result))
+                {
+                    SyndicationFeed feed = SyndicationFeed.Load(xmlReader);
+                    foreach(var item in feed.Items)
+                    {
+                        Decimal similarityPercentage =
+                            LevenshteinDistance.SimilarityPercentage(item.Title.Text, upload.CleanedName);
+                        if (similarityPercentage > configuration.VerifySimilarityPercentageTreshold)
+                            return true;
+                    }
+                }
+            }
+            finally
+            {
+                if(responseStreamTask != null && responseStreamTask.Result != null)
+                    responseStreamTask.Result.Dispose();
+            }
+            return false;
         }
 
         private void RepostIfRequired(UploadEntry upload)
         {
-            throw new NotImplementedException();
+            var AgeInMinutes = upload.Age.TotalMinutes;
+            var repostTreshold = Math.Pow(upload.Size, (1 / 2.5)); 
+            //This is a bit of guesswork, a 15 MB item will repost after about 20 minutes, 
+            // a  5 GB item will repost after about 2 hours
+            // a 15 GB item will repost after about 3h30.
+            // a 50 GB item will repost after about 5 hours.
+            
+            //In any case, it gets overruled by the configuration here.
+            if (repostTreshold < configuration.MinRepostAgeMinutes)
+                repostTreshold = configuration.MinRepostAgeMinutes;
+            if (repostTreshold > configuration.MaxRepostAgeMinutes)
+                repostTreshold = configuration.MaxRepostAgeMinutes;
+
+            if(AgeInMinutes > repostTreshold)
+            {
+                UploadEntry repost = new UploadEntry();
+                repost.Name = upload.Name;
+                repost.RemoveAfterVerify = upload.RemoveAfterVerify;
+                repost.Cancelled = false;
+                repost.Size = upload.Size;
+                DBHandler.Instance.AddNewUploadEntry(repost);   
+                //This implicitly cancels all other uploads with the same name so no need to update the upload itself.
+            }
         }
     }
 }

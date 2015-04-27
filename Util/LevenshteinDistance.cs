@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Util
 {
-    static class LevenshteinDistance
+    public static class LevenshteinDistance
     {
         public static Decimal SimilarityPercentage(String s, String t)
         {

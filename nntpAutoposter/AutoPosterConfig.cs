@@ -24,6 +24,9 @@ namespace nntpAutoposter
         public Boolean UseHashing { get; set; }
         public String HashedNotificationUrl { get; set; }
         public String SearchUrl { get; set; }
+        public Int32 VerifySimilarityPercentageTreshold { get; set; }
+        public Int32 MinRepostAgeMinutes { get; set; }
+        public Int32 MaxRepostAgeMinutes { get; set; }
 
         public AutoPosterConfig()
         {
@@ -45,6 +48,9 @@ namespace nntpAutoposter
             UseHashing = Boolean.Parse(ConfigurationManager.AppSettings["UseHashing"]);
             HashedNotificationUrl = ConfigurationManager.AppSettings["HashedNotificationUrl"];
             SearchUrl = ConfigurationManager.AppSettings["SearchUrl"];
+            VerifySimilarityPercentageTreshold = Int32.Parse(ConfigurationManager.AppSettings["VerifySimilarityPercentageTreshold"]);
+            MinRepostAgeMinutes = Int32.Parse(ConfigurationManager.AppSettings["MinRepostAgeMinutes"]);
+            MaxRepostAgeMinutes = Int32.Parse(ConfigurationManager.AppSettings["MaxRepostAgeMinutes"]);
         }
     }
 }

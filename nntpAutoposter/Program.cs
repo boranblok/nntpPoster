@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using nntpPoster;
+using Util;
 
 namespace nntpAutoposter
 {
@@ -129,6 +130,7 @@ namespace nntpAutoposter
             newUploadentry.Name = toPost.Name;
             newUploadentry.RemoveAfterVerify = autoPosterconfig.RemoveAfterVerify;
             newUploadentry.Cancelled = false;
+            newUploadentry.Size = toPost.Size();
             DBHandler.Instance.AddNewUploadEntry(newUploadentry);
         }
     }

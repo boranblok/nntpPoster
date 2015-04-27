@@ -10,6 +10,7 @@ namespace nntpAutoposter
     {
         public Int64 ID { get; set; }
         public String Name { get; set; }
+        public Int64 Size { get; set; }
         public String CleanedName { get; set; }
         public String HashedName { get; set; }
         public Boolean RemoveAfterVerify { get; set; }
@@ -18,5 +19,15 @@ namespace nntpAutoposter
         public Nullable<DateTime> NotifiedIndexerAt { get; set; }
         public Nullable<DateTime> SeenOnIndexAt { get; set; }
         public Boolean Cancelled { get; set; }
+
+        public TimeSpan Age
+        {
+            get
+            {
+                return DateTime.UtcNow - UploadedAt;
+            }
+        }
+
+        
     }
 }
