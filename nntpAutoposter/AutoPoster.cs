@@ -107,22 +107,34 @@ namespace nntpAutoposter
             if(configuration.UseObscufation)
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
 
-            FileSystemInfo toPost;
-            if (isDirectory)
+            FileSystemInfo toPost = null;
+            try
             {
-                toPost = PrepareDirectoryForPosting(nextUpload, (DirectoryInfo)toUpload);
+                if (isDirectory)
+                {
+                    toPost = PrepareDirectoryForPosting(nextUpload, (DirectoryInfo)toUpload);
+                }
+                else
+                {
+                    toPost = PrepareFileForPosting(nextUpload, (FileInfo)toUpload);
+                }
+
+                var nzbFile = poster.PostToUsenet(toPost, false);
+                if (!String.IsNullOrWhiteSpace(posterConfiguration.NzbOutputFolder))
+                    nzbFile.Save(Path.Combine(posterConfiguration.NzbOutputFolder, nextUpload.CleanedName + ".nzb"));
+
+                nextUpload.UploadedAt = DateTime.UtcNow;
+                DBHandler.Instance.UpdateUploadEntry(nextUpload);
             }
-            else
+            finally
             {
-                toPost = PrepareFileForPosting(nextUpload, (FileInfo)toUpload);
+                if(toPost != null)
+                {
+                    toPost.Refresh();
+                    if(toPost.Exists)
+                        toPost.Delete();
+                }
             }
-
-            var nzbFile = poster.PostToUsenet(toPost, false);
-            if (!String.IsNullOrWhiteSpace(posterConfiguration.NzbOutputFolder))
-                nzbFile.Save(Path.Combine(posterConfiguration.NzbOutputFolder, nextUpload.CleanedName + ".nzb"));
-
-            nextUpload.UploadedAt = DateTime.UtcNow;
-            DBHandler.Instance.UpdateUploadEntry(nextUpload);
         }
 
 
