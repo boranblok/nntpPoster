@@ -27,7 +27,7 @@ namespace nntpPoster
         public void PostMessage(String subject, List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
         {
             Boolean waitForFreeThread = true;
-            while(waitForFreeThread)
+            while (waitForFreeThread)
             {
                 lock (RunningTasks)
                 {
@@ -40,7 +40,7 @@ namespace nntpPoster
                         waitForFreeThread = false;
                     }
                 }
-                if(waitForFreeThread)
+                if (waitForFreeThread)
                     Thread.Sleep(10);     //TODO: optimize sleep value here.
             }
         }
@@ -58,43 +58,36 @@ namespace nntpPoster
             }
         }
 
-        private void PostMessageTask(String subject, 
+        private void PostMessageTask(String subject,
             List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
         {
-            try
+            using (Rfc977NntpClientWithExtensions client = new Rfc977NntpClientWithExtensions())
             {
-                using (Rfc977NntpClientWithExtensions client = new Rfc977NntpClientWithExtensions())
+                client.Connect(configuration.NewsGroupAddress, configuration.NewsGroupUseSsl);
+                client.AuthenticateUser(configuration.NewsGroupUsername, configuration.NewsGroupPassword);
+
+                ArticleHeadersDictionary headers = new ArticleHeadersDictionary();
+                headers.AddHeader("From", configuration.FromAddress);
+                headers.AddHeader("Subject", subject);
+                foreach (var newsGroup in postInfo.PostedGroups)
                 {
-                    client.Connect(configuration.NewsGroupAddress, configuration.NewsGroupUseSsl);
-                    client.AuthenticateUser(configuration.NewsGroupUsername, configuration.NewsGroupPassword);
-
-                    ArticleHeadersDictionary headers = new ArticleHeadersDictionary();
-                    headers.AddHeader("From", configuration.FromAddress);
-                    headers.AddHeader("Subject", subject);
-                    foreach (var newsGroup in postInfo.PostedGroups)
-                    {
-                        headers.AddHeader("Newsgroups", newsGroup);
-                    }
-                    headers.AddHeader("Date", postInfo.PostedDateTime.ToString());
-
-                    String partMessageId = 
-                        client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), prefix, yEncPart.EncodedLines, suffix);
-                    lock (postInfo.Segments)
-                    {
-                        postInfo.Segments.Add(new PostedFileSegment
-                        {
-                            MessageId = partMessageId,
-                            Bytes = yEncPart.Size,
-                            SegmentNumber = yEncPart.Number
-                        });
-                    }
+                    headers.AddHeader("Newsgroups", newsGroup);
                 }
-                OnFilePartPosted(yEncPart);
+                headers.AddHeader("Date", postInfo.PostedDateTime.ToString());
+
+                String partMessageId =
+                    client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), prefix, yEncPart.EncodedLines, suffix);
+                lock (postInfo.Segments)
+                {
+                    postInfo.Segments.Add(new PostedFileSegment
+                    {
+                        MessageId = partMessageId,
+                        Bytes = yEncPart.Size,
+                        SegmentNumber = yEncPart.Number
+                    });
+                }
             }
-            catch(Exception)
-            {
-                throw;
-            }
+            OnFilePartPosted(yEncPart);
         }
     }
 }
