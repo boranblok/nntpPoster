@@ -27,6 +27,7 @@ namespace nntpAutoposter
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
         public Int32 MinRepostAgeMinutes { get; set; }
         public Int32 MaxRepostAgeMinutes { get; set; }
+        
 
         public AutoPosterConfig()
         {

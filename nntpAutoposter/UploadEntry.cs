@@ -12,7 +12,7 @@ namespace nntpAutoposter
         public String Name { get; set; }
         public Int64 Size { get; set; }
         public String CleanedName { get; set; }
-        public String HashedName { get; set; }
+        public String ObscuredName { get; set; }
         public Boolean RemoveAfterVerify { get; set; }
         public DateTime CreatedAt { get; set; }
         public Nullable<DateTime> UploadedAt { get; set; }

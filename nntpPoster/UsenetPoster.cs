@@ -28,7 +28,12 @@ namespace nntpPoster
         private Int64 TotalUploadedBytes { get; set; }
         private DateTime UploadStartTime { get; set; }
 
-        public XDocument PostToUsenet(FileSystemInfo toPost)
+        public XDocument PostToUsenet(FileSystemInfo toPost, Boolean saveNzb = true)
+        {
+            return PostToUsenet(toPost, toPost.NameWithoutExtension(), saveNzb);
+        }
+
+        public XDocument PostToUsenet(FileSystemInfo toPost, String title, Boolean saveNzb = true)
         {
             nntpMessagePoster poster = new nntpMessagePoster(configuration);
             poster.PartPosted += poster_PartPosted;
@@ -47,7 +52,7 @@ namespace nntpPoster
                 Int32 fileCount = 1;
                 foreach (var fileToPost in filesToPost)
                 {
-                    String comment1 = String.Format("{0}/{1}", fileCount++, filesToPost.Count);
+                    String comment1 = String.Format("{0} [{1}/{2}]", title, fileCount++, filesToPost.Count);
                     PostedFileInfo postInfo = fileToPost.PostYEncFile(poster, comment1, "");
                     postedFiles.Add(postInfo);
                 }
@@ -56,7 +61,7 @@ namespace nntpPoster
                 Console.WriteLine();
 
                 XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles);
-                if (!String.IsNullOrWhiteSpace(configuration.NzbOutputFolder))
+                if (saveNzb && !String.IsNullOrWhiteSpace(configuration.NzbOutputFolder))
                     nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder, toPost.NameWithoutExtension() + ".nzb"));
                 return nzbDoc;
             }

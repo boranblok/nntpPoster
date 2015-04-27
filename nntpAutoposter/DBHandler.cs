@@ -54,7 +54,7 @@ namespace nntpAutoposter
                                             Name TEXT, 
                                             Size INTEGER,
                                             CleanedName TEXT, 
-                                            HashedName TEXT, 
+                                            ObscuredName TEXT, 
                                             RemoveAfterVerify INTEGER,
                                             CreatedAt TEXT,
                                             UploadedAt TEXT,
@@ -104,7 +104,7 @@ namespace nntpAutoposter
                 using (SqliteCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
-                                        WHERE HashedName IS NOT NULL 
+                                        WHERE ObscuredName IS NOT NULL 
                                           AND NotifiedIndexerAt IS NULL
                                           AND Cancelled = 0
                                         ORDER BY CreatedAt ASC";
@@ -134,9 +134,9 @@ namespace nntpAutoposter
                                           AND SeenOnIndexerAt IS NULL
                                           AND Cancelled = 0
                                           AND (
-                                            HashedName IS NULL
+                                            ObscuredName IS NULL
                                             OR 
-                                            (HashedName IS NOT NULL AND NotifiedIndexerAt IS NOT NULL)
+                                            (ObscuredName IS NOT NULL AND NotifiedIndexerAt IS NOT NULL)
                                           )
                                         ORDER BY CreatedAt ASC";
                     using (SqliteDataReader reader = cmd.ExecuteReader())
@@ -196,7 +196,7 @@ namespace nntpAutoposter
                                                             Name, 
                                                             Size,
                                                             CleanedName,
-                                                            HashedName,
+                                                            ObscuredName,
                                                             RemoveAfterVerify, 
                                                             CreatedAt,
                                                             UploadedAt,
@@ -207,7 +207,7 @@ namespace nntpAutoposter
                                                             @name,
                                                             @size,
                                                             @cleanedName,
-                                                            @hashedName,
+                                                            @ObscuredName,
                                                             @removeAfterVerify,
                                                             @createdAt, 
                                                             @uploadedAt,
@@ -217,7 +217,7 @@ namespace nntpAutoposter
                         cmd.Parameters.Add(new SqliteParameter("@name", uploadentry.Name));
                         cmd.Parameters.Add(new SqliteParameter("@size", uploadentry.Size));
                         cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadentry.CleanedName));
-                        cmd.Parameters.Add(new SqliteParameter("@hashedName", uploadentry.HashedName));
+                        cmd.Parameters.Add(new SqliteParameter("@ObscuredName", uploadentry.ObscuredName));
                         cmd.Parameters.Add(new SqliteParameter("@removeAfterVerify", uploadentry.RemoveAfterVerify));
                         cmd.Parameters.Add(new SqliteParameter("@createdAt", GetDbValue(uploadentry.CreatedAt)));
                         cmd.Parameters.Add(new SqliteParameter("@uploadedAt", GetDbValue(uploadentry.UploadedAt)));
@@ -245,7 +245,7 @@ namespace nntpAutoposter
                     cmd.CommandText = @"UPDATE UploadEntries SET 
                                             Name = @name,
                                             CleanedName = @cleanedName,
-                                            HashedName = @hashedName,
+                                            ObscuredName = @ObscuredName,
                                             RemoveAfterVerify = @removeAfterVerify,
                                             UploadedAt = @uploadedAt,
                                             NotifiedIndexerAt = @notifiedIndexerAt,
@@ -254,7 +254,7 @@ namespace nntpAutoposter
                                         WHERE ROWID = @rowId";
                     cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                     cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
-                    cmd.Parameters.Add(new SqliteParameter("@hashedName", uploadEntry.HashedName));                    
+                    cmd.Parameters.Add(new SqliteParameter("@ObscuredName", uploadEntry.ObscuredName));                    
                     cmd.Parameters.Add(new SqliteParameter("@removeAfterVerify", uploadEntry.RemoveAfterVerify));
                     cmd.Parameters.Add(new SqliteParameter("@uploadedAt", GetDbValue(uploadEntry.UploadedAt)));
                     cmd.Parameters.Add(new SqliteParameter("@notifiedIndexerAt", GetDbValue(uploadEntry.NotifiedIndexerAt)));
@@ -275,7 +275,7 @@ namespace nntpAutoposter
             uploadEntry.Name = reader["Name"] as String;
             uploadEntry.Size = (Int64)reader["Size"];
             uploadEntry.CleanedName = reader["CleanedName"] as String;
-            uploadEntry.HashedName = reader["HashedName"] as String;
+            uploadEntry.ObscuredName = reader["ObscuredName"] as String;
             uploadEntry.RemoveAfterVerify = GetBoolean(reader["RemoveAfterVerify"]);
             uploadEntry.CreatedAt = GetDateTime(reader["CreatedAt"]);
             uploadEntry.UploadedAt = GetNullableDateTime(reader["UploadedAt"]);

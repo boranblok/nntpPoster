@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NntpClientLib;
 using nntpPoster.yEncLib;
@@ -16,7 +15,6 @@ namespace nntpPoster
         private Int32 partSize;
         private FileInfo file;
 
-        public String FileName { get; private set; }
         public Int32 TotalParts { get; private set; }
 
         public FileToPost(UsenetPosterConfig configuration, FileInfo fileToPost)
@@ -25,23 +23,15 @@ namespace nntpPoster
             partSize = configuration.YEncPartSize;
 
             file = fileToPost;
-            DetermineFileName();
             DetermineTotalParts();
         }
 
-        private void DetermineFileName()
-        {
-            FileName = Regex.Replace(file.Name, "^[:ascii:]", String.Empty);
-            FileName = FileName.Replace(' ', '.');
-        }
-
-
-        private string ConstructSubjectNameBase(String comment1, String comment2)
+        private string ConstructSubjectNameBase(String prefix, String suffix)
         {
             StringBuilder subject = new StringBuilder();
-            if (!String.IsNullOrWhiteSpace(comment1))
-                subject.AppendFormat("[{0}] ", comment1);
-            subject.AppendFormat("\"" + FileName + "\"");
+            if (!String.IsNullOrWhiteSpace(prefix))
+                subject.Append(prefix + " ");
+            subject.AppendFormat("\"" + file.Name + "\"");
             subject.Append(" yEnc ");
             if (TotalParts > 1)
             {
@@ -50,8 +40,8 @@ namespace nntpPoster
                 subject.Append(") ");
             }
             subject.Append(file.Length);
-            if (!String.IsNullOrWhiteSpace(comment2))
-                subject.AppendFormat(" [{0}]", comment2);
+            if (!String.IsNullOrWhiteSpace(suffix))
+                subject.Append(" " + suffix);
 
             return subject.ToString();
         }
@@ -63,10 +53,10 @@ namespace nntpPoster
                 TotalParts += 1;
         }
 
-        public PostedFileInfo PostYEncFile(InntpMessagePoster poster, String comment1, String comment2)
+        public PostedFileInfo PostYEncFile(InntpMessagePoster poster, String prefix, String suffix)
         {
             PostedFileInfo postedFileInfo = new PostedFileInfo();
-            String subjectNameBase = ConstructSubjectNameBase(comment1, comment2);
+            String subjectNameBase = ConstructSubjectNameBase(prefix, suffix);
             if (partSize > 1)
                 postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
             else
@@ -112,7 +102,8 @@ namespace nntpPoster
             return postedFileInfo;
         }
 
-        private void PostPart(InntpMessagePoster poster, PostedFileInfo postedFileInfo, YEncFilePart part, String subjectNameBase)
+        private void PostPart(InntpMessagePoster poster, PostedFileInfo postedFileInfo, YEncFilePart part, 
+            String subjectNameBase)
         {
             String subject;
             
@@ -127,7 +118,7 @@ namespace nntpPoster
             if (TotalParts > 1)
             {
                 yEncPrefix.Add(String.Format("=ybegin part={0} total={1} line={2} size={3} name={4}",
-                    part.Number, TotalParts, configuration.YEncLineSize, file.Length, FileName));
+                    part.Number, TotalParts, configuration.YEncLineSize, file.Length, file.Name));
 
                 yEncPrefix.Add(String.Format("=ypart begin={0} end={1}",
                     part.Begin, part.End));
@@ -139,7 +130,7 @@ namespace nntpPoster
             else
             {
                 yEncPrefix.Add(String.Format("=ybegin line={0} size={1} name={2}",
-                    configuration.YEncLineSize, file.Length, FileName));
+                    configuration.YEncLineSize, file.Length, file.Name));
 
                 yEncSuffix.Add(String.Format("=yend size={0} crc32={1}",
                     file.Length, part.CRC32));

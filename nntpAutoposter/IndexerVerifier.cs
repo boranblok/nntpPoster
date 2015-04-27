@@ -104,13 +104,26 @@ namespace nntpAutoposter
                 Task<HttpResponseMessage> getTask = null;
                 try
                 {
-                    getTask = client.GetAsync(notificationGetUrl, HttpCompletionOption.ResponseContentRead);
-                    //getTask.Start();
-                    return FindUploadInResponse(upload, getTask.Result);   //This blocks until the result is available.
+                    getTask = client.GetAsync(notificationGetUrl);
+                    getTask.Wait(60 * 1000);
+                    if (getTask.IsCompleted)
+                    {
+                        if (getTask.IsFaulted)
+                            throw getTask.Exception;
+                        if (getTask.Result == null)
+                            throw new Exception("No valid HttpResponse received.");
+
+                        if (!getTask.Result.IsSuccessStatusCode)
+                            throw new Exception("Error when verifying on indexer: "
+                                + getTask.Result.StatusCode + " " + getTask.Result.ReasonPhrase);
+
+                        return FindUploadInResponse(upload, getTask.Result);   //This blocks until the result is available.
+                    }
+                    throw new Exception("No valid HttpResponse could be received within the timeout period.");
                 }
                 finally
                 {
-                    if (getTask != null && getTask.Result != null)
+                    if (getTask != null && getTask.IsCompleted && getTask.Result != null)
                         getTask.Result.Dispose();
                 }
             }
@@ -136,7 +149,7 @@ namespace nntpAutoposter
             }
             finally
             {
-                if(responseStreamTask != null && responseStreamTask.Result != null)
+                if (responseStreamTask != null && responseStreamTask.IsCompleted && responseStreamTask.Result != null)
                     responseStreamTask.Result.Dispose();
             }
             return false;

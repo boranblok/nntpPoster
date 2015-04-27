@@ -64,7 +64,7 @@ namespace nntpAutoposter
                     upload.NotifiedIndexerAt = DateTime.UtcNow;
                     DBHandler.Instance.UpdateUploadEntry(upload);
                     Console.WriteLine("Notified indexer that hashed release [{0}] is actually [{1}]", 
-                        upload.HashedName, upload.CleanedName);
+                        upload.ObscuredName, upload.CleanedName);
                 }
                 catch(Exception ex)
                 {
@@ -79,7 +79,7 @@ namespace nntpAutoposter
         {
             String notificationGetUrl = String.Format(
                 configuration.HashedNotificationUrl, 
-                Uri.EscapeDataString(upload.HashedName), 
+                Uri.EscapeDataString(upload.ObscuredName), 
                 Uri.EscapeDataString(upload.CleanedName));
             using (HttpClient client = new HttpClient())
             {
@@ -87,7 +87,6 @@ namespace nntpAutoposter
                 try
                 {
                     getTask = client.GetAsync(notificationGetUrl, HttpCompletionOption.ResponseContentRead);
-                    getTask.Start();
                     getTask.Wait(60 * 1000);
                     if (getTask.IsCompleted)
                     {
@@ -103,7 +102,7 @@ namespace nntpAutoposter
                 }
                 finally
                 {
-                    if (getTask != null && getTask.Result != null)
+                    if (getTask != null && getTask.IsCompleted && getTask.Result != null)
                         getTask.Result.Dispose();
                 }
             }
