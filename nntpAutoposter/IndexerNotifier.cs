@@ -11,6 +11,7 @@ namespace nntpAutoposter
 {
     class IndexerNotifier
     {
+        private Object monitor = new Object();
         private AutoPosterConfig configuration;
         private Task MyTask;
         private Boolean StopRequested;
@@ -22,13 +23,34 @@ namespace nntpAutoposter
             MyTask = new Task(IndexerNotifierTask, TaskCreationOptions.LongRunning);
         }
 
+        public void Start()
+        {
+            MyTask.Start();
+        }
+
+        public void Stop()
+        {
+            lock (monitor)
+            {
+                StopRequested = true;
+                Monitor.Pulse(monitor);
+            }
+            MyTask.Wait();
+        }
+
         private void IndexerNotifierTask()
         {
             while (!StopRequested)
             {
                 NotifyIndexerOfNewHashedUploads();
-                if (!StopRequested)
-                    Thread.Sleep(configuration.NotifierIntervalMinutes * 60 * 1000);
+                lock (monitor)
+                {
+                    if (StopRequested)
+                    {
+                        break;
+                    }
+                    Monitor.Wait(monitor, configuration.NotifierIntervalMinutes * 60 * 1000);
+                }
             }
         }
 

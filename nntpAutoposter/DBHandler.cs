@@ -131,7 +131,7 @@ namespace nntpAutoposter
                 {
                     cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
                                         WHERE UploadedAt IS NOT NULL
-                                          AND SeenOnIndexAt IS NULL
+                                          AND SeenOnIndexerAt IS NULL
                                           AND Cancelled = 0
                                           AND (
                                             HashedName IS NULL

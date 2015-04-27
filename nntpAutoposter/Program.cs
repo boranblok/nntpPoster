@@ -35,8 +35,23 @@ namespace nntpAutoposter
             poster.Start();
             Console.WriteLine("Autoposter started");
 
+            IndexerNotifier notifier = new IndexerNotifier(autoPosterconfig);
+            notifier.Start();
+            Console.WriteLine("Notifier started");
+
+            IndexerVerifier verifier = new IndexerVerifier(autoPosterconfig);
+            verifier.Start();
+            Console.WriteLine("Verifier started");
+
             Console.WriteLine("Press any key to stop after the current operations have finished.");
             Console.ReadKey();
+
+            verifier.Stop();
+            Console.WriteLine("Verifier stopped");
+
+            notifier.Stop();
+            Console.WriteLine("Notifier stopped");
+
             poster.Stop();
             Console.WriteLine("Autoposter stopped");
         }

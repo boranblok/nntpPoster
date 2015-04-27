@@ -11,6 +11,7 @@ namespace nntpAutoposter
 {    
     class AutoPoster
     {
+        private Object monitor = new Object();
         private AutoPosterConfig configuration;
         private UsenetPosterConfig posterConfiguration;
         private UsenetPoster poster;
@@ -33,7 +34,11 @@ namespace nntpAutoposter
 
         public void Stop()
         {
-            StopRequested = true;
+            lock (monitor)
+            {
+                StopRequested = true;
+                Monitor.Pulse(monitor);
+            }
             MyTask.Wait();
         }
 
@@ -42,8 +47,14 @@ namespace nntpAutoposter
             while(!StopRequested)
             {
                 UploadNextItemInQueue();
-                if(!StopRequested)
-                    Thread.Sleep(configuration.AutoposterIntervalMillis);
+                lock (monitor)
+                {
+                    if (StopRequested)
+                    {
+                        break;
+                    }
+                    Monitor.Wait(monitor, configuration.AutoposterIntervalMillis);
+                }
             }
         }
 

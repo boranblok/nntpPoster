@@ -14,6 +14,7 @@ namespace nntpAutoposter
 {
     class IndexerVerifier
     {
+        private Object monitor = new Object();
         private AutoPosterConfig configuration;
         private Task MyTask;
         private Boolean StopRequested;
@@ -25,13 +26,34 @@ namespace nntpAutoposter
             MyTask = new Task(IndexerVerifierTask, TaskCreationOptions.LongRunning);
         }
 
+        public void Start()
+        {
+            MyTask.Start();
+        }
+
+        public void Stop()
+        {
+            lock (monitor)
+            {
+                StopRequested = true;
+                Monitor.Pulse(monitor);
+            }            
+            MyTask.Wait();
+        }
+
         private void IndexerVerifierTask()
         {
             while (!StopRequested)
             {
                 VerifyUploadsOnIndexer();
-                if (!StopRequested)
-                    Thread.Sleep(configuration.VerifierIntervalMinutes * 60 * 1000);
+                lock (monitor)
+                {
+                    if (StopRequested)
+                    {
+                        break;
+                    }
+                    Monitor.Wait(monitor, configuration.VerifierIntervalMinutes * 60 * 1000);
+                }
             }
         }
 
@@ -122,7 +144,7 @@ namespace nntpAutoposter
 
         private void RepostIfRequired(UploadEntry upload)
         {
-            var AgeInMinutes = upload.Age.TotalMinutes;
+            var AgeInMinutes = (DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes;
             var repostTreshold = Math.Pow(upload.Size, (1 / 2.5)); 
             //This is a bit of guesswork, a 15 MB item will repost after about 20 minutes, 
             // a  5 GB item will repost after about 2 hours
