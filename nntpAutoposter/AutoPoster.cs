@@ -39,7 +39,21 @@ namespace nntpAutoposter
 
         public void Start()
         {
+            InitializeEnvironment();
             MyTask.Start();
+        }
+
+        private void InitializeEnvironment()
+        {
+            Console.WriteLine("Cleaning out processing folder of any leftover files.");
+            foreach(var fsi in posterConfiguration.WorkingFolder.EnumerateFileSystemInfos())
+            {
+                FileAttributes attributes = File.GetAttributes(fsi.FullName);
+                if (attributes.HasFlag(FileAttributes.Directory))
+                    Directory.Delete(fsi.FullName, true);
+                else
+                    File.Delete(fsi.FullName);
+            }
         }
 
         public void Stop()
