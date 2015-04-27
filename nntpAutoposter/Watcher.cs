@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Util;
 
 namespace nntpAutoposter
 {
@@ -24,7 +26,7 @@ namespace nntpAutoposter
 
         public void Start()
         {
-            foreach (FileSystemInfo toPost in autoPosterconfig.WatchFolder.EnumerateFileSystemInfos())
+            foreach (FileSystemInfo toPost in configuration.WatchFolder.EnumerateFileSystemInfos())
             {
                 MoveToBackupFolderAndPost(toPost.FullName);
             }
@@ -37,19 +39,19 @@ namespace nntpAutoposter
             watcher.EnableRaisingEvents = false;
         }
 
-        static void watcher_Error(object sender, ErrorEventArgs e)
+        private void watcher_Error(object sender, ErrorEventArgs e)
         {
             Console.WriteLine("The FileSystemWatcher got an error:");
             Console.WriteLine(e.GetException().ToString());
             Environment.Exit(1);
         }
 
-        static void watcher_Created(object sender, FileSystemEventArgs e)
+        private void watcher_Created(object sender, FileSystemEventArgs e)
         {
             MoveToBackupFolderAndPost(e.FullPath);
         }
 
-        static void MoveToBackupFolderAndPost(String fullPath)
+        private void MoveToBackupFolderAndPost(String fullPath)
         {
             FileSystemInfo backup;
             FileAttributes attributes = File.GetAttributes(fullPath);
@@ -65,11 +67,11 @@ namespace nntpAutoposter
             AddItemToPostingDb(backup);
         }
 
-        private static FileSystemInfo MoveFolderToBackup(String fullPath)
+        private FileSystemInfo MoveFolderToBackup(String fullPath)
         {
             FileSystemInfo backup;
             DirectoryInfo toPost = new DirectoryInfo(fullPath);
-            String destinationFolder = Path.Combine(autoPosterconfig.BackupFolder.FullName, toPost.Name);
+            String destinationFolder = Path.Combine(configuration.BackupFolder.FullName, toPost.Name);
             backup = new DirectoryInfo(destinationFolder);
             if (backup.Exists)
                 backup.Delete();
@@ -92,11 +94,11 @@ namespace nntpAutoposter
             return backup;
         }
 
-        private static FileSystemInfo MoveFileToBackup(String fullPath)
+        private FileSystemInfo MoveFileToBackup(String fullPath)
         {
             FileSystemInfo backup;
             FileInfo toPost = new FileInfo(fullPath);
-            String destinationFile = Path.Combine(autoPosterconfig.BackupFolder.FullName, toPost.Name);
+            String destinationFile = Path.Combine(configuration.BackupFolder.FullName, toPost.Name);
             backup = new FileInfo(destinationFile);
             if (backup.Exists)
                 backup.Delete();
@@ -119,12 +121,12 @@ namespace nntpAutoposter
             return backup;
         }
 
-        private static void AddItemToPostingDb(FileSystemInfo toPost)
+        private void AddItemToPostingDb(FileSystemInfo toPost)
         {
             UploadEntry newUploadentry = new UploadEntry();
             newUploadentry.CreatedAt = DateTime.UtcNow;
             newUploadentry.Name = toPost.Name;
-            newUploadentry.RemoveAfterVerify = autoPosterconfig.RemoveAfterVerify;
+            newUploadentry.RemoveAfterVerify = configuration.RemoveAfterVerify;
             newUploadentry.Cancelled = false;
             newUploadentry.Size = toPost.Size();
             DBHandler.Instance.AddNewUploadEntry(newUploadentry);
