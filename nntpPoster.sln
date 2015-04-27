@@ -13,15 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rarLib", "rarLib\rarLib.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rarTester", "rarTester\rarTester.csproj", "{0D5C7128-F9D9-4505-B0DE-64980BE03591}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "par2Lib", "par2Lib\par2Lib.csproj", "{E34E8477-5ED3-45C6-95A9-7C79EFC9A1DB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nntpAutoposter", "nntpAutoposter\nntpAutoposter.csproj", "{DF3F2C45-6232-41FA-A214-6A1EBC3CA2D7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Util", "Util\Util.csproj", "{F9427F11-11D3-4157-8876-C8DD1F62D009}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mkvPropEditLib", "mkvPropEditLib\mkvPropEditLib.csproj", "{6DF50BE0-8B67-448D-900A-842EB5B73B66}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ffmpegLib", "ffmpegLib\ffmpegLib.csproj", "{19A62359-1CB4-4945-B9B3-F43AA2EF4A3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,10 +43,6 @@ Global
 		{0D5C7128-F9D9-4505-B0DE-64980BE03591}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D5C7128-F9D9-4505-B0DE-64980BE03591}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D5C7128-F9D9-4505-B0DE-64980BE03591}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E34E8477-5ED3-45C6-95A9-7C79EFC9A1DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E34E8477-5ED3-45C6-95A9-7C79EFC9A1DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E34E8477-5ED3-45C6-95A9-7C79EFC9A1DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E34E8477-5ED3-45C6-95A9-7C79EFC9A1DB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DF3F2C45-6232-41FA-A214-6A1EBC3CA2D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DF3F2C45-6232-41FA-A214-6A1EBC3CA2D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF3F2C45-6232-41FA-A214-6A1EBC3CA2D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -61,14 +51,6 @@ Global
 		{F9427F11-11D3-4157-8876-C8DD1F62D009}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9427F11-11D3-4157-8876-C8DD1F62D009}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9427F11-11D3-4157-8876-C8DD1F62D009}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6DF50BE0-8B67-448D-900A-842EB5B73B66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6DF50BE0-8B67-448D-900A-842EB5B73B66}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6DF50BE0-8B67-448D-900A-842EB5B73B66}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6DF50BE0-8B67-448D-900A-842EB5B73B66}.Release|Any CPU.Build.0 = Release|Any CPU
-		{19A62359-1CB4-4945-B9B3-F43AA2EF4A3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19A62359-1CB4-4945-B9B3-F43AA2EF4A3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19A62359-1CB4-4945-B9B3-F43AA2EF4A3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19A62359-1CB4-4945-B9B3-F43AA2EF4A3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
