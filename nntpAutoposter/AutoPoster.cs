@@ -177,10 +177,10 @@ namespace nntpAutoposter
             if(preparedFile.Extension.Length < 1)
                 return;
 
-            String rawExt = preparedFile.Extension.Remove(1);
-            if (rawExt == "mkv")
+            String rawExt = preparedFile.Extension.Substring(1);
+            if ("mkv".Equals(rawExt, StringComparison.InvariantCultureIgnoreCase))
                 StripMkvMetaDataFromTile(preparedFile);
-            if (ffmpegHandledExtensions.Contains<String>(rawExt))
+            if (ffmpegHandledExtensions.Any(ext => ext.Equals(rawExt, StringComparison.InvariantCultureIgnoreCase)))
                 StripMetaDataWithFFmpeg(preparedFile);
         }
 
