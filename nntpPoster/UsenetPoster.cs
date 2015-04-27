@@ -134,11 +134,11 @@ namespace nntpPoster
             DirectoryInfo targetDirectory = new DirectoryInfo(Path.Combine(
                 configuration.WorkingFolder.FullName, nameWithoutExtension + "_readyToPost"));
             targetDirectory.Create();
-            var rarWrapper = new RarWrapper(configuration.RarToolLocation);
+            var rarWrapper = new RarWrapper(configuration.RarLocation);
             rarWrapper.Compress(
                 toPost, targetDirectory, nameWithoutExtension, rarSizeRecommendation.ReccomendedRarSize);
 
-            var parWrapper = new ParWrapper(configuration.ParToolLocation);
+            var parWrapper = new ParWrapper(configuration.ParLocation);
             parWrapper.CreateParFilesInDirectory(
                 targetDirectory, configuration.YEncPartSize, rarSizeRecommendation.ReccomendedRecoveryPercentage);
 

@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using ffmpegLib;
+using mkvPropEditLib;
 using nntpPoster;
 using Util;
 
@@ -15,6 +17,10 @@ namespace nntpAutoposter
     class AutoPoster
     {
         private static readonly String CharsToRemove = "()=@#$%^+,?<>{}|";
+        private static readonly String[] ffmpegHandledExtensions = new String[] {"mkv", "avi", "wmv", "mp4", 
+                                                                                 "mov", "ogg", "ogm", "wav", 
+                                                                                 "mka", "mks", "mpeg", "mpg", 
+                                                                                 "vob", "mp3", "asf", "ape", "flac"};
         private Object monitor = new Object();
         private AutoPosterConfig configuration;
         private UsenetPosterConfig posterConfiguration;
@@ -91,28 +97,24 @@ namespace nntpAutoposter
                     DBHandler.Instance.UpdateUploadEntry(nextUpload);
                     return;
                 }
-                PostObscuredRelease(nextUpload, toUpload, isDirectory);
+                PostRelease(nextUpload, toUpload, isDirectory);
             }
         }
 
-        private void PostObscuredRelease(UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
+        private void PostRelease(UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
         {
             nextUpload.CleanedName = CleanName(toUpload.NameWithoutExtension()) + configuration.PostTag;
-            nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
+            if(configuration.UseObscufation)
+                nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
 
             FileSystemInfo toPost;
             if (isDirectory)
             {
-                var destination = Path.Combine(posterConfiguration.WorkingFolder.FullName, nextUpload.ObscuredName);
-                ((DirectoryInfo)toUpload).Copy(destination, true);
-                toPost = new DirectoryInfo(destination);
+                toPost = PrepareDirectoryForPosting(nextUpload, (DirectoryInfo)toUpload);
             }
             else
             {
-                var destination = Path.Combine(posterConfiguration.WorkingFolder.FullName,
-                    nextUpload.ObscuredName + toUpload.Extension);
-                ((FileInfo)toUpload).CopyTo(destination, true);
-                toPost = new FileInfo(destination);
+                toPost = PrepareFileForPosting(nextUpload, (FileInfo)toUpload);
             }
 
             var nzbFile = poster.PostToUsenet(toPost, false);
@@ -121,6 +123,65 @@ namespace nntpAutoposter
 
             nextUpload.UploadedAt = DateTime.UtcNow;
             DBHandler.Instance.UpdateUploadEntry(nextUpload);
+        }
+
+
+        private DirectoryInfo PrepareDirectoryForPosting(UploadEntry nextUpload, DirectoryInfo toUpload)
+        {
+            String destination;
+            if (configuration.UseObscufation)
+                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName, nextUpload.ObscuredName);
+            else
+                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName, nextUpload.CleanedName);
+
+            ((DirectoryInfo)toUpload).Copy(destination, true);
+            return new DirectoryInfo(destination);
+        }
+
+        private FileInfo PrepareFileForPosting(UploadEntry nextUpload, FileInfo toUpload)
+        {
+            String destination;
+            if (configuration.UseObscufation)
+                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName,
+                    nextUpload.ObscuredName + toUpload.Extension);
+            else
+                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName,
+                    nextUpload.CleanedName + toUpload.Extension);
+
+
+            ((FileInfo)toUpload).CopyTo(destination, true);
+            FileInfo preparedFile = new FileInfo(destination);
+
+            if(configuration.StripFileMetadata)
+            {
+                StripMetaDataFromFile(preparedFile);
+            }
+
+            return preparedFile;
+        }
+
+        private void StripMetaDataFromFile(FileInfo preparedFile)
+        {
+            if(preparedFile.Extension.Length < 1)
+                return;
+
+            String rawExt = preparedFile.Extension.Remove(1);
+            if (rawExt == "mkv")
+                StripMkvMetaDataFromTile(preparedFile);
+            if (ffmpegHandledExtensions.Contains<String>(rawExt))
+                StripMetaDataWithFFmpeg(preparedFile);
+        }
+
+        private void StripMkvMetaDataFromTile(FileInfo preparedFile)
+        {
+            var mkvPropEdit = new MkvPropEditWrapper(configuration.MkvPropEditLocation);
+            mkvPropEdit.SetTitle(preparedFile, "g33k");
+        }
+
+        private void StripMetaDataWithFFmpeg(FileInfo preparedFile)
+        {
+            var ffmpeg = new FFmpegWrapper(configuration.FFmpegLocation);
+            ffmpeg.TryStripMetadata(preparedFile);
         }
 
         private String CleanName(String nameToClean)

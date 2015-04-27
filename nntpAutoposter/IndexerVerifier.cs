@@ -95,16 +95,18 @@ namespace nntpAutoposter
 
         private Boolean UploadIsOnIndexer(UploadEntry upload)
         {
-            String notificationGetUrl = String.Format(
+            var postAge = (Int32)Math.Ceiling((DateTime.UtcNow - upload.UploadedAt.Value).TotalDays);
+            String verificationGetUrl = String.Format(
                 configuration.SearchUrl,
-                Uri.EscapeDataString(upload.CleanedName));
+                Uri.EscapeDataString(upload.CleanedName),
+                postAge);
 
             using (HttpClient client = new HttpClient())
             {
                 Task<HttpResponseMessage> getTask = null;
                 try
                 {
-                    getTask = client.GetAsync(notificationGetUrl);
+                    getTask = client.GetAsync(verificationGetUrl);
                     getTask.Wait(60 * 1000);
                     if (getTask.IsCompleted)
                     {
@@ -158,11 +160,11 @@ namespace nntpAutoposter
         private void RepostIfRequired(UploadEntry upload)
         {
             var AgeInMinutes = (DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes;
-            var repostTreshold = Math.Pow(upload.Size, (1 / 2.5)); 
-            //This is a bit of guesswork, a 15 MB item will repost after about 20 minutes, 
-            // a  5 GB item will repost after about 2 hours
-            // a 15 GB item will repost after about 3h30.
-            // a 50 GB item will repost after about 5 hours.
+            var repostTreshold = Math.Pow(upload.Size, (1 / 2.45)) / 60; 
+            //This is a bit of guesswork, a 15 MB item will repost after about 15 minutes, 
+            // a  5 GB item will repost after about 2h30.
+            // a 15 GB item will repost after about 4h00.
+            // a 50 GB item will repost after about 6h30.
             
             //In any case, it gets overruled by the configuration here.
             if (repostTreshold < configuration.MinRepostAgeMinutes)

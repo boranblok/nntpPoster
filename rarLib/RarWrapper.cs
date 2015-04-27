@@ -10,17 +10,17 @@ namespace rarLib
 {
     public class RarWrapper
     {
-        private String _rarToolLocation = "rar";
+        private String _rarLocation = "rar";
 
-        public String RarToolLocation
+        public String RarLocation
         {
-            get { return _rarToolLocation; }
+            get { return _rarLocation; }
             set 
             {
                 if (String.IsNullOrWhiteSpace(value))
-                    _rarToolLocation = "rar";   //Assume rar is accessible via the PATH environment variable.
+                    _rarLocation = "rar";   //Assume rar is accessible via the PATH environment variable.
                 else
-                    _rarToolLocation = value; 
+                    _rarLocation = value; 
             }
         }
 
@@ -28,9 +28,9 @@ namespace rarLib
         {
         }
 
-        public RarWrapper(String rarToolLocation)
+        public RarWrapper(String rarLocation)
         {
-            RarToolLocation = rarToolLocation;
+            RarLocation = rarLocation;
         }
 
         public void Compress(FileSystemInfo source, DirectoryInfo destination, String archiveName, Int32 partSize)
@@ -50,7 +50,7 @@ namespace rarLib
 
             Process rarProcess = new Process();
             rarProcess.StartInfo.Arguments = rarParameters;
-            rarProcess.StartInfo.FileName = RarToolLocation;
+            rarProcess.StartInfo.FileName = RarLocation;
 
             rarProcess.StartInfo.UseShellExecute = false;
             rarProcess.StartInfo.RedirectStandardOutput = true;

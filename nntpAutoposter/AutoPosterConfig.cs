@@ -21,13 +21,16 @@ namespace nntpAutoposter
         public Int32 NotifierIntervalMinutes { get; set; }
         public Int32 VerifierIntervalMinutes { get; set; }
 
-        public Boolean UseHashing { get; set; }
-        public String HashedNotificationUrl { get; set; }
+        public Boolean UseObscufation { get; set; }
+        public String ObscufatedNotificationUrl { get; set; }
         public String SearchUrl { get; set; }
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
         public Int32 MinRepostAgeMinutes { get; set; }
         public Int32 MaxRepostAgeMinutes { get; set; }
-        
+
+        public Boolean StripFileMetadata { get; set; }
+        public String MkvPropEditLocation { get; set; }
+        public String FFmpegLocation { get; set; }
 
         public AutoPosterConfig()
         {
@@ -46,12 +49,16 @@ namespace nntpAutoposter
             NotifierIntervalMinutes = Int32.Parse(ConfigurationManager.AppSettings["NotifierIntervalMinutes"]);
             VerifierIntervalMinutes = Int32.Parse(ConfigurationManager.AppSettings["VerifierIntervalMinutes"]);
 
-            UseHashing = Boolean.Parse(ConfigurationManager.AppSettings["UseHashing"]);
-            HashedNotificationUrl = ConfigurationManager.AppSettings["HashedNotificationUrl"];
+            UseObscufation = Boolean.Parse(ConfigurationManager.AppSettings["UseObscufation"]);
+            ObscufatedNotificationUrl = ConfigurationManager.AppSettings["ObscufatedNotificationUrl"];
             SearchUrl = ConfigurationManager.AppSettings["SearchUrl"];
             VerifySimilarityPercentageTreshold = Int32.Parse(ConfigurationManager.AppSettings["VerifySimilarityPercentageTreshold"]);
             MinRepostAgeMinutes = Int32.Parse(ConfigurationManager.AppSettings["MinRepostAgeMinutes"]);
             MaxRepostAgeMinutes = Int32.Parse(ConfigurationManager.AppSettings["MaxRepostAgeMinutes"]);
+
+            StripFileMetadata = Boolean.Parse(ConfigurationManager.AppSettings["StripFileMetadata"]);
+            MkvPropEditLocation = ConfigurationManager.AppSettings["MkvPropEditLocation"];
+            FFmpegLocation = ConfigurationManager.AppSettings["FFmpegLocation"];
         }
     }
 }

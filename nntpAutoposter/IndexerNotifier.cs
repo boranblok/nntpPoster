@@ -42,7 +42,7 @@ namespace nntpAutoposter
         {
             while (!StopRequested)
             {
-                NotifyIndexerOfNewHashedUploads();
+                NotifyIndexerOfNewObscufatedUploads();
                 lock (monitor)
                 {
                     if (StopRequested)
@@ -54,31 +54,31 @@ namespace nntpAutoposter
             }
         }
 
-        private void NotifyIndexerOfNewHashedUploads()
+        private void NotifyIndexerOfNewObscufatedUploads()
         {
             foreach(var upload in DBHandler.Instance.GetUploadEntriesToNotifyIndexer())
             {
                 try
                 {
-                    NotifyIndexerOfHashedUpload(upload);
+                    NotifyIndexerOfObscufatedUpload(upload);
                     upload.NotifiedIndexerAt = DateTime.UtcNow;
                     DBHandler.Instance.UpdateUploadEntry(upload);
-                    Console.WriteLine("Notified indexer that hashed release [{0}] is actually [{1}]", 
+                    Console.WriteLine("Notified indexer that obscufated release [{0}] is actually [{1}]", 
                         upload.ObscuredName, upload.CleanedName);
                 }
                 catch(Exception ex)
                 {
-                    Console.WriteLine("Could not notify indexer of hashed release:");
+                    Console.WriteLine("Could not notify indexer of obscufated release:");
                     Console.WriteLine(ex.ToString());
                     //TODO: Log.
                 }
             }
         }
 
-        private void NotifyIndexerOfHashedUpload(UploadEntry upload)
+        private void NotifyIndexerOfObscufatedUpload(UploadEntry upload)
         {
             String notificationGetUrl = String.Format(
-                configuration.HashedNotificationUrl, 
+                configuration.ObscufatedNotificationUrl, 
                 Uri.EscapeDataString(upload.ObscuredName), 
                 Uri.EscapeDataString(upload.CleanedName));
             using (HttpClient client = new HttpClient())
