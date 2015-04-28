@@ -193,12 +193,12 @@ namespace nntpAutoposter
 
             String rawExt = preparedFile.Extension.Substring(1);
             if ("mkv".Equals(rawExt, StringComparison.InvariantCultureIgnoreCase))
-                StripMkvMetaDataFromTile(preparedFile);
+                StripMkvMetaDataFromFile(preparedFile);
             if (ffmpegHandledExtensions.Any(ext => ext.Equals(rawExt, StringComparison.InvariantCultureIgnoreCase)))
                 StripMetaDataWithFFmpeg(preparedFile);
         }
 
-        private void StripMkvMetaDataFromTile(FileInfo preparedFile)
+        private void StripMkvMetaDataFromFile(FileInfo preparedFile)
         {
             var mkvPropEdit = new MkvPropEditWrapper(configuration.MkvPropEditLocation);
             mkvPropEdit.SetTitle(preparedFile, "g33k");

@@ -11,6 +11,7 @@ namespace nntpPoster
         public Int32 TotalParts { get; set; }
         public Int32 UploadedParts { get; set; }
         public Double BytesPerSecond { get; set; }
+        public String CurrentlyPostingName { get; set; }
 
         public String GetHumanReadableSpeed()
         {
@@ -39,8 +40,8 @@ namespace nntpPoster
         {
             var tpl = TotalParts.ToString().Length;
 
-            return String.Format("{0," + tpl + "} of {1} parts uploaded at {2}", UploadedParts, TotalParts,
-                GetHumanReadableSpeed());
+            return String.Format("{0," + tpl + "} of {1} parts uploaded at {2}, now posting {3}", UploadedParts, TotalParts,
+                GetHumanReadableSpeed(), CurrentlyPostingName);
 
         }
     }

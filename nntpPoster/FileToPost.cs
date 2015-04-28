@@ -33,13 +33,9 @@ namespace nntpPoster
                 subject.Append(prefix + " ");
             subject.AppendFormat("\"" + file.Name + "\"");
             subject.Append(" yEnc ");
-            if (TotalParts > 1)
-            {
-                subject.Append("({0}/");    //The {0}  placeholder here is for the format statement later.
-                subject.Append(TotalParts);
-                subject.Append(") ");
-            }
-            subject.Append(file.Length);
+            subject.Append("({0}/");    //The {0}  placeholder here is for the format statement later.
+            subject.Append(TotalParts);
+            subject.Append(")");
             if (!String.IsNullOrWhiteSpace(suffix))
                 subject.Append(" " + suffix);
 
@@ -57,10 +53,7 @@ namespace nntpPoster
         {
             PostedFileInfo postedFileInfo = new PostedFileInfo();
             String subjectNameBase = ConstructSubjectNameBase(prefix, suffix);
-            if (partSize > 1)
-                postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
-            else
-                postedFileInfo.NzbSubjectName = subjectNameBase;
+            postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
             postedFileInfo.PostedGroups.AddRange(configuration.TargetNewsgroups);
             postedFileInfo.PostedDateTime = new NntpDateTime(DateTime.Now);
 
@@ -78,6 +71,7 @@ namespace nntpPoster
                     CRC32 partCRCCalculator = new CRC32();
 
                     var part = new YEncFilePart();
+                    part.SourcefileName = file.Name;
                     part.Number = partNumber;
                     part.Begin = fileStream.Position + 1;
 
@@ -105,12 +99,7 @@ namespace nntpPoster
         private void PostPart(InntpMessagePoster poster, PostedFileInfo postedFileInfo, YEncFilePart part, 
             String subjectNameBase)
         {
-            String subject;
-            
-            if(TotalParts > 1)
-                subject = String.Format(subjectNameBase, part.Number);
-            else
-                subject = subjectNameBase;
+            String subject = String.Format(subjectNameBase, part.Number);
 
             List<String> yEncPrefix = new List<String>();
             List<String> yEncSuffix = new List<String>();

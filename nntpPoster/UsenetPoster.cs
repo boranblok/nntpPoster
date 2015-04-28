@@ -41,6 +41,7 @@ namespace nntpPoster
             try
             {
                 List<FileToPost> filesToPost = processedFiles.GetFiles()
+                    .OrderBy(f => f.Name)
                     .Select(f => new FileToPost(configuration, f)).ToList();
 
                 List < PostedFileInfo > postedFiles = new List<PostedFileInfo>();
@@ -93,7 +94,8 @@ namespace nntpPoster
             OnNewUploadSpeedReport(new UploadSpeedReport{
                     TotalParts = TotalPartCount,
                     UploadedParts = _uploadedPartCount,
-                    BytesPerSecond = speed
+                    BytesPerSecond = speed,
+                    CurrentlyPostingName = e.SourcefileName
                 });
         }
 
@@ -140,7 +142,7 @@ namespace nntpPoster
 
             var parWrapper = new ParWrapper(configuration.ParLocation);
             parWrapper.CreateParFilesInDirectory(
-                targetDirectory, configuration.YEncPartSize, rarSizeRecommendation.ReccomendedRecoveryPercentage);
+                targetDirectory, nameWithoutExtension, configuration.YEncPartSize, rarSizeRecommendation.ReccomendedRecoveryPercentage);
 
             return targetDirectory;
         }

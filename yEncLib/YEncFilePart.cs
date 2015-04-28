@@ -9,6 +9,8 @@ namespace nntpPoster.yEncLib
 {
     public class YEncFilePart
     {
+        public String SourcefileName { get; set; }
+
         public Byte[] EncodedLines { get; set; }
 
         public String CRC32 { get; set; }
