@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Mono.Data.Sqlite;
@@ -29,19 +31,36 @@ namespace nntpAutoposter
             }
         }
 
+        private String _connectionString;
+
         private DBHandler()
         {
+            DetermineConnectionString();
             InitializeDataBase();
         }
 
-        private SqliteConnection GetConnection()
+        private void DetermineConnectionString()
         {
-            return new SqliteConnection(ConfigurationManager.ConnectionStrings["DBConnection"].ConnectionString);
+            String dbFilePath;
+            if (String.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["DatabaseFile"]))
+            {
+                String codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                UriBuilder uri = new UriBuilder(codeBase);
+                String path = Uri.UnescapeDataString(uri.Path);
+                String assemblyDirectory = Path.GetDirectoryName(path);
+
+                dbFilePath = Path.Combine(assemblyDirectory, "nntpAutoPoster.Sqlite3.db");
+            }
+            else
+            {
+                dbFilePath = ConfigurationManager.AppSettings["DatabaseFile"];
+            }
+            _connectionString = String.Format("URI=file:{0},version=3", dbFilePath);
         }
 
         private void InitializeDataBase()
         {
-            using (SqliteConnection conn = GetConnection())
+            using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
                 using (SqliteTransaction trans = conn.BeginTransaction())
@@ -72,7 +91,7 @@ namespace nntpAutoposter
 
         public UploadEntry GetNextUploadEntryToUpload()
         {
-            using (SqliteConnection conn = GetConnection())
+            using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
                 using (SqliteCommand cmd = conn.CreateCommand())
@@ -98,7 +117,7 @@ namespace nntpAutoposter
         public List<UploadEntry> GetUploadEntriesToNotifyIndexer()
         {
             List<UploadEntry> uploadEntries = new List<UploadEntry>();
-            using (SqliteConnection conn = GetConnection())
+            using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
                 using (SqliteCommand cmd = conn.CreateCommand())
@@ -110,7 +129,6 @@ namespace nntpAutoposter
                                         ORDER BY CreatedAt ASC";
                     using (SqliteDataReader reader = cmd.ExecuteReader())
                     {
-                        UploadEntry uploadEntry = null;
                         while (reader.Read())
                         {
                             uploadEntries.Add(GetUploadEntryFromReader(reader));
@@ -124,7 +142,7 @@ namespace nntpAutoposter
         public List<UploadEntry> GetUploadEntriesToVerify()
         {
             List<UploadEntry> uploadEntries = new List<UploadEntry>();
-            using (SqliteConnection conn = GetConnection())
+            using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
                 using (SqliteCommand cmd = conn.CreateCommand())
@@ -141,7 +159,6 @@ namespace nntpAutoposter
                                         ORDER BY CreatedAt ASC";
                     using (SqliteDataReader reader = cmd.ExecuteReader())
                     {
-                        UploadEntry uploadEntry = null;
                         while (reader.Read())
                         {
                             uploadEntries.Add(GetUploadEntryFromReader(reader));
@@ -154,7 +171,7 @@ namespace nntpAutoposter
 
         public UploadEntry GetActiveUploadEntry(String name)
         {
-            using (SqliteConnection conn = GetConnection())
+            using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
                 using (SqliteCommand cmd = conn.CreateCommand())
@@ -180,7 +197,7 @@ namespace nntpAutoposter
 
         public void AddNewUploadEntry(UploadEntry uploadentry)
         {
-            using (SqliteConnection conn = GetConnection())
+            using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
                 using (SqliteTransaction trans = conn.BeginTransaction())
@@ -237,7 +254,7 @@ namespace nntpAutoposter
 
         public void UpdateUploadEntry(UploadEntry uploadEntry)
         {
-            using (SqliteConnection conn = GetConnection())
+            using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
                 using (SqliteCommand cmd = conn.CreateCommand())
