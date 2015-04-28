@@ -65,6 +65,21 @@ namespace nntpAutoposter
             {
                 try
                 {
+                    String fullPath = Path.Combine(configuration.BackupFolder.FullName, upload.Name);
+                    
+                    Boolean backupExists = false;
+                    backupExists = Directory.Exists(fullPath);
+                    if(!backupExists)
+                        backupExists = File.Exists(fullPath);
+
+                    if (!backupExists)
+                    {
+                        Console.WriteLine("The upload [{0}] was removed from the backup folder, cancelling verification.", upload.Name);
+                        upload.Cancelled = true;
+                        DBHandler.Instance.UpdateUploadEntry(upload);
+                        continue;
+                    }
+
                     if (UploadIsOnIndexer(upload))
                     {
                         upload.SeenOnIndexAt = DateTime.UtcNow;
@@ -73,7 +88,6 @@ namespace nntpAutoposter
 
                         if (upload.RemoveAfterVerify)
                         {
-                            String fullPath = Path.Combine(configuration.BackupFolder.FullName, upload.Name);
                             FileAttributes attributes = File.GetAttributes(fullPath);
                             if (attributes.HasFlag(FileAttributes.Directory))
                                 Directory.Delete(fullPath, true);
@@ -150,6 +164,7 @@ namespace nntpAutoposter
 
             if(AgeInMinutes > repostTreshold)
             {
+                Console.WriteLine("Could not find [{0}] after {1:F2} minutes, reposting.", upload.Name, repostTreshold);
                 UploadEntry repost = new UploadEntry();
                 repost.Name = upload.Name;
                 repost.RemoveAfterVerify = upload.RemoveAfterVerify;
