@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Security.Principal;
 using System.ServiceModel.Syndication;
 using System.Text;
 using System.Threading;
@@ -101,60 +103,34 @@ namespace nntpAutoposter
                 Uri.EscapeDataString(upload.CleanedName),
                 postAge);
 
-            using (HttpClient client = new HttpClient())
-            {
-                Task<HttpResponseMessage> getTask = null;
-                try
-                {
-                    getTask = client.GetAsync(verificationGetUrl);
-                    getTask.Wait(60 * 1000);
-                    if (getTask.IsCompleted)
-                    {
-                        if (getTask.IsFaulted)
-                            throw getTask.Exception;
-                        if (getTask.Result == null)
-                            throw new Exception("No valid HttpResponse received.");
+            ServicePointManager.ServerCertificateValidationCallback = ServerCertificateValidationCallback;
 
-                        if (!getTask.Result.IsSuccessStatusCode)
-                            throw new Exception("Error when verifying on indexer: "
-                                + getTask.Result.StatusCode + " " + getTask.Result.ReasonPhrase);
+            HttpWebRequest request = WebRequest.Create(verificationGetUrl) as HttpWebRequest;       //Mono does not support CreateHttp
+            //request.ServerCertificateValidationCallback = ServerCertificateValidationCallback;    //Not implemented in mono
+            request.Method = "GET";
+            request.Timeout = 60*1000;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            if(response.StatusCode != HttpStatusCode.OK)
+                throw new Exception("Error when verifying on indexer: "
+                                + response.StatusCode + " " + response.StatusDescription);
 
-                        return FindUploadInResponse(upload, getTask.Result);   //This blocks until the result is available.
-                    }
-                    throw new Exception("No valid HttpResponse could be received within the timeout period.");
-                }
-                finally
-                {
-                    if (getTask != null && getTask.IsCompleted && getTask.Result != null)
-                        getTask.Result.Dispose();
-                }
-            }
-        }
-
-        private Boolean FindUploadInResponse(UploadEntry upload, HttpResponseMessage httpResponseMessage)
-        {
-            Task<Stream> responseStreamTask = null;
-            try
+            using (XmlReader xmlReader = XmlReader.Create(response.GetResponseStream()))
             {
-                responseStreamTask = httpResponseMessage.Content.ReadAsStreamAsync();
-                using(XmlReader xmlReader = XmlReader.Create(responseStreamTask.Result))
+                SyndicationFeed feed = SyndicationFeed.Load(xmlReader);
+                foreach (var item in feed.Items)
                 {
-                    SyndicationFeed feed = SyndicationFeed.Load(xmlReader);
-                    foreach(var item in feed.Items)
-                    {
-                        Decimal similarityPercentage =
-                            LevenshteinDistance.SimilarityPercentage(item.Title.Text, upload.CleanedName);
-                        if (similarityPercentage > configuration.VerifySimilarityPercentageTreshold)
-                            return true;
-                    }
+                    Decimal similarityPercentage =
+                        LevenshteinDistance.SimilarityPercentage(item.Title.Text, upload.CleanedName);
+                    if (similarityPercentage > configuration.VerifySimilarityPercentageTreshold)
+                        return true;
                 }
-            }
-            finally
-            {
-                if (responseStreamTask != null && responseStreamTask.IsCompleted && responseStreamTask.Result != null)
-                    responseStreamTask.Result.Dispose();
             }
             return false;
+        }
+
+        private bool ServerCertificateValidationCallback(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
+        {
+            return true;    //HACK: this should be worked out better, right now we accept all SSL Certs.
         }
 
         private void RepostIfRequired(UploadEntry upload)

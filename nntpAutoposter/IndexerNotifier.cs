@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -81,31 +83,22 @@ namespace nntpAutoposter
                 configuration.ObscufatedNotificationUrl, 
                 Uri.EscapeDataString(upload.ObscuredName), 
                 Uri.EscapeDataString(upload.CleanedName));
-            using (HttpClient client = new HttpClient())
-            {
-                Task<HttpResponseMessage> getTask = null;
-                try
-                {
-                    getTask = client.GetAsync(notificationGetUrl, HttpCompletionOption.ResponseContentRead);
-                    getTask.Wait(60 * 1000);
-                    if (getTask.IsCompleted)
-                    {
-                        if (getTask.IsFaulted)
-                            throw getTask.Exception;
-                        if (getTask.Result == null)
-                            throw new Exception("No valid HttpResponse received.");
 
-                        if (!getTask.Result.IsSuccessStatusCode)
-                            throw new Exception("Error when notifying indexer: "
-                                + getTask.Result.StatusCode + " " + getTask.Result.ReasonPhrase);
-                    }
-                }
-                finally
-                {
-                    if (getTask != null && getTask.IsCompleted && getTask.Result != null)
-                        getTask.Result.Dispose();
-                }
-            }
+            ServicePointManager.ServerCertificateValidationCallback = ServerCertificateValidationCallback;
+
+            HttpWebRequest request = WebRequest.Create(notificationGetUrl) as HttpWebRequest;       //Mono does not support CreateHttp
+            //request.ServerCertificateValidationCallback = ServerCertificateValidationCallback;    //Not implemented in mono
+            request.Method = "GET";
+            request.Timeout = 60 * 1000;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new Exception("Error when notifying indexer: "
+                                + response.StatusCode + " " + response.StatusDescription);
+        }
+
+        private bool ServerCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            return true;    //HACK: this should be worked out better, right now we accept all SSL Certs.
         }
     }
 }

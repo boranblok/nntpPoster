@@ -71,7 +71,6 @@
     <None Include="App.config" />
     <None Include="App.Debug.config">
       <DependentUpon>App.config</DependentUpon>
-      <SubType>Designer</SubType>
     </None>
     <None Include="App.Mono.config">
       <DependentUpon>App.config</DependentUpon>
