@@ -1,27 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using nntpPoster;
+using Util;
 
 namespace nntpAutoposter
 {
     class Program
     {
-        static AutoPosterConfig _configuration;
-        static void Main()
+        static AutoPosterConfig configuration;
+        static void Main(string[] args)
         {
-            _configuration = new AutoPosterConfig();
+            configuration = new AutoPosterConfig();
 
-            var watcher = new Watcher(_configuration);
+            Watcher watcher = new Watcher(configuration);
             watcher.Start();
             Console.WriteLine("FileSystemWatcher started");
 
-            var poster = new AutoPoster(_configuration);
+            AutoPoster poster = new AutoPoster(configuration);
             poster.Start();
             Console.WriteLine("Autoposter started");
 
-            var notifier = new IndexerNotifier(_configuration);
+            IndexerNotifier notifier = new IndexerNotifier(configuration);
             notifier.Start();
             Console.WriteLine("Notifier started");
 
-            var verifier = new IndexerVerifier(_configuration);
+            IndexerVerifier verifier = new IndexerVerifier(configuration);
             verifier.Start();
             Console.WriteLine("Verifier started");
 

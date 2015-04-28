@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using nntpPoster.yEncLib;
 using par2Lib;
@@ -12,16 +14,16 @@ namespace nntpPoster
 {
     public class UsenetPoster
     {
-        public event EventHandler<UploadSpeedReport> NewUploadSpeedReport;
+        public event EventHandler<UploadSpeedReport> newUploadSpeedReport;
 
-        private readonly UsenetPosterConfig _configuration;
+        private UsenetPosterConfig configuration;
         public UsenetPoster(UsenetPosterConfig configuration)
         {
-            _configuration = configuration;
+            this.configuration = configuration;
         }
         
         private Int32 TotalPartCount { get; set; }
-        private readonly Object _uploadLock = new Object();
+        private Object UploadLock = new Object();
         private Int32 UploadedPartCount { get; set; }
         private Int64 TotalUploadedBytes { get; set; }
         private DateTime UploadStartTime { get; set; }
@@ -33,35 +35,35 @@ namespace nntpPoster
 
         public XDocument PostToUsenet(FileSystemInfo toPost, String title, Boolean saveNzb = true)
         {
-            var poster = new NntpMessagePoster(_configuration);
+            nntpMessagePoster poster = new nntpMessagePoster(configuration);
             poster.PartPosted += poster_PartPosted;
-            var processedFiles = PrepareToPost(toPost);
+            DirectoryInfo processedFiles = PrepareToPost(toPost);
             try
             {
-                var filesToPost = processedFiles.GetFiles()
+                List<FileToPost> filesToPost = processedFiles.GetFiles()
                     .OrderBy(f => f.Name)
-                    .Select(f => new FileToPost(_configuration, f)).ToList();
+                    .Select(f => new FileToPost(configuration, f)).ToList();
 
-                var postedFiles = new List<PostedFileInfo>();
+                List < PostedFileInfo > postedFiles = new List<PostedFileInfo>();
                 TotalPartCount = filesToPost.Sum(f => f.TotalParts);
                 UploadedPartCount = 0;
                 TotalUploadedBytes = 0;
                 UploadStartTime = DateTime.Now;
 
-                var fileCount = 1;
+                Int32 fileCount = 1;
                 foreach (var fileToPost in filesToPost)
                 {
-                    var comment1 = String.Format("{0} [{1}/{2}]", title, fileCount++, filesToPost.Count);
-                    var postInfo = fileToPost.PostYEncFile(poster, comment1, "");
+                    String comment1 = String.Format("{0} [{1}/{2}]", title, fileCount++, filesToPost.Count);
+                    PostedFileInfo postInfo = fileToPost.PostYEncFile(poster, comment1, "");
                     postedFiles.Add(postInfo);
                 }
 
                 poster.WaitTillCompletion();
                 Console.WriteLine();
 
-                var nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles);
-                if (saveNzb && !String.IsNullOrWhiteSpace(_configuration.NzbOutputFolder))
-                    nzbDoc.Save(Path.Combine(_configuration.NzbOutputFolder, toPost.NameWithoutExtension() + ".nzb"));
+                XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles);
+                if (saveNzb && !String.IsNullOrWhiteSpace(configuration.NzbOutputFolder))
+                    nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder, toPost.NameWithoutExtension() + ".nzb"));
                 return nzbDoc;
             }
             finally
@@ -76,22 +78,22 @@ namespace nntpPoster
 
         void poster_PartPosted(object sender, YEncFilePart e)
         {
-            Int32 uploadedPartCount;
-            Int64 totalUploadedBytes;
-            lock (_uploadLock)
+            Int32 _uploadedPartCount;
+            Int64 _totalUploadedBytes;
+            lock (UploadLock)
             {
                 UploadedPartCount++;
-                uploadedPartCount = UploadedPartCount;
+                _uploadedPartCount = UploadedPartCount;
                 TotalUploadedBytes += e.Size;
-                totalUploadedBytes = TotalUploadedBytes;
+                _totalUploadedBytes = TotalUploadedBytes;
             }
 
-            var timeElapsed = DateTime.Now - UploadStartTime;
-            var speed = totalUploadedBytes/timeElapsed.TotalSeconds;
+            TimeSpan timeElapsed = DateTime.Now - UploadStartTime;
+            Double speed = (Double) _totalUploadedBytes/timeElapsed.TotalSeconds;
 
             OnNewUploadSpeedReport(new UploadSpeedReport{
                     TotalParts = TotalPartCount,
-                    UploadedParts = uploadedPartCount,
+                    UploadedParts = _uploadedPartCount,
                     BytesPerSecond = speed,
                     CurrentlyPostingName = e.SourcefileName
                 });
@@ -99,9 +101,9 @@ namespace nntpPoster
 
         protected virtual void OnNewUploadSpeedReport(UploadSpeedReport e)
         {
-            Console.Write("\r" + e + "   ");
+            Console.Write("\r" + e.ToString() + "   ");
 
-            var handler = NewUploadSpeedReport;
+            EventHandler<UploadSpeedReport> handler = newUploadSpeedReport;
             if (handler != null) handler(this, e);
         }
 
@@ -126,21 +128,21 @@ namespace nntpPoster
 
         private DirectoryInfo MakeRarAndParFiles(FileSystemInfo toPost, String nameWithoutExtension)
         {
-            var size = toPost.Size();
-            var rarSizeRecommendation = _configuration.RecommendationMap
+            Int64 size = toPost.Size();
+            var rarSizeRecommendation = configuration.RecommendationMap
                 .Where(rr => rr.FromFileSize < size)
                 .OrderByDescending(rr => rr.FromFileSize)
                 .First();
-            var targetDirectory = new DirectoryInfo(Path.Combine(
-                _configuration.WorkingFolder.FullName, nameWithoutExtension + "_readyToPost"));
+            DirectoryInfo targetDirectory = new DirectoryInfo(Path.Combine(
+                configuration.WorkingFolder.FullName, nameWithoutExtension + "_readyToPost"));
             targetDirectory.Create();
-            var rarWrapper = new RarWrapper(_configuration.RarLocation);
+            var rarWrapper = new RarWrapper(configuration.RarLocation);
             rarWrapper.Compress(
                 toPost, targetDirectory, nameWithoutExtension, rarSizeRecommendation.ReccomendedRarSize);
 
-            var parWrapper = new ParWrapper(_configuration.ParLocation);
+            var parWrapper = new ParWrapper(configuration.ParLocation);
             parWrapper.CreateParFilesInDirectory(
-                targetDirectory, nameWithoutExtension, _configuration.YEncPartSize, rarSizeRecommendation.ReccomendedRecoveryPercentage);
+                targetDirectory, nameWithoutExtension, configuration.YEncPartSize, rarSizeRecommendation.ReccomendedRecoveryPercentage);
 
             return targetDirectory;
         }
@@ -149,7 +151,7 @@ namespace nntpPoster
         {
             XNamespace ns = "http://www.newzbin.com/DTD/2003/nzb";
 
-            var doc = new XDocument(
+            XDocument doc = new XDocument(
                 new XDeclaration("1.0", "utf-8", "yes"),
                 new XDocumentType("nzb", "-//newzBin//DTD NZB 1.1//EN", "http://www.newzbin.com/DTD/nzb/nzb-1.1.dtd", null),
                 new XElement(ns + "nzb",
@@ -161,7 +163,7 @@ namespace nntpPoster
                         ),
                     postedFiles.Select(f =>
                         new XElement(ns + "file",
-                            new XAttribute("poster", _configuration.FromAddress),
+                            new XAttribute("poster", configuration.FromAddress),
                             new XAttribute("date", f.PostedDateTime.GetUnixTimeStamp()),
                             new XAttribute("subject", f.NzbSubjectName),
                             new XElement(ns + "groups",

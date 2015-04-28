@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace mkvPropEditLib
 {
@@ -31,12 +35,12 @@ namespace mkvPropEditLib
 
         public void SetTitle(FileInfo mkvFile, String title)
         {
-            var mkvPropEditParameters = String.Format("--set title=\"{0}\" \"{1}\"",
+            String mkvPropEditParameters = String.Format("--set title=\"{0}\" \"{1}\"",
                 title,
                 mkvFile.FullName
             );
 
-            var mkvPropEditProcess = new Process();
+            Process mkvPropEditProcess = new Process();
             mkvPropEditProcess.StartInfo.Arguments = mkvPropEditParameters;
             mkvPropEditProcess.StartInfo.FileName = MkvPropEditLocation;
 

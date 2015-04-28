@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Util
 {
@@ -6,8 +10,8 @@ namespace Util
     {
         public static Decimal SimilarityPercentage(String s, String t)
         {
-            var averageLength = (s.Length + (Decimal)t.Length) / 2;
-            var levenshteinDistance = Compute(s, t);
+            Decimal averageLength = ((Decimal)s.Length + (Decimal)t.Length) / 2;
+            Int32 levenshteinDistance = Compute(s, t);
             return ((averageLength - levenshteinDistance) / averageLength) * 100;
         }
         public static int Compute(string s, string t)
@@ -24,22 +28,22 @@ namespace Util
                 return s.Length;
             }
 
-            var n = s.Length;
-            var m = t.Length;
-            var d = new int[n + 1, m + 1];
+            int n = s.Length;
+            int m = t.Length;
+            int[,] d = new int[n + 1, m + 1];
 
             // initialize the top and right of the table to 0, 1, 2, ...
-            for (var i = 0; i <= n; d[i, 0] = i++) ;
-            for (var j = 1; j <= m; d[0, j] = j++) ;
+            for (int i = 0; i <= n; d[i, 0] = i++) ;
+            for (int j = 1; j <= m; d[0, j] = j++) ;
 
-            for (var i = 1; i <= n; i++)
+            for (int i = 1; i <= n; i++)
             {
-                for (var j = 1; j <= m; j++)
+                for (int j = 1; j <= m; j++)
                 {
-                    var cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
-                    var min1 = d[i - 1, j] + 1;
-                    var min2 = d[i, j - 1] + 1;
-                    var min3 = d[i - 1, j - 1] + cost;
+                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
+                    int min1 = d[i - 1, j] + 1;
+                    int min2 = d[i, j - 1] + 1;
+                    int min3 = d[i - 1, j - 1] + cost;
                     d[i, j] = Math.Min(Math.Min(min1, min2), min3);
                 }
             }

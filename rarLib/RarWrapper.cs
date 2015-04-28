@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace rarLib
 {
@@ -32,19 +36,19 @@ namespace rarLib
         public void Compress(FileSystemInfo source, DirectoryInfo destination, String archiveName, Int32 partSize)
         {
             String toCompress;
-            var attributes = File.GetAttributes(source.FullName);
+            FileAttributes attributes = File.GetAttributes(source.FullName);
             if (attributes.HasFlag(FileAttributes.Directory))
                 toCompress = Path.Combine(source.FullName, "*");
             else
                 toCompress = source.FullName;
 
-            var rarParameters = String.Format("a -ep1 -m0 -v{0}b \"{1}\" \"{2}\"",
+            String rarParameters = String.Format("a -ep1 -m0 -v{0}b \"{1}\" \"{2}\"",
                 partSize,
                 Path.Combine(destination.FullName, archiveName),
                 toCompress
             );
 
-            var rarProcess = new Process();
+            Process rarProcess = new Process();
             rarProcess.StartInfo.Arguments = rarParameters;
             rarProcess.StartInfo.FileName = RarLocation;
 

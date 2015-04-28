@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace nntpPoster
 {
@@ -45,7 +47,7 @@ namespace nntpPoster
             NewsGroupPassword = ConfigurationManager.AppSettings["NewsGroupPassword"];
             NewsGroupUseSsl = Boolean.Parse(ConfigurationManager.AppSettings["NewsGroupUseSsl"]);
             TargetNewsgroups = ConfigurationManager.AppSettings["TargetNewsgroups"]
-                .Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+                .Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
 
             MaxConnectionCount = Int32.Parse(ConfigurationManager.AppSettings["MaxConnectionCount"]);
 
@@ -59,7 +61,7 @@ namespace nntpPoster
             NzbOutputFolder = ConfigurationManager.AppSettings["NzbOutputFolder"];
             if(!String.IsNullOrWhiteSpace(NzbOutputFolder))
             {
-                var nzbFolder = new DirectoryInfo(NzbOutputFolder);
+                DirectoryInfo nzbFolder = new DirectoryInfo(NzbOutputFolder);
                 if (!nzbFolder.Exists)
                     nzbFolder.Create();
             }
@@ -72,8 +74,8 @@ namespace nntpPoster
 
         private List<RarAndRecoveryRecommendation> LoadReccomendationMap(String configValue)
         {
-            return configValue.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
-                .Select(sizeMapping => sizeMapping.Split(new[] {'|'}, StringSplitOptions.RemoveEmptyEntries))
+            return configValue.Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries)
+                .Select(sizeMapping => sizeMapping.Split(new char[] {'|'}, StringSplitOptions.RemoveEmptyEntries))
                 .Select(configEntry => new RarAndRecoveryRecommendation
             {
                 FromFileSize = Int32.Parse(configEntry[0]) * 1024 * 1024, 
@@ -84,9 +86,9 @@ namespace nntpPoster
 
         private Int32 DetermineOpticalRarSize(Int32 configuredMegabytes)
         {
-            var configuredBytes = configuredMegabytes * 1024 * 1024;
-            var blockSizeBytes = YEncLineSize * YEncLinesPerMessage;
-            var optimalNumberOfBlocks = (Int32)Math.Round((Decimal)configuredBytes / blockSizeBytes, 0, MidpointRounding.AwayFromZero);
+            Int32 configuredBytes = configuredMegabytes * 1024 * 1024;
+            Int32 blockSizeBytes = YEncLineSize * YEncLinesPerMessage;
+            Int32 optimalNumberOfBlocks = (Int32)Math.Round((Decimal)configuredBytes / blockSizeBytes, 0, MidpointRounding.AwayFromZero);
             return optimalNumberOfBlocks * blockSizeBytes;
         }
     }

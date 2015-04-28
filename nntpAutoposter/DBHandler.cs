@@ -2,31 +2,34 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Mono.Data.Sqlite;
 
 namespace nntpAutoposter
 {
-    class DbHandler
+    class DBHandler
     {
-        private static readonly Object LockObject = new Object();
-        private static DbHandler _instance;
-        public static DbHandler Instance
+        private static Object lockObject = new Object();
+        private static DBHandler _instance;
+        public static DBHandler Instance
         {
             get
             {
                 if(_instance == null)
                 {
-                    lock(LockObject)
+                    lock(lockObject)
                     {
                         if (_instance == null)
-                            _instance = new DbHandler();
+                            _instance = new DBHandler();
                     }
                 }
                 return _instance;
             }
         }
 
-        private DbHandler()
+        private DBHandler()
         {
             InitializeDataBase();
         }
@@ -38,12 +41,12 @@ namespace nntpAutoposter
 
         private void InitializeDataBase()
         {
-            using (var conn = GetConnection())
+            using (SqliteConnection conn = GetConnection())
             {
                 conn.Open();
-                using (var trans = conn.BeginTransaction())
+                using (SqliteTransaction trans = conn.BeginTransaction())
                 {
-                    using (var ddlCmd = conn.CreateCommand())
+                    using (SqliteCommand ddlCmd = conn.CreateCommand())
                     {
                         ddlCmd.Transaction = trans;
                         ddlCmd.CommandText = @"CREATE TABLE IF NOT EXISTS 
@@ -69,17 +72,17 @@ namespace nntpAutoposter
 
         public UploadEntry GetNextUploadEntryToUpload()
         {
-            using (var conn = GetConnection())
+            using (SqliteConnection conn = GetConnection())
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (SqliteCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
                                         WHERE UploadedAt IS NULL 
                                           AND Cancelled = 0
                                         ORDER BY CreatedAt ASC
                                         LIMIT 1";
-                    using (var reader = cmd.ExecuteReader())
+                    using (SqliteDataReader reader = cmd.ExecuteReader())
                     {
                         UploadEntry uploadEntry = null;
                         if (reader.Read())
@@ -94,19 +97,20 @@ namespace nntpAutoposter
 
         public List<UploadEntry> GetUploadEntriesToNotifyIndexer()
         {
-            var uploadEntries = new List<UploadEntry>();
-            using (var conn = GetConnection())
+            List<UploadEntry> uploadEntries = new List<UploadEntry>();
+            using (SqliteConnection conn = GetConnection())
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (SqliteCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
                                         WHERE ObscuredName IS NOT NULL 
                                           AND NotifiedIndexerAt IS NULL
                                           AND Cancelled = 0
                                         ORDER BY CreatedAt ASC";
-                    using (var reader = cmd.ExecuteReader())
+                    using (SqliteDataReader reader = cmd.ExecuteReader())
                     {
+                        UploadEntry uploadEntry = null;
                         while (reader.Read())
                         {
                             uploadEntries.Add(GetUploadEntryFromReader(reader));
@@ -119,11 +123,11 @@ namespace nntpAutoposter
 
         public List<UploadEntry> GetUploadEntriesToVerify()
         {
-            var uploadEntries = new List<UploadEntry>();
-            using (var conn = GetConnection())
+            List<UploadEntry> uploadEntries = new List<UploadEntry>();
+            using (SqliteConnection conn = GetConnection())
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (SqliteCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
                                         WHERE UploadedAt IS NOT NULL
@@ -135,8 +139,9 @@ namespace nntpAutoposter
                                             (ObscuredName IS NOT NULL AND NotifiedIndexerAt IS NOT NULL)
                                           )
                                         ORDER BY CreatedAt ASC";
-                    using (var reader = cmd.ExecuteReader())
+                    using (SqliteDataReader reader = cmd.ExecuteReader())
                     {
+                        UploadEntry uploadEntry = null;
                         while (reader.Read())
                         {
                             uploadEntries.Add(GetUploadEntryFromReader(reader));
@@ -149,14 +154,14 @@ namespace nntpAutoposter
 
         public UploadEntry GetActiveUploadEntry(String name)
         {
-            using (var conn = GetConnection())
+            using (SqliteConnection conn = GetConnection())
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (SqliteCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT ROWID, * from UploadEntries WHERE Name = @name AND Cancelled = 0";
                     cmd.Parameters.Add(new SqliteParameter("@name", name));
-                    using(var reader = cmd.ExecuteReader())
+                    using(SqliteDataReader reader = cmd.ExecuteReader())
                     {
                         UploadEntry uploadEntry = null;
                         if(reader.Read())
@@ -175,12 +180,12 @@ namespace nntpAutoposter
 
         public void AddNewUploadEntry(UploadEntry uploadentry)
         {
-            using (var conn = GetConnection())
+            using (SqliteConnection conn = GetConnection())
             {
                 conn.Open();
-                using (var trans = conn.BeginTransaction())
+                using (SqliteTransaction trans = conn.BeginTransaction())
                 {
-                    using (var cmd = conn.CreateCommand())
+                    using (SqliteCommand cmd = conn.CreateCommand())
                     {
                         cmd.Transaction = trans;
                         cmd.CommandText = @"UPDATE UploadEntries SET Cancelled = 1 WHERE Name = @name";
@@ -232,10 +237,10 @@ namespace nntpAutoposter
 
         public void UpdateUploadEntry(UploadEntry uploadEntry)
         {
-            using (var conn = GetConnection())
+            using (SqliteConnection conn = GetConnection())
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (SqliteCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"UPDATE UploadEntries SET 
                                             Name = @name,
@@ -264,7 +269,7 @@ namespace nntpAutoposter
 
         private static UploadEntry GetUploadEntryFromReader(SqliteDataReader reader)
         {
-            var uploadEntry = new UploadEntry();
+            UploadEntry uploadEntry = new UploadEntry();
 
             uploadEntry.ID = (Int64)reader["ROWID"];
             uploadEntry.Name = reader["Name"] as String;
@@ -295,19 +300,19 @@ namespace nntpAutoposter
 
         private static Boolean GetBoolean(Object dbValue)
         {
-            var boolValue = (Int64)dbValue;
+            Int64 boolValue = (Int64)dbValue;
             return boolValue == 1;
         }
 
         private static DateTime GetDateTime(Object dbValue)
         {
-            var dateTimeStr = dbValue as String;
+            String dateTimeStr = dbValue as String;
             return DateTime.Parse(dateTimeStr, null, DateTimeStyles.RoundtripKind);
         }
 
         private static Nullable<DateTime> GetNullableDateTime(Object dbValue)
         {
-            var dateTimeStr = dbValue as String;
+            String dateTimeStr = dbValue as String;
             DateTime result;
             if (dateTimeStr != null && DateTime.TryParse(dateTimeStr, null, DateTimeStyles.RoundtripKind, out result))
                 return result;

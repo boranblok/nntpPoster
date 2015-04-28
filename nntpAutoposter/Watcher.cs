@@ -1,38 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Util;
 
 namespace nntpAutoposter
 {
     class Watcher
     {
-        private readonly AutoPosterConfig _configuration;
-        private readonly FileSystemWatcher _watcher;
+        private AutoPosterConfig configuration;
+        private FileSystemWatcher watcher;
 
         public Watcher(AutoPosterConfig configuration)
         {
-            _configuration = configuration;
-            _watcher = new FileSystemWatcher(configuration.WatchFolder.FullName);
-            _watcher.IncludeSubdirectories = false;
-            _watcher.Created += watcher_Created;
-            _watcher.Error += watcher_Error;
+            this.configuration = configuration;
+            watcher = new FileSystemWatcher(configuration.WatchFolder.FullName);
+            watcher.IncludeSubdirectories = false;
+            watcher.Created += watcher_Created;
+            watcher.Error += watcher_Error;
 
         }
 
         public void Start()
         {
-            foreach (var toPost in _configuration.WatchFolder.EnumerateFileSystemInfos())
+            foreach (FileSystemInfo toPost in configuration.WatchFolder.EnumerateFileSystemInfos())
             {
                 MoveToBackupFolderAndPost(toPost.FullName);
             }
-            _watcher.EnableRaisingEvents = true;
-            Console.WriteLine("Monitoring '{0}' for new files or folders to post.", _configuration.WatchFolder.FullName);
+            watcher.EnableRaisingEvents = true;
+            Console.WriteLine("Monitoring '{0}' for new files or folders to post.", configuration.WatchFolder.FullName);
         }
 
         public void Stop()
         {
-            _watcher.EnableRaisingEvents = false;
+            watcher.EnableRaisingEvents = false;
         }
 
         private void watcher_Error(object sender, ErrorEventArgs e)
@@ -50,7 +54,7 @@ namespace nntpAutoposter
         private void MoveToBackupFolderAndPost(String fullPath)
         {
             FileSystemInfo backup;
-            var attributes = File.GetAttributes(fullPath);
+            FileAttributes attributes = File.GetAttributes(fullPath);
             if (attributes.HasFlag(FileAttributes.Directory))
             {
                 backup = MoveFolderToBackup(fullPath);
@@ -65,12 +69,13 @@ namespace nntpAutoposter
 
         private FileSystemInfo MoveFolderToBackup(String fullPath)
         {
-            var toPost = new DirectoryInfo(fullPath);
-            var destinationFolder = Path.Combine(_configuration.BackupFolder.FullName, toPost.Name);
-            var backup = new DirectoryInfo(destinationFolder);
+            FileSystemInfo backup;
+            DirectoryInfo toPost = new DirectoryInfo(fullPath);
+            String destinationFolder = Path.Combine(configuration.BackupFolder.FullName, toPost.Name);
+            backup = new DirectoryInfo(destinationFolder);
             if (backup.Exists)
                 backup.Delete();
-            var retry = true;
+            Boolean retry = true;
             while (retry)
             {
                 try
@@ -91,12 +96,13 @@ namespace nntpAutoposter
 
         private FileSystemInfo MoveFileToBackup(String fullPath)
         {
-            var toPost = new FileInfo(fullPath);
-            var destinationFile = Path.Combine(_configuration.BackupFolder.FullName, toPost.Name);
-            FileSystemInfo backup = new FileInfo(destinationFile);
+            FileSystemInfo backup;
+            FileInfo toPost = new FileInfo(fullPath);
+            String destinationFile = Path.Combine(configuration.BackupFolder.FullName, toPost.Name);
+            backup = new FileInfo(destinationFile);
             if (backup.Exists)
                 backup.Delete();
-            var retry = true;
+            Boolean retry = true;
             while (retry)
             {
                 try
@@ -117,13 +123,13 @@ namespace nntpAutoposter
 
         private void AddItemToPostingDb(FileSystemInfo toPost)
         {
-            var newUploadentry = new UploadEntry();
+            UploadEntry newUploadentry = new UploadEntry();
             newUploadentry.CreatedAt = DateTime.UtcNow;
             newUploadentry.Name = toPost.Name;
-            newUploadentry.RemoveAfterVerify = _configuration.RemoveAfterVerify;
+            newUploadentry.RemoveAfterVerify = configuration.RemoveAfterVerify;
             newUploadentry.Cancelled = false;
             newUploadentry.Size = toPost.Size();
-            DbHandler.Instance.AddNewUploadEntry(newUploadentry);
+            DBHandler.Instance.AddNewUploadEntry(newUploadentry);
         }
     }
 }
