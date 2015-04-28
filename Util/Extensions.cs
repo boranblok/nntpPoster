@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Util
 {
@@ -11,41 +8,31 @@ namespace Util
     {
         public static Int64 Size(this FileSystemInfo fsi)
         {
-            FileAttributes attributes = File.GetAttributes(fsi.FullName);
+            var attributes = File.GetAttributes(fsi.FullName);
             if (attributes.HasFlag(FileAttributes.Directory))
                 return new DirectoryInfo(fsi.FullName).Size();
-            else
-                return new FileInfo(fsi.FullName).Length;
+            return new FileInfo(fsi.FullName).Length;
         }
 
         public static Int64 Size(this DirectoryInfo d)
         {
-            Int64 Size = 0;
-            foreach (FileInfo fi in d.GetFiles())
-            {
-                Size += fi.Length;
-            }
+            var size = d.GetFiles().Sum(fi => fi.Length);
+            size += d.GetDirectories().Sum(di => di.Size());
 
-            foreach (DirectoryInfo di in d.GetDirectories())
-            {
-                Size += di.Size();
-            }
-
-            return (Size);
+            return (size);
         }
 
         public static String NameWithoutExtension(this FileSystemInfo fsi)
         {
-            FileAttributes attributes = File.GetAttributes(fsi.FullName);
+            var attributes = File.GetAttributes(fsi.FullName);
             if (attributes.HasFlag(FileAttributes.Directory))
                 return new DirectoryInfo(fsi.FullName).Name;
-            else
-                return new FileInfo(fsi.FullName).NameWithoutExtension();
+            return NameWithoutExtension((FileSystemInfo) new FileInfo(fsi.FullName));
         }
 
         public static String NameWithoutExtension(this FileInfo f)
         {
-            Int32 extensionPosition = f.Name.LastIndexOf(f.Extension);
+            var extensionPosition = f.Name.LastIndexOf(f.Extension, StringComparison.Ordinal);
             if (extensionPosition > 0)
                 return f.Name.Substring(0, extensionPosition);
             return f.Name;
@@ -53,7 +40,7 @@ namespace Util
 
         public static void Copy(this DirectoryInfo sourceDirectory, String destDirName, Boolean copySubDirs)
         {
-            DirectoryInfo[] dirs = sourceDirectory.GetDirectories();
+            var dirs = sourceDirectory.GetDirectories();
 
             if (!sourceDirectory.Exists)
             {
@@ -67,19 +54,19 @@ namespace Util
                 Directory.CreateDirectory(destDirName);
             }
 
-            FileInfo[] files = sourceDirectory.GetFiles();
-            foreach (FileInfo file in files)
+            var files = sourceDirectory.GetFiles();
+            foreach (var file in files)
             {
-                String temppath = Path.Combine(destDirName, file.Name);
+                var temppath = Path.Combine(destDirName, file.Name);
                 file.CopyTo(temppath, false);
             }
 
             if (copySubDirs)
             {
-                foreach (DirectoryInfo subdir in dirs)
+                foreach (var subdir in dirs)
                 {
-                    String subDirDest = Path.Combine(destDirName, subdir.Name);
-                    subdir.Copy(subDirDest, copySubDirs);
+                    var subDirDest = Path.Combine(destDirName, subdir.Name);
+                    subdir.Copy(subDirDest, true);
                 }
             }
         }

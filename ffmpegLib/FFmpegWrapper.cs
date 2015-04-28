@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ffmpegLib
 {
     public class FFmpegWrapper
     {
         private String _ffmpegLocation = "ffmpeg";
-        private Boolean haserror;
+        private Boolean _haserror;
 
         public String FFmpegLocation
         {
@@ -36,9 +32,9 @@ namespace ffmpegLib
 
         public void TryStripMetadata(FileInfo mediaFile)
         {
-            haserror = false;
-            String originalFile = mediaFile.FullName;
-            String tmpFile = originalFile + ".tmp";
+            _haserror = false;
+            var originalFile = mediaFile.FullName;
+            var tmpFile = originalFile + ".tmp";
             try
             {
                 File.Move(originalFile, tmpFile);
@@ -46,12 +42,12 @@ namespace ffmpegLib
                 {
                     //FFMpeg outputs all output to sterr, making error detection very hard, 
                     //therefore we have set verbosity to 16, level 8 might be required if this is still to conservative.
-                    String ffmpegParameters = String.Format("-v 16 -i \"{0}\" -map_metadata -1 -vcodec copy -acodec copy \"{1}\"",
+                    var ffmpegParameters = String.Format("-v 16 -i \"{0}\" -map_metadata -1 -vcodec copy -acodec copy \"{1}\"",
                       tmpFile,
                       originalFile
                   );
 
-                    Process ffmpegProcess = new Process();
+                    var ffmpegProcess = new Process();
                     ffmpegProcess.StartInfo.Arguments = ffmpegParameters;
                     ffmpegProcess.StartInfo.FileName = FFmpegLocation;
 
@@ -67,12 +63,12 @@ namespace ffmpegLib
                     ffmpegProcess.BeginErrorReadLine();
                     ffmpegProcess.WaitForExit();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    haserror = true;
+                    _haserror = true;
                     throw;
                 }
-                if (haserror)   // If we had any error we revert back to the original file.
+                if (_haserror)   // If we had any error we revert back to the original file.
                 {
                     if (File.Exists(originalFile))
                     {
@@ -95,7 +91,7 @@ namespace ffmpegLib
         {
             if (!String.IsNullOrWhiteSpace(e.Data)) //FFmpeg outputs null lines to stderr.
             {
-                haserror = true;
+                _haserror = true;
                 Console.Out.WriteLine(e.Data);
             }
         }

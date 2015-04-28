@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace par2Lib
 {
@@ -35,7 +32,7 @@ namespace par2Lib
 
         public void CreateParFilesInDirectory(DirectoryInfo workingFolder, String nameWithoutExtension, Int32 blockSize, Int32 redundancyPercentage)
         {
-            String parParameters = String.Format("c -s{0} -r{1} -- \"{2}\"{3}",
+            var parParameters = String.Format("c -s{0} -r{1} -- \"{2}\"{3}",
                blockSize,
                redundancyPercentage,
                Path.Combine(workingFolder.FullName, nameWithoutExtension + ".par2"),
@@ -44,7 +41,7 @@ namespace par2Lib
 
             Console.WriteLine("par2 {0}", parParameters);
 
-            Process parProcess = new Process();
+            var parProcess = new Process();
             parProcess.StartInfo.Arguments = parParameters;
             parProcess.StartInfo.FileName = ParLocation;
 
@@ -64,7 +61,7 @@ namespace par2Lib
         private String GetFileList(DirectoryInfo workingFolder)
         {
             var allFiles = workingFolder.GetFileSystemInfos("*", SearchOption.AllDirectories);
-            StringBuilder fileList = new StringBuilder();
+            var fileList = new StringBuilder();
             foreach (var file in allFiles)
             {
                 fileList.Append(" \"");

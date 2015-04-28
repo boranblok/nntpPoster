@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NntpClientLib;
@@ -9,14 +7,14 @@ using nntpPoster.yEncLib;
 
 namespace nntpPoster
 {
-    public class nntpMessagePoster : InntpMessagePoster
+    public class NntpMessagePoster : INntpMessagePoster
     {
-        private UsenetPosterConfig configuration;
-        public nntpMessagePoster(UsenetPosterConfig configuration)
+        private readonly UsenetPosterConfig _configuration;
+        public NntpMessagePoster(UsenetPosterConfig configuration)
         {
-            this.configuration = configuration;
+            _configuration = configuration;
         }
-        private List<Task> RunningTasks = new List<Task>();
+        private readonly List<Task> _runningTasks = new List<Task>();
         public event EventHandler<YEncFilePart> PartPosted;
 
         protected virtual void OnFilePartPosted(YEncFilePart e)
@@ -26,16 +24,16 @@ namespace nntpPoster
 
         public void PostMessage(String subject, List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
         {
-            Boolean waitForFreeThread = true;
+            var waitForFreeThread = true;
             while (waitForFreeThread)
             {
-                lock (RunningTasks)
+                lock (_runningTasks)
                 {
-                    if (RunningTasks.Count < configuration.MaxConnectionCount)
+                    if (_runningTasks.Count < _configuration.MaxConnectionCount)
                     {
-                        Task task = new Task(() => PostMessageTask(subject, prefix, yEncPart, suffix, postInfo));
-                        task.ContinueWith(t => CleanupTask(t));
-                        RunningTasks.Add(task);
+                        var task = new Task(() => PostMessageTask(subject, prefix, yEncPart, suffix, postInfo));
+                        task.ContinueWith(CleanupTask);
+                        _runningTasks.Add(task);
                         task.Start();
                         waitForFreeThread = false;
                     }
@@ -47,27 +45,27 @@ namespace nntpPoster
 
         public void WaitTillCompletion()
         {
-            Task.WaitAll(RunningTasks.ToArray());
+            Task.WaitAll(_runningTasks.ToArray());
         }
 
         private void CleanupTask(Task task)
         {
-            lock (RunningTasks)
+            lock (_runningTasks)
             {
-                RunningTasks.Remove(task);
+                _runningTasks.Remove(task);
             }
         }
 
         private void PostMessageTask(String subject,
             List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
         {
-            using (Rfc977NntpClientWithExtensions client = new Rfc977NntpClientWithExtensions())
+            using (var client = new Rfc977NntpClientWithExtensions())
             {
-                client.Connect(configuration.NewsGroupAddress, configuration.NewsGroupUseSsl);
-                client.AuthenticateUser(configuration.NewsGroupUsername, configuration.NewsGroupPassword);
+                client.Connect(_configuration.NewsGroupAddress, _configuration.NewsGroupUseSsl);
+                client.AuthenticateUser(_configuration.NewsGroupUsername, _configuration.NewsGroupPassword);
 
-                ArticleHeadersDictionary headers = new ArticleHeadersDictionary();
-                headers.AddHeader("From", configuration.FromAddress);
+                var headers = new ArticleHeadersDictionary();
+                headers.AddHeader("From", _configuration.FromAddress);
                 headers.AddHeader("Subject", subject);
                 foreach (var newsGroup in postInfo.PostedGroups)
                 {
@@ -75,7 +73,7 @@ namespace nntpPoster
                 }
                 headers.AddHeader("Date", postInfo.PostedDateTime.ToString());
 
-                String partMessageId =
+                var partMessageId =
                     client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), prefix, yEncPart.EncodedLines, suffix);
                 lock (postInfo.Segments)
                 {

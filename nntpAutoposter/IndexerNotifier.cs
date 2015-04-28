@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,58 +9,58 @@ namespace nntpAutoposter
 {
     class IndexerNotifier
     {
-        private Object monitor = new Object();
-        private AutoPosterConfig configuration;
-        private Task MyTask;
-        private Boolean StopRequested;
+        private readonly Object _monitor = new Object();
+        private readonly AutoPosterConfig _configuration;
+        private readonly Task _myTask;
+        private Boolean _stopRequested;
 
         public IndexerNotifier(AutoPosterConfig configuration)
         {
-            this.configuration = configuration;
-            StopRequested = false;
-            MyTask = new Task(IndexerNotifierTask, TaskCreationOptions.LongRunning);
+            _configuration = configuration;
+            _stopRequested = false;
+            _myTask = new Task(IndexerNotifierTask, TaskCreationOptions.LongRunning);
         }
 
         public void Start()
         {
-            MyTask.Start();
+            _myTask.Start();
         }
 
         public void Stop()
         {
-            lock (monitor)
+            lock (_monitor)
             {
-                StopRequested = true;
-                Monitor.Pulse(monitor);
+                _stopRequested = true;
+                Monitor.Pulse(_monitor);
             }
-            MyTask.Wait();
+            _myTask.Wait();
         }
 
         private void IndexerNotifierTask()
         {
-            while (!StopRequested)
+            while (!_stopRequested)
             {
                 NotifyIndexerOfNewObscufatedUploads();
-                lock (monitor)
+                lock (_monitor)
                 {
-                    if (StopRequested)
+                    if (_stopRequested)
                     {
                         break;
                     }
-                    Monitor.Wait(monitor, configuration.NotifierIntervalMinutes * 60 * 1000);
+                    Monitor.Wait(_monitor, _configuration.NotifierIntervalMinutes * 60 * 1000);
                 }
             }
         }
 
         private void NotifyIndexerOfNewObscufatedUploads()
         {
-            foreach(var upload in DBHandler.Instance.GetUploadEntriesToNotifyIndexer())
+            foreach(var upload in DbHandler.Instance.GetUploadEntriesToNotifyIndexer())
             {
                 try
                 {
                     NotifyIndexerOfObscufatedUpload(upload);
                     upload.NotifiedIndexerAt = DateTime.UtcNow;
-                    DBHandler.Instance.UpdateUploadEntry(upload);
+                    DbHandler.Instance.UpdateUploadEntry(upload);
                     Console.WriteLine("Notified indexer that obscufated release [{0}] is actually [{1}]", 
                         upload.ObscuredName, upload.CleanedName);
                 }
@@ -79,18 +75,18 @@ namespace nntpAutoposter
 
         private void NotifyIndexerOfObscufatedUpload(UploadEntry upload)
         {
-            String notificationGetUrl = String.Format(
-                configuration.ObscufatedNotificationUrl, 
+            var notificationGetUrl = String.Format(
+                _configuration.ObscufatedNotificationUrl, 
                 Uri.EscapeDataString(upload.ObscuredName), 
                 Uri.EscapeDataString(upload.CleanedName));
 
             ServicePointManager.ServerCertificateValidationCallback = ServerCertificateValidationCallback;
 
-            HttpWebRequest request = WebRequest.Create(notificationGetUrl) as HttpWebRequest;       //Mono does not support CreateHttp
+            var request = WebRequest.Create(notificationGetUrl) as HttpWebRequest;       //Mono does not support CreateHttp
             //request.ServerCertificateValidationCallback = ServerCertificateValidationCallback;    //Not implemented in mono
             request.Method = "GET";
             request.Timeout = 60 * 1000;
-            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            var response = request.GetResponse() as HttpWebResponse;
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new Exception("Error when notifying indexer: "
                                 + response.StatusCode + " " + response.StatusDescription);

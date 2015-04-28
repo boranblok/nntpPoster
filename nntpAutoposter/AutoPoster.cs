@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,39 +14,41 @@ namespace nntpAutoposter
 {    
     class AutoPoster
     {
-        private static readonly String CharsToRemove = "()=@#$%^+,?<>{}|";
-        private static readonly String[] ffmpegHandledExtensions = new String[] {"mkv", "avi", "wmv", "mp4", 
-                                                                                 "mov", "ogg", "ogm", "wav", 
-                                                                                 "mka", "mks", "mpeg", "mpg", 
-                                                                                 "vob", "mp3", "asf", "ape", "flac"};
-        private Object monitor = new Object();
-        private AutoPosterConfig configuration;
-        private UsenetPosterConfig posterConfiguration;
-        private UsenetPoster poster;
-        private Task MyTask;
-        private Boolean StopRequested;
+        private const String CharsToRemove = "()=@#$%^+,?<>{}|";
+
+        private static readonly String[] FfmpegHandledExtensions =
+        {"mkv", "avi", "wmv", "mp4", 
+            "mov", "ogg", "ogm", "wav", 
+            "mka", "mks", "mpeg", "mpg", 
+            "vob", "mp3", "asf", "ape", "flac"};
+        private readonly Object _monitor = new Object();
+        private readonly AutoPosterConfig _configuration;
+        private readonly UsenetPosterConfig _posterConfiguration;
+        private readonly UsenetPoster _poster;
+        private readonly Task _myTask;
+        private Boolean _stopRequested;
 
         public AutoPoster(AutoPosterConfig configuration)
         {
-            this.configuration = configuration;
-            posterConfiguration = new UsenetPosterConfig();
-            poster = new UsenetPoster(posterConfiguration);
-            StopRequested = false;
-            MyTask = new Task(AutopostingTask, TaskCreationOptions.LongRunning);
+            _configuration = configuration;
+            _posterConfiguration = new UsenetPosterConfig();
+            _poster = new UsenetPoster(_posterConfiguration);
+            _stopRequested = false;
+            _myTask = new Task(AutopostingTask, TaskCreationOptions.LongRunning);
         }
 
         public void Start()
         {
             InitializeEnvironment();
-            MyTask.Start();
+            _myTask.Start();
         }
 
         private void InitializeEnvironment()
         {
             Console.WriteLine("Cleaning out processing folder of any leftover files.");
-            foreach(var fsi in posterConfiguration.WorkingFolder.EnumerateFileSystemInfos())
+            foreach(var fsi in _posterConfiguration.WorkingFolder.EnumerateFileSystemInfos())
             {
-                FileAttributes attributes = File.GetAttributes(fsi.FullName);
+                var attributes = File.GetAttributes(fsi.FullName);
                 if (attributes.HasFlag(FileAttributes.Directory))
                     Directory.Delete(fsi.FullName, true);
                 else
@@ -58,41 +58,41 @@ namespace nntpAutoposter
 
         public void Stop()
         {
-            lock (monitor)
+            lock (_monitor)
             {
-                StopRequested = true;
-                Monitor.Pulse(monitor);
+                _stopRequested = true;
+                Monitor.Pulse(_monitor);
             }
-            MyTask.Wait();
+            _myTask.Wait();
         }
 
         private void AutopostingTask()
         {
-            while(!StopRequested)
+            while(!_stopRequested)
             {
                 UploadNextItemInQueue();
-                lock (monitor)
+                lock (_monitor)
                 {
-                    if (StopRequested)
+                    if (_stopRequested)
                     {
                         break;
                     }
-                    Monitor.Wait(monitor, configuration.AutoposterIntervalMillis);
+                    Monitor.Wait(_monitor, _configuration.AutoposterIntervalMillis);
                 }
             }
         }
 
         private void UploadNextItemInQueue()
         {
-            UploadEntry nextUpload = DBHandler.Instance.GetNextUploadEntryToUpload();
+            var nextUpload = DbHandler.Instance.GetNextUploadEntryToUpload();
             if (nextUpload != null)
             {
                 FileSystemInfo toUpload;
                 Boolean isDirectory;
-                String fullPath = Path.Combine(configuration.BackupFolder.FullName, nextUpload.Name);
+                var fullPath = Path.Combine(_configuration.BackupFolder.FullName, nextUpload.Name);
                 try
                 {
-                    FileAttributes attributes = File.GetAttributes(fullPath);
+                    var attributes = File.GetAttributes(fullPath);
                     if (attributes.HasFlag(FileAttributes.Directory))
                     {
                         isDirectory = true;
@@ -108,7 +108,7 @@ namespace nntpAutoposter
                 {
                     Console.WriteLine("Can no longer find {0} in the backup folder, cancelling upload", nextUpload.Name);
                     nextUpload.Cancelled = true;
-                    DBHandler.Instance.UpdateUploadEntry(nextUpload);
+                    DbHandler.Instance.UpdateUploadEntry(nextUpload);
                     return;
                 }
                 PostRelease(nextUpload, toUpload, isDirectory);
@@ -117,8 +117,8 @@ namespace nntpAutoposter
 
         private void PostRelease(UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
         {
-            nextUpload.CleanedName = CleanName(toUpload.NameWithoutExtension()) + configuration.PostTag;
-            if(configuration.UseObscufation)
+            nextUpload.CleanedName = CleanName(toUpload.NameWithoutExtension()) + _configuration.PostTag;
+            if(_configuration.UseObscufation)
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
 
             FileSystemInfo toPost = null;
@@ -133,12 +133,12 @@ namespace nntpAutoposter
                     toPost = PrepareFileForPosting(nextUpload, (FileInfo)toUpload);
                 }
 
-                var nzbFile = poster.PostToUsenet(toPost, false);
-                if (!String.IsNullOrWhiteSpace(posterConfiguration.NzbOutputFolder))
-                    nzbFile.Save(Path.Combine(posterConfiguration.NzbOutputFolder, nextUpload.CleanedName + ".nzb"));
+                var nzbFile = _poster.PostToUsenet(toPost, false);
+                if (!String.IsNullOrWhiteSpace(_posterConfiguration.NzbOutputFolder))
+                    nzbFile.Save(Path.Combine(_posterConfiguration.NzbOutputFolder, nextUpload.CleanedName + ".nzb"));
 
                 nextUpload.UploadedAt = DateTime.UtcNow;
-                DBHandler.Instance.UpdateUploadEntry(nextUpload);
+                DbHandler.Instance.UpdateUploadEntry(nextUpload);
             }
             finally
             {
@@ -154,31 +154,28 @@ namespace nntpAutoposter
 
         private DirectoryInfo PrepareDirectoryForPosting(UploadEntry nextUpload, DirectoryInfo toUpload)
         {
-            String destination;
-            if (configuration.UseObscufation)
-                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName, nextUpload.ObscuredName);
-            else
-                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName, nextUpload.CleanedName);
+            var destination = Path.Combine(_posterConfiguration.WorkingFolder.FullName, 
+                _configuration.UseObscufation ? nextUpload.ObscuredName : nextUpload.CleanedName);
 
-            ((DirectoryInfo)toUpload).Copy(destination, true);
+            toUpload.Copy(destination, true);
             return new DirectoryInfo(destination);
         }
 
         private FileInfo PrepareFileForPosting(UploadEntry nextUpload, FileInfo toUpload)
         {
             String destination;
-            if (configuration.UseObscufation)
-                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName,
+            if (_configuration.UseObscufation)
+                destination = Path.Combine(_posterConfiguration.WorkingFolder.FullName,
                     nextUpload.ObscuredName + toUpload.Extension);
             else
-                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName,
+                destination = Path.Combine(_posterConfiguration.WorkingFolder.FullName,
                     nextUpload.CleanedName + toUpload.Extension);
 
 
-            ((FileInfo)toUpload).CopyTo(destination, true);
-            FileInfo preparedFile = new FileInfo(destination);
+            toUpload.CopyTo(destination, true);
+            var preparedFile = new FileInfo(destination);
 
-            if(configuration.StripFileMetadata)
+            if(_configuration.StripFileMetadata)
             {
                 StripMetaDataFromFile(preparedFile);
             }
@@ -191,33 +188,34 @@ namespace nntpAutoposter
             if(preparedFile.Extension.Length < 1)
                 return;
 
-            String rawExt = preparedFile.Extension.Substring(1);
+            var rawExt = preparedFile.Extension.Substring(1);
             if ("mkv".Equals(rawExt, StringComparison.InvariantCultureIgnoreCase))
                 StripMkvMetaDataFromFile(preparedFile);
-            if (ffmpegHandledExtensions.Any(ext => ext.Equals(rawExt, StringComparison.InvariantCultureIgnoreCase)))
+            if (FfmpegHandledExtensions.Any(ext => ext.Equals(rawExt, StringComparison.InvariantCultureIgnoreCase)))
                 StripMetaDataWithFFmpeg(preparedFile);
         }
 
         private void StripMkvMetaDataFromFile(FileInfo preparedFile)
         {
-            var mkvPropEdit = new MkvPropEditWrapper(configuration.MkvPropEditLocation);
+            var mkvPropEdit = new MkvPropEditWrapper(_configuration.MkvPropEditLocation);
             mkvPropEdit.SetTitle(preparedFile, "g33k");
         }
 
         private void StripMetaDataWithFFmpeg(FileInfo preparedFile)
         {
-            var ffmpeg = new FFmpegWrapper(configuration.FFmpegLocation);
+            var ffmpeg = new FFmpegWrapper(_configuration.FFmpegLocation);
             ffmpeg.TryStripMetadata(preparedFile);
         }
 
         private String CleanName(String nameToClean)
         {
-            String cleanName = Regex.Replace(nameToClean, "^[:ascii:]", String.Empty);
+            var cleanName = Regex.Replace(nameToClean, "^[:ascii:]", String.Empty);
             cleanName = cleanName.Replace(' ', '.');
             cleanName = cleanName.Replace("&", "and");
             foreach(var charToRemove in CharsToRemove)
             {
-                cleanName = cleanName.Replace(charToRemove.ToString(), String.Empty);
+                cleanName = cleanName.Replace(
+                    charToRemove.ToString(CultureInfo.InvariantCulture), String.Empty);
             }
 
             cleanName = Regex.Replace(cleanName, "\\.{2,}", String.Empty);

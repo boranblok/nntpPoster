@@ -1,16 +1,14 @@
 using System;
-using System.Text;
-using System.Security.Cryptography;
 
 namespace nntpPoster.yEncLib
 {
 	public class YEncEncoder
 	{
-		const Byte delta = 42;
-        const Byte escapeAdditionalDelta = 64;
-        const Byte escapeByte = 61;
-        const Byte dot = 46;
-        Byte[] escapeBytes = new Byte[] { 10, 13, 0, escapeByte };
+		const Byte Delta = 42;
+        const Byte EscapeAdditionalDelta = 64;
+        const Byte EscapeByte = 61;
+        const Byte Dot = 46;
+	    readonly Byte[] _escapeBytes = { 10, 13, 0, EscapeByte };
 
         /// <summary>
         /// Encodes an entire block of bytes into yEnc format splitting the output every lineLength bytes into a new line.
@@ -23,26 +21,26 @@ namespace nntpPoster.yEncLib
         /// <returns>A block of yEnc encoded bytes</returns>
         public Byte[] EncodeBlock(Int32 lineLength, Byte[] source, Int32 offset, Int32 count)
         {
-            Byte[] buffer = new Byte[source.Length * 2];
-            Int32 position = 0;
-            Boolean isStartOfLine = true;
-            for (Int32 i = 0; i < count; i++)
+            var buffer = new Byte[source.Length * 2];
+            var position = 0;
+            var isStartOfLine = true;
+            for (var i = 0; i < count; i++)
             {
-                Byte b = source[offset + i];
-                Boolean escape = false;
-                Byte e = EncodeByte(b, out escape);
+                var b = source[offset + i];
+                var escape = false;
+                var e = EncodeByte(b, out escape);
                 if (escape)
                 {                    
-                    buffer[position] = escapeByte;
+                    buffer[position] = EscapeByte;
                     position++;
                     isStartOfLine = false;  //If we have an escape char as first byte it is not a dot.
                 }
                 if (isStartOfLine)
                 {
                     isStartOfLine = false;
-                    if(e == dot)
+                    if(e == Dot)
                     {
-                        buffer[position] = dot;
+                        buffer[position] = Dot;
                         position++;
                     }
                 }
@@ -71,7 +69,7 @@ namespace nntpPoster.yEncLib
                 position++;
             }
 
-            Byte[] output = new Byte[position];
+            var output = new Byte[position];
             Buffer.BlockCopy(buffer, 0, output, 0, position);
             return output;
         }
@@ -86,15 +84,15 @@ namespace nntpPoster.yEncLib
 		{
             unchecked       //unchecked, so we wrap aroundthe byte due to overflow.
 			{
-				b += delta;
+				b += Delta;
 
 				escape = false;
-                foreach(byte escb in escapeBytes)
+                foreach(var escb in _escapeBytes)
                 {
                     if (b == escb)
                     {
                         escape = true;
-                        b += escapeAdditionalDelta;
+                        b += EscapeAdditionalDelta;
                         break;
                     }
                 }

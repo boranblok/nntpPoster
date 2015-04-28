@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 
 namespace nntpPoster
 {
@@ -38,7 +35,7 @@ namespace nntpPoster
 
         public override string ToString()
         {
-            var tpl = TotalParts.ToString().Length;
+            var tpl = TotalParts.ToString(CultureInfo.InvariantCulture).Length;
 
             return String.Format("{0," + tpl + "} of {1} parts uploaded at {2}", UploadedParts, TotalParts,
                 GetHumanReadableSpeed());
