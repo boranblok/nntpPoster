@@ -83,7 +83,7 @@ namespace nntpAutoposter
 
                     if ((DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes < configuration.MinRepostAgeMinutes)
                     {
-                        Console.WriteLine("The upload [{0}] is not older than {1} minutes. Skipping check for now.", 
+                        Console.WriteLine("The upload [{0}] is younger than {1} minutes. Skipping check.", 
                             upload.CleanedName, configuration.MinRepostAgeMinutes);
                         continue;
                     }

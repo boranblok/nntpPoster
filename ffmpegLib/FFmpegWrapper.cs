@@ -67,7 +67,7 @@ namespace ffmpegLib
                     ffmpegProcess.BeginErrorReadLine();
                     ffmpegProcess.WaitForExit();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     haserror = true;
                     throw;
