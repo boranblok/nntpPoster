@@ -65,7 +65,6 @@ namespace nntpAutoposter
             {
                 try
                 {
-                    Console.WriteLine("Checking if [{0}] has been indexed.", upload.CleanedName);
                     String fullPath = Path.Combine(configuration.BackupFolder.FullName, upload.Name);
                     
                     Boolean backupExists = false;
