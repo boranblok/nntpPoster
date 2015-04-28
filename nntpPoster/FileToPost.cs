@@ -55,7 +55,7 @@ namespace nntpPoster
             String subjectNameBase = ConstructSubjectNameBase(prefix, suffix);
             postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
             postedFileInfo.PostedGroups.AddRange(configuration.TargetNewsgroups);
-            postedFileInfo.PostedDateTime = new NntpDateTime(DateTime.Now);
+            postedFileInfo.PostedDateTime = new NntpDateTime(DateTime.UtcNow);
 
             var yEncoder = new YEncEncoder();
             Int32 partNumber = 0;

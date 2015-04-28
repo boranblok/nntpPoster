@@ -65,6 +65,7 @@ namespace nntpAutoposter
             {
                 try
                 {
+                    Console.WriteLine("Checking if [{0}] has been indexed.", upload.CleanedName);
                     String fullPath = Path.Combine(configuration.BackupFolder.FullName, upload.Name);
                     
                     Boolean backupExists = false;
@@ -77,6 +78,13 @@ namespace nntpAutoposter
                         Console.WriteLine("The upload [{0}] was removed from the backup folder, cancelling verification.", upload.Name);
                         upload.Cancelled = true;
                         DBHandler.Instance.UpdateUploadEntry(upload);
+                        continue;
+                    }
+
+                    if ((DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes < configuration.MinRepostAgeMinutes)
+                    {
+                        Console.WriteLine("The upload [{0}] is not older than {1} minutes. Skipping check for now.", 
+                            upload.CleanedName, configuration.MinRepostAgeMinutes);
                         continue;
                     }
 
@@ -97,6 +105,8 @@ namespace nntpAutoposter
                     }
                     else
                     {
+                        Console.WriteLine("Release [{0}] has NOT been found on the indexer. Checking if a repost is required.", 
+                            upload.CleanedName);
                         RepostIfRequired(upload);
                     }
                 }
