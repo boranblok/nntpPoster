@@ -34,10 +34,14 @@ namespace nntpAutoposter
             verifier.Start();
             Console.WriteLine("Verifier started");
 
+            Console.WriteLine("Press the \"s\" key to stop after the current operations have finished.");
 
-            Console.WriteLine("Press any key to stop after the current operations have finished.");
-            Console.ReadKey();
-
+            Boolean stop = false;
+            while (!stop)
+            {
+                var keyInfo = Console.ReadKey();
+                stop = keyInfo.KeyChar == 's' || keyInfo.KeyChar == 'S';
+            }
 
             watcher.Stop();
             Console.WriteLine("FileSystemWatcher stopped");
