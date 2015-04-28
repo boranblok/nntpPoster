@@ -12,7 +12,7 @@ namespace Util
         {
             Decimal averageLength = ((Decimal)s.Length + (Decimal)t.Length) / 2;
             Int32 levenshteinDistance = Compute(s, t);
-            return (averageLength - levenshteinDistance) / averageLength;
+            return ((averageLength - levenshteinDistance) / averageLength) * 100;
         }
         public static int Compute(string s, string t)
         {

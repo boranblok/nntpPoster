@@ -40,8 +40,8 @@ namespace nntpPoster
         {
             var tpl = TotalParts.ToString().Length;
 
-            return String.Format("{0," + tpl + "} of {1} parts uploaded at {2}, now posting {3}", UploadedParts, TotalParts,
-                GetHumanReadableSpeed(), CurrentlyPostingName);
+            return String.Format("{0," + tpl + "} of {1} parts uploaded at {2}", UploadedParts, TotalParts,
+                GetHumanReadableSpeed());
 
         }
     }
