@@ -78,6 +78,7 @@
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
+    <None Include="start.sh" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ffmpegLib\ffmpegLib.csproj">
