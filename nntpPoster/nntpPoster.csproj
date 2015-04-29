@@ -41,6 +41,16 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Package|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Package\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -74,11 +84,6 @@
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <None Include="testFiles\BG2sizeComp.jpg.sha1" />
-    <None Include="testFiles\TestFile.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="testFiles\TestFile.zip.sha1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NntpClientLib\NntpClientLib.csproj">
@@ -101,11 +106,6 @@
       <Project>{f2a8ed8b-794c-4501-b128-d3c30e953ec9}</Project>
       <Name>yEncLib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="testFiles\BG2sizeComp.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
