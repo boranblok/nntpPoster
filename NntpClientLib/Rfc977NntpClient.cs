@@ -884,7 +884,7 @@ namespace NntpClientLib
             {
                 return serverResponseCode.Substring(indexOfOpenBracket, indexOfCloseBracket - indexOfOpenBracket + 1);
             }
-            return String.Empty;
+            return "<" + Guid.NewGuid().ToString("N") + "@" + Host + ">";
         }
 
         /// <summary>
