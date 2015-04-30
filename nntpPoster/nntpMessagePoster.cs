@@ -61,33 +61,51 @@ namespace nntpPoster
         private void PostMessageTask(String subject,
             List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
         {
-            using (Rfc977NntpClientWithExtensions client = new Rfc977NntpClientWithExtensions())
+            var retryCount = 0;
+            var retry = true;
+            while (retry && retryCount < configuration.MaxRetryCount)
             {
-                client.Connect(configuration.NewsGroupAddress, configuration.NewsGroupUseSsl);
-                client.AuthenticateUser(configuration.NewsGroupUsername, configuration.NewsGroupPassword);
-
-                ArticleHeadersDictionary headers = new ArticleHeadersDictionary();
-                headers.AddHeader("From", configuration.FromAddress);
-                headers.AddHeader("Subject", subject);
-                foreach (var newsGroup in postInfo.PostedGroups)
+                try
                 {
-                    headers.AddHeader("Newsgroups", newsGroup);
-                }
-                headers.AddHeader("Date", postInfo.PostedDateTime.ToString());
-
-                String partMessageId =
-                    client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), prefix, yEncPart.EncodedLines, suffix);
-                lock (postInfo.Segments)
-                {
-                    postInfo.Segments.Add(new PostedFileSegment
+                    using (Rfc977NntpClientWithExtensions client = new Rfc977NntpClientWithExtensions())
                     {
-                        MessageId = partMessageId,
-                        Bytes = yEncPart.Size,
-                        SegmentNumber = yEncPart.Number
-                    });
+                        client.Connect(configuration.NewsGroupAddress, configuration.NewsGroupUseSsl);
+                        client.AuthenticateUser(configuration.NewsGroupUsername, configuration.NewsGroupPassword);
+
+                        ArticleHeadersDictionary headers = new ArticleHeadersDictionary();
+                        headers.AddHeader("From", configuration.FromAddress);
+                        headers.AddHeader("Subject", subject);
+                        foreach (var newsGroup in postInfo.PostedGroups)
+                        {
+                            headers.AddHeader("Newsgroups", newsGroup);
+                        }
+                        headers.AddHeader("Date", postInfo.PostedDateTime.ToString());
+
+                        String partMessageId =
+                            client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), prefix, yEncPart.EncodedLines, suffix);
+                        lock (postInfo.Segments)
+                        {
+                            postInfo.Segments.Add(new PostedFileSegment
+                            {
+                                MessageId = partMessageId,
+                                Bytes = yEncPart.Size,
+                                SegmentNumber = yEncPart.Number
+                            });
+                        }
+                    }
+                    retry = false;
+                    OnFilePartPosted(yEncPart);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine("Posting yEnc message failed:");
+                    Console.WriteLine(ex.ToString());
+                    if (retryCount++ < configuration.MaxRetryCount)
+                        Console.WriteLine("Retrying to post message, attempt {0}", retryCount);
+                    else
+                        Console.WriteLine("Maximum retry attempts reached. Posting is probably corrupt.", retryCount);
                 }
             }
-            OnFilePartPosted(yEncPart);
         }
     }
 }

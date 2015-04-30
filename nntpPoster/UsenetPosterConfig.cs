@@ -22,6 +22,7 @@ namespace nntpPoster
 
         public Int32 YEncLineSize { get; set; }
         public Int32 YEncLinesPerMessage { get; set; }
+        public Int32 MaxRetryCount { get; set; }
 
         public DirectoryInfo WorkingFolder { get; set; }
         public String NzbOutputFolder { get; set; }
@@ -53,6 +54,7 @@ namespace nntpPoster
 
             YEncLineSize = Int32.Parse(ConfigurationManager.AppSettings["yEncLineSize"]);
             YEncLinesPerMessage = Int32.Parse(ConfigurationManager.AppSettings["yEncLinesPerMessage"]);
+            MaxRetryCount = Int32.Parse(ConfigurationManager.AppSettings["MaxRetryCount"]);
 
             WorkingFolder = new DirectoryInfo(ConfigurationManager.AppSettings["WorkingFolder"]);
             if(!WorkingFolder.Exists)
