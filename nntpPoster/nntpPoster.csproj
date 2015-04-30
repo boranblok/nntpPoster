@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="FileToPost.cs" />
     <Compile Include="InntpMessagePoster.cs" />
+    <Compile Include="nntpMessage.cs" />
     <Compile Include="nntpMessagePoster.cs" />
     <Compile Include="PostedFileInfo.cs" />
     <Compile Include="RarAndRecoveryRecommendation.cs" />

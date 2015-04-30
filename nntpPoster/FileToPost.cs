@@ -98,33 +98,34 @@ namespace nntpPoster
         private void PostPart(InntpMessagePoster poster, PostedFileInfo postedFileInfo, YEncFilePart part, 
             String subjectNameBase)
         {
-            String subject = String.Format(subjectNameBase, part.Number);
+            var message = new nntpMessage();
+            message.Subject = String.Format(subjectNameBase, part.Number);
 
-            List<String> yEncPrefix = new List<String>();
-            List<String> yEncSuffix = new List<String>();
+            message.YEncFilePart = part;
+            message.PostInfo = postedFileInfo;
 
             if (TotalParts > 1)
             {
-                yEncPrefix.Add(String.Format("=ybegin part={0} total={1} line={2} size={3} name={4}",
+                message.Prefix.Add(String.Format("=ybegin part={0} total={1} line={2} size={3} name={4}",
                     part.Number, TotalParts, configuration.YEncLineSize, file.Length, file.Name));
 
-                yEncPrefix.Add(String.Format("=ypart begin={0} end={1}",
+                message.Prefix.Add(String.Format("=ypart begin={0} end={1}",
                     part.Begin, part.End));
 
-                yEncSuffix.Add(String.Format("=yend size={0} part={1} pcrc32={2}",
+                message.Suffix.Add(String.Format("=yend size={0} part={1} pcrc32={2}",
                     part.Size, part.Number, part.CRC32));
 
             }
             else
             {
-                yEncPrefix.Add(String.Format("=ybegin line={0} size={1} name={2}",
+                message.Prefix.Add(String.Format("=ybegin line={0} size={1} name={2}",
                     configuration.YEncLineSize, file.Length, file.Name));
 
-                yEncSuffix.Add(String.Format("=yend size={0} crc32={1}",
+                message.Suffix.Add(String.Format("=yend size={0} crc32={1}",
                     file.Length, part.CRC32));
             }
 
-            poster.PostMessage(subject, yEncPrefix, part, yEncSuffix, postedFileInfo);
+            poster.PostMessage(message);
         }
     }
 }

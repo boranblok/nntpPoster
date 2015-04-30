@@ -6,7 +6,6 @@ namespace nntpPoster
 {
     public interface InntpMessagePoster
     {
-        void PostMessage(String subject, List<String> prefix, YEncFilePart yEncPart, List<String> suffix,
-            PostedFileInfo postInfo);
+        void PostMessage(nntpMessage message);
     }
 }

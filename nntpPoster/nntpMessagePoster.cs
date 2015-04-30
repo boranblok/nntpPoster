@@ -33,7 +33,7 @@ namespace nntpPoster
             if (PartPosted != null) PartPosted(this, e);
         }
 
-        public void PostMessage(String subject, List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
+        public void PostMessage(nntpMessage message)
         {
             Boolean waitForFreeThread = true;
             while (waitForFreeThread)
@@ -42,7 +42,7 @@ namespace nntpPoster
                 {
                     if (RunningTasks.Count < configuration.MaxConnectionCount)
                     {
-                        Task task = new Task(() => PostMessageTask(subject, prefix, yEncPart, suffix, postInfo));
+                        Task task = new Task(() => PostMessageTask(message));
                         task.ContinueWith(t => CleanupTask(t));
                         RunningTasks.Add(task);
                         task.Start();
@@ -67,8 +67,7 @@ namespace nntpPoster
             }
         }
 
-        private void PostMessageTask(String subject,
-            List<String> prefix, YEncFilePart yEncPart, List<String> suffix, PostedFileInfo postInfo)
+        private void PostMessageTask(nntpMessage message)
         {
             var retryCount = 0;
             var retry = true;
@@ -82,25 +81,25 @@ namespace nntpPoster
 
                         var partMessageId = client.PostYEncMessage(
                                 configuration.FromAddress,
-                                subject,
-                                postInfo.PostedGroups,
-                                postInfo.PostedDateTime,
-                                prefix,
-                                yEncPart.EncodedLines,
-                                suffix
+                                message.Subject,
+                                message.PostInfo.PostedGroups,
+                                message.PostInfo.PostedDateTime,
+                                message.Prefix,
+                                message.YEncFilePart.EncodedLines,
+                                message.Suffix
                             );
-                        lock (postInfo.Segments)
+                        lock (message.PostInfo.Segments)
                         {
-                            postInfo.Segments.Add(new PostedFileSegment
+                            message.PostInfo.Segments.Add(new PostedFileSegment
                             {
                                 MessageId = partMessageId,
-                                Bytes = yEncPart.Size,
-                                SegmentNumber = yEncPart.Number
+                                Bytes = message.YEncFilePart.Size,
+                                SegmentNumber = message.YEncFilePart.Number
                             });
                         }
                     }
                     retry = false;
-                    OnFilePartPosted(yEncPart);
+                    OnFilePartPosted(message.YEncFilePart);
                 }
                 catch(Exception ex)
                 {
