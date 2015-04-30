@@ -4,17 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using NntpClientLib;
 using nntpPoster.yEncLib;
+using PostingNntpClient;
 
 namespace nntpPoster
 {
     public class nntpMessagePoster : InntpMessagePoster
     {
         private UsenetPosterConfig configuration;
+        private NewsHostConnectionInfo connectionInfo;
         public nntpMessagePoster(UsenetPosterConfig configuration)
         {
             this.configuration = configuration;
+            connectionInfo = new NewsHostConnectionInfo()
+            {
+                Address = configuration.NewsGroupAddress,
+                Port = 443,
+                UseSsl = configuration.NewsGroupUseSsl,
+                Username = configuration.NewsGroupUsername,
+                Password = configuration.NewsGroupPassword
+            };
         }
         private List<Task> RunningTasks = new List<Task>();
         public event EventHandler<YEncFilePart> PartPosted;
@@ -67,22 +76,19 @@ namespace nntpPoster
             {
                 try
                 {
-                    using (Rfc977NntpClientWithExtensions client = new Rfc977NntpClientWithExtensions())
+                    using (SimpleNntpPostingClient client = new SimpleNntpPostingClient(connectionInfo))
                     {
-                        client.Connect(configuration.NewsGroupAddress, configuration.NewsGroupUseSsl);
-                        client.AuthenticateUser(configuration.NewsGroupUsername, configuration.NewsGroupPassword);
+                        client.Connect();
 
-                        ArticleHeadersDictionary headers = new ArticleHeadersDictionary();
-                        headers.AddHeader("From", configuration.FromAddress);
-                        headers.AddHeader("Subject", subject);
-                        foreach (var newsGroup in postInfo.PostedGroups)
-                        {
-                            headers.AddHeader("Newsgroups", newsGroup);
-                        }
-                        headers.AddHeader("Date", postInfo.PostedDateTime.ToString());
-
-                        String partMessageId =
-                            client.PostArticle(new ArticleHeadersDictionaryEnumerator(headers), prefix, yEncPart.EncodedLines, suffix);
+                        var partMessageId = client.PostYEncMessage(
+                                configuration.FromAddress,
+                                subject,
+                                postInfo.PostedGroups,
+                                postInfo.PostedDateTime,
+                                prefix,
+                                yEncPart.EncodedLines,
+                                suffix
+                            );
                         lock (postInfo.Segments)
                         {
                             postInfo.Segments.Add(new PostedFileSegment

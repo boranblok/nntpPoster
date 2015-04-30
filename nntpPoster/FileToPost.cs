@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NntpClientLib;
 using nntpPoster.yEncLib;
 
 namespace nntpPoster
@@ -55,7 +54,7 @@ namespace nntpPoster
             String subjectNameBase = ConstructSubjectNameBase(prefix, suffix);
             postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
             postedFileInfo.PostedGroups.AddRange(configuration.TargetNewsgroups);
-            postedFileInfo.PostedDateTime = new NntpDateTime(DateTime.UtcNow);
+            postedFileInfo.PostedDateTime = DateTime.Now;
 
             var yEncoder = new YEncEncoder();
             Int32 partNumber = 0;
