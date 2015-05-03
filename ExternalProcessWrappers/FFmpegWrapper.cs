@@ -8,30 +8,21 @@ using System.Threading.Tasks;
 
 namespace ExternalProcessWrappers
 {
-    public class FFmpegWrapper
+    public class FFmpegWrapper : ExternalProcessWrapperBase
     {
-        private String _ffmpegLocation = "ffmpeg";
+        protected override string ProcessPathLocation
+        {
+            get { return "ffmpeg"; }
+        }
+
         private Boolean haserror;
 
-        public String FFmpegLocation
-        {
-            get { return _ffmpegLocation; }
-            set
-            {
-                if (String.IsNullOrWhiteSpace(value))
-                    _ffmpegLocation = "ffmpeg";   //Assume ffmpeg is accessible via the PATH environment variable.
-                else
-                    _ffmpegLocation = value;
-            }
-        }
-
-        public FFmpegWrapper()
+        public FFmpegWrapper() : base()
         {
         }
 
-        public FFmpegWrapper(String ffmpegLocation)
+        public FFmpegWrapper(String ffmpegLocation) : base(ffmpegLocation)
         {
-            FFmpegLocation = ffmpegLocation;
         }
 
         public void TryStripMetadata(FileInfo mediaFile)
@@ -51,21 +42,7 @@ namespace ExternalProcessWrappers
                       originalFile
                   );
 
-                    Process ffmpegProcess = new Process();
-                    ffmpegProcess.StartInfo.Arguments = ffmpegParameters;
-                    ffmpegProcess.StartInfo.FileName = FFmpegLocation;
-
-                    ffmpegProcess.StartInfo.UseShellExecute = false;
-                    ffmpegProcess.StartInfo.RedirectStandardOutput = true;
-                    ffmpegProcess.StartInfo.RedirectStandardError = true;
-                    ffmpegProcess.StartInfo.CreateNoWindow = true;
-                    ffmpegProcess.ErrorDataReceived += ffmpegProcess_ErrorDataReceived;
-                    ffmpegProcess.OutputDataReceived += ffmpegProcess_OutputDataReceived;
-                    ffmpegProcess.EnableRaisingEvents = true;
-                    ffmpegProcess.Start();
-                    ffmpegProcess.BeginOutputReadLine();
-                    ffmpegProcess.BeginErrorReadLine();
-                    ffmpegProcess.WaitForExit();
+                    this.ExecuteProcess(ffmpegParameters);
                 }
                 catch (Exception)
                 {
@@ -91,18 +68,13 @@ namespace ExternalProcessWrappers
             mediaFile.Refresh();
         }
 
-        private void ffmpegProcess_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        protected override void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (!String.IsNullOrWhiteSpace(e.Data)) //FFmpeg outputs null lines to stderr.
             {
                 haserror = true;
                 Console.Out.WriteLine(e.Data);
             }
-        }
-
-        private void ffmpegProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            Console.Error.WriteLine(e.Data);
         }
     }
 }

@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExternalProcessWrapperBase.cs" />
     <Compile Include="FFmpegWrapper.cs" />
     <Compile Include="MkvPropEditWrapper.cs" />
     <Compile Include="ParWrapper.cs" />

@@ -114,6 +114,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ExternalProcessWrappers\ExternalProcessWrappers.csproj">
+      <Project>{80062f4f-5489-41c7-9b7e-bcb8a641e420}</Project>
+      <Name>ExternalProcessWrappers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\nntpPoster\nntpPoster.csproj">
       <Project>{52ede790-8bc6-4cf3-aaf5-a2ea7a281f30}</Project>
       <Name>nntpPoster</Name>

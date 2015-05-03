@@ -87,6 +87,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ExternalProcessWrappers\ExternalProcessWrappers.csproj">
+      <Project>{80062f4f-5489-41c7-9b7e-bcb8a641e420}</Project>
+      <Name>ExternalProcessWrappers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PostingNntpClient\PostingNntpClient.csproj">
       <Project>{1f83c86a-2fb2-44f5-82ab-e17527006a35}</Project>
       <Name>PostingNntpClient</Name>

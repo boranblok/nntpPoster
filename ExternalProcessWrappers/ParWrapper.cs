@@ -8,29 +8,19 @@ using System.Threading.Tasks;
 
 namespace ExternalProcessWrappers
 {
-    public class ParWrapper
+    public class ParWrapper : ExternalProcessWrapperBase
     {
-        private String _parLocation = "par2";
-
-        public String ParLocation
+        protected override string ProcessPathLocation
         {
-            get { return _parLocation; }
-            set
-            {
-                if (String.IsNullOrWhiteSpace(value))
-                    _parLocation = "par2";   //Assume par2 is accessible via the PATH environment variable.
-                else
-                    _parLocation = value;
-            }
+            get { return "par2"; }
         }
 
-        public ParWrapper()
+        public ParWrapper() : base()
         {
         }
 
-        public ParWrapper(String parLocation)
+        public ParWrapper(String parLocation) :base(parLocation)
         {
-            ParLocation = parLocation;
         }
 
         public void CreateParFilesInDirectory(DirectoryInfo workingFolder, String nameWithoutExtension, Int32 blockSize, Int32 redundancyPercentage)
@@ -42,23 +32,7 @@ namespace ExternalProcessWrappers
                GetFileList(workingFolder)
             );
 
-            Console.WriteLine("par2 {0}", parParameters);
-
-            Process parProcess = new Process();
-            parProcess.StartInfo.Arguments = parParameters;
-            parProcess.StartInfo.FileName = ParLocation;
-
-            parProcess.StartInfo.UseShellExecute = false;
-            parProcess.StartInfo.RedirectStandardOutput = true;
-            parProcess.StartInfo.RedirectStandardError = true;
-            parProcess.StartInfo.CreateNoWindow = true;
-            parProcess.ErrorDataReceived += parProcess_ErrorDataReceived;
-            parProcess.OutputDataReceived += parProcess_OutputDataReceived;
-            parProcess.EnableRaisingEvents = true;
-            parProcess.Start();
-            parProcess.BeginOutputReadLine();
-            parProcess.BeginErrorReadLine();
-            parProcess.WaitForExit();
+            this.ExecuteProcess(parParameters);
         }
 
         private String GetFileList(DirectoryInfo workingFolder)
@@ -73,16 +47,6 @@ namespace ExternalProcessWrappers
             }
 
             return fileList.ToString();
-        }
-
-        private void parProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            Console.Out.WriteLine(e.Data);
-        }
-
-        private void parProcess_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            Console.Error.WriteLine(e.Data);
         }
     }
 }

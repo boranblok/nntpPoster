@@ -8,29 +8,19 @@ using System.Threading.Tasks;
 
 namespace ExternalProcessWrappers
 {
-    public class MkvPropEditWrapper
+    public class MkvPropEditWrapper : ExternalProcessWrapperBase
     {
-        private String _mkvPropEditLocation = "mkvpropedit";
-
-        public String MkvPropEditLocation
+        protected override string ProcessPathLocation
         {
-            get { return _mkvPropEditLocation; }
-            set
-            {
-                if (String.IsNullOrWhiteSpace(value))
-                    _mkvPropEditLocation = "mkvpropedit";   //Assume mkvpropedit is accessible via the PATH environment variable.
-                else
-                    _mkvPropEditLocation = value;
-            }
+            get { return "mkvpropedit"; }
         }
 
-        public MkvPropEditWrapper()
+        public MkvPropEditWrapper() : base()
         {
         }
 
-        public MkvPropEditWrapper(String mkvPropEditLocation)
+        public MkvPropEditWrapper(String mkvPropEditLocation) : base(mkvPropEditLocation)
         {
-            MkvPropEditLocation = mkvPropEditLocation;
         }
 
         public void SetTitle(FileInfo mkvFile, String title)
@@ -40,31 +30,7 @@ namespace ExternalProcessWrappers
                 mkvFile.FullName
             );
 
-            Process mkvPropEditProcess = new Process();
-            mkvPropEditProcess.StartInfo.Arguments = mkvPropEditParameters;
-            mkvPropEditProcess.StartInfo.FileName = MkvPropEditLocation;
-
-            mkvPropEditProcess.StartInfo.UseShellExecute = false;
-            mkvPropEditProcess.StartInfo.RedirectStandardOutput = true;
-            mkvPropEditProcess.StartInfo.RedirectStandardError = true;
-            mkvPropEditProcess.StartInfo.CreateNoWindow = true;
-            mkvPropEditProcess.ErrorDataReceived += mkvPropEditProcess_ErrorDataReceived;
-            mkvPropEditProcess.OutputDataReceived += mkvPropEditProcess_OutputDataReceived;
-            mkvPropEditProcess.EnableRaisingEvents = true;
-            mkvPropEditProcess.Start();
-            mkvPropEditProcess.BeginOutputReadLine();
-            mkvPropEditProcess.BeginErrorReadLine();
-            mkvPropEditProcess.WaitForExit();
-        }
-
-        private void mkvPropEditProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            Console.Out.WriteLine(e.Data);
-        }
-
-        private void mkvPropEditProcess_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            Console.Error.WriteLine(e.Data);
+            this.ExecuteProcess(mkvPropEditParameters);
         }
     }
 }

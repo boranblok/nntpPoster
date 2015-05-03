@@ -8,29 +8,19 @@ using System.Threading.Tasks;
 
 namespace ExternalProcessWrappers
 {
-    public class RarWrapper
+    public class RarWrapper : ExternalProcessWrapperBase
     {
-        private String _rarLocation = "rar";
-
-        public String RarLocation
+        protected override string ProcessPathLocation
         {
-            get { return _rarLocation; }
-            set 
-            {
-                if (String.IsNullOrWhiteSpace(value))
-                    _rarLocation = "rar";   //Assume rar is accessible via the PATH environment variable.
-                else
-                    _rarLocation = value; 
-            }
+            get { return "rar"; }
         }
 
-        public RarWrapper()
+        public RarWrapper() : base()
         {
         }
 
-        public RarWrapper(String rarLocation)
+        public RarWrapper(String rarLocation) : base(rarLocation)
         {
-            RarLocation = rarLocation;
         }
 
         public void Compress(FileSystemInfo source, DirectoryInfo destination, String archiveName, Int32 partSize)
@@ -48,31 +38,7 @@ namespace ExternalProcessWrappers
                 toCompress
             );
 
-            Process rarProcess = new Process();
-            rarProcess.StartInfo.Arguments = rarParameters;
-            rarProcess.StartInfo.FileName = RarLocation;
-
-            rarProcess.StartInfo.UseShellExecute = false;
-            rarProcess.StartInfo.RedirectStandardOutput = true;
-            rarProcess.StartInfo.RedirectStandardError = true;
-            rarProcess.StartInfo.CreateNoWindow = true;
-            rarProcess.ErrorDataReceived += rarProcess_ErrorDataReceived;
-            rarProcess.OutputDataReceived += rarProcess_OutputDataReceived;
-            rarProcess.EnableRaisingEvents = true;
-            rarProcess.Start();
-            rarProcess.BeginOutputReadLine();
-            rarProcess.BeginErrorReadLine();
-            rarProcess.WaitForExit();
-        }
-
-        private void rarProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            Console.Out.WriteLine(e.Data);
-        }
-
-        private void rarProcess_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            Console.Error.WriteLine(e.Data);
+            this.ExecuteProcess(rarParameters);
         }
     }
 }

@@ -67,6 +67,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExternalProcessWrappers\ExternalProcessWrappers.csproj">
+      <Project>{80062f4f-5489-41c7-9b7e-bcb8a641e420}</Project>
+      <Name>ExternalProcessWrappers</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
