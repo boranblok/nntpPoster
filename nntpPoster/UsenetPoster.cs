@@ -5,9 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using ExternalProcessWrappers;
 using nntpPoster.yEncLib;
-using par2Lib;
-using rarLib;
 using Util;
 
 namespace nntpPoster

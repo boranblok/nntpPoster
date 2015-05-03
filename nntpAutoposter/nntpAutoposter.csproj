@@ -114,14 +114,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ffmpegLib\ffmpegLib.csproj">
-      <Project>{19a62359-1cb4-4945-b9b3-f43aa2ef4a3b}</Project>
-      <Name>ffmpegLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\mkvPropEditLib\mkvPropEditLib.csproj">
-      <Project>{6df50be0-8b67-448d-900a-842eb5b73b66}</Project>
-      <Name>mkvPropEditLib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\nntpPoster\nntpPoster.csproj">
       <Project>{52ede790-8bc6-4cf3-aaf5-a2ea7a281f30}</Project>
       <Name>nntpPoster</Name>

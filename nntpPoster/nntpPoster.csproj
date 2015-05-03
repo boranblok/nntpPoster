@@ -87,17 +87,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\par2Lib\par2Lib.csproj">
-      <Project>{e34e8477-5ed3-45c6-95a9-7c79efc9a1db}</Project>
-      <Name>par2Lib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PostingNntpClient\PostingNntpClient.csproj">
       <Project>{1f83c86a-2fb2-44f5-82ab-e17527006a35}</Project>
       <Name>PostingNntpClient</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\rarLib\rarLib.csproj">
-      <Project>{4d750f87-f6eb-4e0f-a9db-895fde20362d}</Project>
-      <Name>rarLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\Util\Util.csproj">
       <Project>{f9427f11-11d3-4157-8876-c8dd1f62d009}</Project>
