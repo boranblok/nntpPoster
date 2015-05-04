@@ -9,10 +9,16 @@ using PostingNntpClient;
 
 namespace nntpPoster
 {
-    public class nntpMessagePoster : InntpMessagePoster
+    public class nntpMessagePoster : InntpMessagePoster, IDisposable
     {
+        private Object monitor = new Object();
         private UsenetPosterConfig configuration;
         private NewsHostConnectionInfo connectionInfo;
+
+        private Queue<nntpMessage> MessagesToPost;
+        private List<PostingThread> PostingThreads;
+        private Boolean IsPosting;
+
         public nntpMessagePoster(UsenetPosterConfig configuration)
         {
             this.configuration = configuration;
@@ -24,93 +30,90 @@ namespace nntpPoster
                 Username = configuration.NewsGroupUsername,
                 Password = configuration.NewsGroupPassword
             };
-        }
-        private List<Task> RunningTasks = new List<Task>();
-        public event EventHandler<YEncFilePart> PartPosted;
 
+            MessagesToPost = new Queue<nntpMessage>();
+            PostingThreads = ConstructPostingThreads();
+            IsPosting = false;
+        }
+
+        private List<PostingThread> ConstructPostingThreads()
+        {
+            List<PostingThread> postingThreads = new List<PostingThread>();
+            for (int i = 0; i < configuration.MaxConnectionCount; i++)
+            {
+                var postingThread = new PostingThread(configuration, connectionInfo, MessagesToPost);
+                postingThread.MessagePosted += postingThread_MessagePosted;
+                postingThreads.Add(postingThread);
+            }
+
+            return postingThreads;
+        }
+
+        void postingThread_MessagePosted(object sender, nntpMessage e)  //TODO propagate this further instead of yEnc part? (combine the two ?)
+        {
+            OnFilePartPosted(e.YEncFilePart);
+        }
+
+        private void StartPostingThreadsIfNotStarted()
+        {
+            if (!IsPosting)
+            {
+                IsPosting = true;
+                PostingThreads.ForEach(t => t.Start());
+            }
+        }
+
+        public event EventHandler<YEncFilePart> PartPosted;
         protected virtual void OnFilePartPosted(YEncFilePart e)
         {
+            lock (monitor)
+            {
+                Monitor.Pulse(monitor);
+            }
             if (PartPosted != null) PartPosted(this, e);
         }
 
         public void PostMessage(nntpMessage message)
         {
-            Boolean waitForFreeThread = true;
-            while (waitForFreeThread)
+            Boolean wait = true;
+            while (wait)
             {
-                lock (RunningTasks)
+                lock (MessagesToPost)
                 {
-                    if (RunningTasks.Count < configuration.MaxConnectionCount)
+                    if (MessagesToPost.Count <= configuration.MaxConnectionCount * 2)
                     {
-                        Task task = new Task(() => PostMessageTask(message));
-                        task.ContinueWith(t => CleanupTask(t));
-                        RunningTasks.Add(task);
-                        task.Start();
-                        waitForFreeThread = false;
+                        if (MessagesToPost.Count >= configuration.MaxConnectionCount)
+                            StartPostingThreadsIfNotStarted();
+
+                        MessagesToPost.Enqueue(message);
+                        wait = false;
                     }
                 }
-                if (waitForFreeThread)
-                    Thread.Sleep(10);     //TODO: optimize sleep value here.
+                if (wait)
+                {
+                    lock (monitor)
+                    {
+                        if (!wait)
+                        {
+                            break;
+                        }
+                        Monitor.Wait(monitor, 1000);
+                    }
+                }
             }
         }
 
         public void WaitTillCompletion()
         {
-            Task.WaitAll(RunningTasks.ToArray());
+            //If the amount of blocks to post was not enough to trigger the start of posting, we trigger it here.
+            StartPostingThreadsIfNotStarted();
+
+            Task.WaitAll(PostingThreads.Select(t => t.RequestStop()).ToArray());
         }
 
-        private void CleanupTask(Task task)
+        public void Dispose()
         {
-            lock (RunningTasks)
-            {
-                RunningTasks.Remove(task);
-            }
-        }
-
-        private void PostMessageTask(nntpMessage message)
-        {
-            var retryCount = 0;
-            var retry = true;
-            while (retry && retryCount < configuration.MaxRetryCount)
-            {
-                try
-                {
-                    using (SimpleNntpPostingClient client = new SimpleNntpPostingClient(connectionInfo))
-                    {
-                        client.Connect();
-
-                        var partMessageId = client.PostYEncMessage(
-                                configuration.FromAddress,
-                                message.Subject,
-                                message.PostInfo.PostedGroups,
-                                message.PostInfo.PostedDateTime,
-                                message.Prefix,
-                                message.YEncFilePart.EncodedLines,
-                                message.Suffix
-                            );
-                        lock (message.PostInfo.Segments)
-                        {
-                            message.PostInfo.Segments.Add(new PostedFileSegment
-                            {
-                                MessageId = partMessageId,
-                                Bytes = message.YEncFilePart.Size,
-                                SegmentNumber = message.YEncFilePart.Number
-                            });
-                        }
-                    }
-                    retry = false;
-                    OnFilePartPosted(message.YEncFilePart);
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine("Posting yEnc message failed:");
-                    Console.WriteLine(ex.ToString());
-                    if (retryCount++ < configuration.MaxRetryCount)
-                        Console.WriteLine("Retrying to post message, attempt {0}", retryCount);
-                    else
-                        Console.WriteLine("Maximum retry attempts reached. Posting is probably corrupt.", retryCount);
-                }
-            }
+            PostingThreads.ForEach(t => t.Dispose());
         }
     }
 }

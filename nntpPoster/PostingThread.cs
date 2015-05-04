@@ -21,7 +21,12 @@ namespace nntpPoster
         private UsenetPosterConfig _configuration;
         private NewsHostConnectionInfo _connectionInfo;        
         private Queue<nntpMessage> _messageQueue;
-        
+
+        public event EventHandler<nntpMessage> MessagePosted;
+        protected virtual void OnMessagePosted(nntpMessage e)
+        {
+            if (MessagePosted != null) MessagePosted(this, e);
+        }        
 
         public PostingThread(UsenetPosterConfig configuration, NewsHostConnectionInfo connectionInfo, 
             Queue<nntpMessage> messageQueue)
@@ -32,13 +37,13 @@ namespace nntpPoster
             MyTask = new Task(PostingTask, TaskCreationOptions.LongRunning);
         }
 
-        private void Start()
+        public void Start()
         {
             StopRequested = false;
             MyTask.Start();
         }
 
-        private void Stop()
+        public void Stop()
         {
             lock (monitor)
             {
@@ -48,27 +53,65 @@ namespace nntpPoster
             MyTask.Wait();
         }
 
+        public Task RequestStop()
+        {
+            lock (monitor)
+            {
+                StopRequested = true;
+                Monitor.Pulse(monitor);
+            }
+            return MyTask;
+        }
+
         private void PostingTask()
         {
             while (!Finished)
             {
                 var message = GetNextMessageToPost();
-                if(message != null)
+                if (message != null)
                 {
                     if (_client == null)
                     {
-                        _client = new SimpleNntpPostingClient(connectionInfo);
+                        _client = new SimpleNntpPostingClient(_connectionInfo);
                         _client.Connect();
                     }
 
-                    _client.PostYEncMessage(
-                        _configuration.FromAddress,
-                        message.Subject,
-                        message.PostInfo.PostedGroups,
-                        message.PostInfo.PostedDateTime,
-                        message.Prefix,
-                        message.YEncFilePart.EncodedLines,
-                        message.Suffix);
+                    var retryCount = 0;
+                    var retry = true;
+                    while (retry && retryCount < _configuration.MaxRetryCount)
+                    {
+                        try
+                        {
+                            var partMessageId = _client.PostYEncMessage(
+                                _configuration.FromAddress,
+                                message.Subject,
+                                message.PostInfo.PostedGroups,
+                                message.PostInfo.PostedDateTime,
+                                message.Prefix,
+                                message.YEncFilePart.EncodedLines,
+                                message.Suffix);
+                            lock (message.PostInfo.Segments)
+                            {
+                                message.PostInfo.Segments.Add(new PostedFileSegment
+                                {
+                                    MessageId = partMessageId,
+                                    Bytes = message.YEncFilePart.Size,
+                                    SegmentNumber = message.YEncFilePart.Number
+                                });
+                            }
+                            retry = false;
+                            OnMessagePosted(message);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Posting yEnc message failed:");
+                            Console.WriteLine(ex.ToString());
+                            if (retryCount++ < _configuration.MaxRetryCount)
+                                Console.WriteLine("Retrying to post message, attempt {0}", retryCount);
+                            else
+                                Console.WriteLine("Maximum retry attempts reached. Posting is probably corrupt.", retryCount);
+                        }
+                    }
                 }
                 else
                 {
@@ -85,7 +128,7 @@ namespace nntpPoster
                     {
                         lock (monitor)
                         {
-                            if(Finished)
+                            if (Finished)
                             {
                                 break;
                             }

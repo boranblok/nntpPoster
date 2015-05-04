@@ -34,46 +34,48 @@ namespace nntpPoster
 
         public XDocument PostToUsenet(FileSystemInfo toPost, String title, Boolean saveNzb = true)
         {
-            nntpMessagePoster poster = new nntpMessagePoster(configuration);
-            poster.PartPosted += poster_PartPosted;
-            DirectoryInfo processedFiles = null;
-            try
+            using (nntpMessagePoster poster = new nntpMessagePoster(configuration))
             {
-                processedFiles = MakeProcessingFolder(toPost.NameWithoutExtension());
-                MakeRarAndParFiles(toPost, toPost.NameWithoutExtension(), processedFiles);
-
-                List<FileToPost> filesToPost = processedFiles.GetFiles()
-                    .OrderBy(f => f.Name)
-                    .Select(f => new FileToPost(configuration, f)).ToList();
-
-                List < PostedFileInfo > postedFiles = new List<PostedFileInfo>();
-                TotalPartCount = filesToPost.Sum(f => f.TotalParts);
-                UploadedPartCount = 0;
-                TotalUploadedBytes = 0;
-                UploadStartTime = DateTime.Now;
-
-                Int32 fileCount = 1;
-                foreach (var fileToPost in filesToPost)
+                poster.PartPosted += poster_PartPosted;
+                DirectoryInfo processedFiles = null;
+                try
                 {
-                    String comment1 = String.Format("{0} [{1}/{2}]", title, fileCount++, filesToPost.Count);
-                    PostedFileInfo postInfo = fileToPost.PostYEncFile(poster, comment1, "");
-                    postedFiles.Add(postInfo);
+                    processedFiles = MakeProcessingFolder(toPost.NameWithoutExtension());
+                    MakeRarAndParFiles(toPost, toPost.NameWithoutExtension(), processedFiles);
+
+                    List<FileToPost> filesToPost = processedFiles.GetFiles()
+                        .OrderBy(f => f.Name)
+                        .Select(f => new FileToPost(configuration, f)).ToList();
+
+                    List<PostedFileInfo> postedFiles = new List<PostedFileInfo>();
+                    TotalPartCount = filesToPost.Sum(f => f.TotalParts);
+                    UploadedPartCount = 0;
+                    TotalUploadedBytes = 0;
+                    UploadStartTime = DateTime.Now;
+
+                    Int32 fileCount = 1;
+                    foreach (var fileToPost in filesToPost)
+                    {
+                        String comment1 = String.Format("{0} [{1}/{2}]", title, fileCount++, filesToPost.Count);
+                        PostedFileInfo postInfo = fileToPost.PostYEncFile(poster, comment1, "");
+                        postedFiles.Add(postInfo);
+                    }
+
+                    poster.WaitTillCompletion();
+                    Console.WriteLine();
+
+                    XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles);
+                    if (saveNzb && !String.IsNullOrWhiteSpace(configuration.NzbOutputFolder))
+                        nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder, toPost.NameWithoutExtension() + ".nzb"));
+                    return nzbDoc;
                 }
-
-                poster.WaitTillCompletion();
-                Console.WriteLine();
-
-                XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles);
-                if (saveNzb && !String.IsNullOrWhiteSpace(configuration.NzbOutputFolder))
-                    nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder, toPost.NameWithoutExtension() + ".nzb"));
-                return nzbDoc;
-            }
-            finally
-            {
-                if (processedFiles != null && processedFiles.Exists)
+                finally
                 {
-                    Console.WriteLine("Deleting processed folder");
-                    processedFiles.Delete(true);
+                    if (processedFiles != null && processedFiles.Exists)
+                    {
+                        Console.WriteLine("Deleting processed folder");
+                        processedFiles.Delete(true);
+                    }
                 }
             }
         }
