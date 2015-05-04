@@ -25,7 +25,7 @@ namespace ExternalProcessWrappers
 
         public void CreateParFilesInDirectory(DirectoryInfo workingFolder, String nameWithoutExtension, Int32 blockSize, Int32 redundancyPercentage)
         {
-            String parParameters = String.Format("c -q -s{0} -r{1} -- \"{2}\"{3}",
+            String parParameters = String.Format("c -s{0} -r{1} -- \"{2}\"{3}",
                blockSize,
                redundancyPercentage,
                Path.Combine(workingFolder.FullName, nameWithoutExtension + ".par2"),

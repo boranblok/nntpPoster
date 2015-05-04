@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -83,35 +84,44 @@ namespace nntpAutoposter
 
         private void UploadNextItemInQueue()
         {
-            UploadEntry nextUpload = DBHandler.Instance.GetNextUploadEntryToUpload();
-            if (nextUpload != null)
+            try
             {
-                FileSystemInfo toUpload;
-                Boolean isDirectory;
-                String fullPath = Path.Combine(configuration.BackupFolder.FullName, nextUpload.Name);
-                try
+                UploadEntry nextUpload = DBHandler.Instance.GetNextUploadEntryToUpload();
+                if (nextUpload != null)
                 {
-                    FileAttributes attributes = File.GetAttributes(fullPath);
-                    if (attributes.HasFlag(FileAttributes.Directory))
+                    FileSystemInfo toUpload;
+                    Boolean isDirectory;
+                    String fullPath = Path.Combine(configuration.BackupFolder.FullName, nextUpload.Name);
+                    try
                     {
-                        isDirectory = true;
-                        toUpload = new DirectoryInfo(fullPath);
+                        FileAttributes attributes = File.GetAttributes(fullPath);
+                        if (attributes.HasFlag(FileAttributes.Directory))
+                        {
+                            isDirectory = true;
+                            toUpload = new DirectoryInfo(fullPath);
+                        }
+                        else
+                        {
+                            isDirectory = false;
+                            toUpload = new FileInfo(fullPath);
+                        }
                     }
-                    else
+                    catch (FileNotFoundException)
                     {
-                        isDirectory = false;
-                        toUpload = new FileInfo(fullPath);
+                        Console.WriteLine("Can no longer find {0} in the backup folder, cancelling upload", nextUpload.Name);
+                        nextUpload.Cancelled = true;
+                        DBHandler.Instance.UpdateUploadEntry(nextUpload);
+                        return;
                     }
+                    PostRelease(nextUpload, toUpload, isDirectory);
                 }
-                catch(FileNotFoundException)
-                {
-                    Console.WriteLine("Can no longer find {0} in the backup folder, cancelling upload", nextUpload.Name);
-                    nextUpload.Cancelled = true;
-                    DBHandler.Instance.UpdateUploadEntry(nextUpload);
-                    return;
-                }
-                PostRelease(nextUpload, toUpload, isDirectory);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("The upload failed to post. Retrying.");
+                Console.WriteLine(ex.ToString());
+            }
+           
         }
 
         private void PostRelease(UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)

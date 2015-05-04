@@ -15,8 +15,6 @@ namespace ExternalProcessWrappers
             get { return "ffmpeg"; }
         }
 
-        private Boolean haserror;
-
         public FFmpegWrapper() : base()
         {
         }
@@ -27,7 +25,6 @@ namespace ExternalProcessWrappers
 
         public void TryStripMetadata(FileInfo mediaFile)
         {
-            haserror = false;
             String originalFile = mediaFile.FullName;
             String tmpFile = originalFile + ".tmp";
             try
@@ -35,9 +32,7 @@ namespace ExternalProcessWrappers
                 File.Move(originalFile, tmpFile);
                 try
                 {
-                    //FFMpeg outputs all output to sterr, making error detection very hard, 
-                    //therefore we have set verbosity to 16, level 8 might be required if this is still to conservative.
-                    String ffmpegParameters = String.Format("-v 16 -i \"{0}\" -map_metadata -1 -vcodec copy -acodec copy \"{1}\"",
+                    String ffmpegParameters = String.Format("-i \"{0}\" -map_metadata -1 -vcodec copy -acodec copy \"{1}\"",
                       tmpFile,
                       originalFile
                   );
@@ -46,16 +41,12 @@ namespace ExternalProcessWrappers
                 }
                 catch (Exception)
                 {
-                    haserror = true;
-                    throw;
-                }
-                if (haserror)   // If we had any error we revert back to the original file.
-                {
                     if (File.Exists(originalFile))
                     {
                         File.Delete(originalFile);
                     }
                     File.Move(tmpFile, originalFile);
+                    throw;
                 }
             }
             finally //The tempfile should always be removed so we dont leave stuff behind.
@@ -66,15 +57,6 @@ namespace ExternalProcessWrappers
                 }
             }
             mediaFile.Refresh();
-        }
-
-        protected override void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (!String.IsNullOrWhiteSpace(e.Data)) //FFmpeg outputs null lines to stderr.
-            {
-                haserror = true;
-                Console.Out.WriteLine(e.Data);
-            }
         }
     }
 }

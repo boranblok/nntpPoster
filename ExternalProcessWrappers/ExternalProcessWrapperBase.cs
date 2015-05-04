@@ -11,8 +11,9 @@ namespace ExternalProcessWrappers
     {
         protected abstract String ProcessPathLocation { get; }
 
-        private String _processLocation;
+        protected DateTime LastOutputReceivedAt { get; set; }
 
+        private String _processLocation;
         public String ProcessLocation
         {
             get { return _processLocation; }
@@ -25,19 +26,19 @@ namespace ExternalProcessWrappers
             }
         }
 
-        public ExternalProcessWrapperBase()
+        protected ExternalProcessWrapperBase()
         {
             ProcessLocation = ProcessPathLocation;
         }
 
-        public ExternalProcessWrapperBase(String processLocation)
+        protected ExternalProcessWrapperBase(String processLocation)
         {
             ProcessLocation = processLocation;
         }
 
         protected void ExecuteProcess(String parameters)
         {
-            using (Process process = new Process())
+            using (var process = new Process())
             {
                 process.StartInfo.Arguments = parameters;
                 process.StartInfo.FileName = ProcessLocation;
@@ -52,18 +53,34 @@ namespace ExternalProcessWrappers
                 process.Start();
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
-                process.WaitForExit();
+
+                while (!process.WaitForExit(60*1000))
+                {
+                    if ((DateTime.Now - LastOutputReceivedAt).TotalMinutes > 5)     //TODO: make a parameter to give slower systems more timeout ?
+                    {
+                        Console.WriteLine("No output received for 5 minutes, killing external process.");
+                        process.Kill();
+                        throw new Exception("External process had to be killed due to inactivity.");
+                    }
+                }
+
+                if (process.ExitCode != 0)
+                {
+                    throw new Exception("Process has exited with errors. Exit code: " + process.ExitCode);
+                }
             }
         }
 
         protected virtual void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            Console.Out.WriteLine(e.Data);
+            LastOutputReceivedAt = DateTime.Now;
+            Console.Out.WriteLine(DateTime.Now.ToString("HH:mm:ss,fff") + " " + e.Data);
         }
 
         protected virtual void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            Console.Error.WriteLine(e.Data);
+            LastOutputReceivedAt = DateTime.Now;
+            Console.Error.WriteLine(DateTime.Now.ToString("HH:mm:ss,fff") + " " + e.Data);
         }
     }
 }
