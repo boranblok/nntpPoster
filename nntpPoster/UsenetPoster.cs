@@ -36,9 +36,12 @@ namespace nntpPoster
         {
             nntpMessagePoster poster = new nntpMessagePoster(configuration);
             poster.PartPosted += poster_PartPosted;
-            DirectoryInfo processedFiles = PrepareToPost(toPost);
+            DirectoryInfo processedFiles = null;
             try
             {
+                processedFiles = MakeProcessingFolder(toPost.NameWithoutExtension());
+                MakeRarAndParFiles(toPost, toPost.NameWithoutExtension(), processedFiles);
+
                 List<FileToPost> filesToPost = processedFiles.GetFiles()
                     .OrderBy(f => f.Name)
                     .Select(f => new FileToPost(configuration, f)).ToList();
@@ -67,7 +70,7 @@ namespace nntpPoster
             }
             finally
             {
-                if (processedFiles.Exists)
+                if (processedFiles != null && processedFiles.Exists)
                 {
                     Console.WriteLine("Deleting processed folder");
                     processedFiles.Delete(true);
@@ -106,44 +109,29 @@ namespace nntpPoster
             if (handler != null) handler(this, e);
         }
 
-        private DirectoryInfo PrepareToPost(FileSystemInfo toPost)
+        private DirectoryInfo MakeProcessingFolder(String nameWithoutExtension)
         {
-            DirectoryInfo processedFolder = null;
-            try
-            {
-                processedFolder = MakeRarAndParFiles(toPost, toPost.NameWithoutExtension());
-                return processedFolder;
-            }
-            catch(Exception)
-            {
-                if (processedFolder != null && processedFolder.Exists)
-                {
-                    Console.WriteLine("Error occurred, deleting processed folder");
-                    processedFolder.Delete(true);
-                }
-                throw;
-            }
+            var processedFolder = new DirectoryInfo(Path.Combine(
+                configuration.WorkingFolder.FullName, nameWithoutExtension + "_readyToPost"));
+            processedFolder.Create();
+            return processedFolder;
         }
 
-        private DirectoryInfo MakeRarAndParFiles(FileSystemInfo toPost, String nameWithoutExtension)
+        private void MakeRarAndParFiles(FileSystemInfo toPost, String nameWithoutExtension,
+            DirectoryInfo processedFolder)
         {
             Int64 size = toPost.Size();
             var rarSizeRecommendation = configuration.RecommendationMap
                 .Where(rr => rr.FromFileSize < size)
                 .OrderByDescending(rr => rr.FromFileSize)
                 .First();
-            DirectoryInfo targetDirectory = new DirectoryInfo(Path.Combine(
-                configuration.WorkingFolder.FullName, nameWithoutExtension + "_readyToPost"));
-            targetDirectory.Create();
             var rarWrapper = new RarWrapper(configuration.RarLocation);
             rarWrapper.Compress(
-                toPost, targetDirectory, nameWithoutExtension, rarSizeRecommendation.ReccomendedRarSize);
+                toPost, processedFolder, nameWithoutExtension, rarSizeRecommendation.ReccomendedRarSize);
 
             var parWrapper = new ParWrapper(configuration.ParLocation);
             parWrapper.CreateParFilesInDirectory(
-                targetDirectory, nameWithoutExtension, configuration.YEncPartSize, rarSizeRecommendation.ReccomendedRecoveryPercentage);
-
-            return targetDirectory;
+                processedFolder, nameWithoutExtension, configuration.YEncPartSize, rarSizeRecommendation.ReccomendedRecoveryPercentage);
         }
 
         private XDocument GenerateNzbFromPostInfo(String title, List<PostedFileInfo> postedFiles)
