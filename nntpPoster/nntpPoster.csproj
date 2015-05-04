@@ -67,6 +67,9 @@
     <Compile Include="nntpMessage.cs" />
     <Compile Include="nntpMessagePoster.cs" />
     <Compile Include="PostedFileInfo.cs" />
+    <Compile Include="PostingThread.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="RarAndRecoveryRecommendation.cs" />
     <Compile Include="UploadSpeedReport.cs" />
     <Compile Include="UsenetPosterConfig.cs" />
