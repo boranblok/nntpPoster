@@ -117,6 +117,7 @@ namespace nntpPoster
                 {
                     if (_client != null)         //If the queue runs dry we close the connection
                     {
+                        Console.WriteLine("Disposing client because of empty queue.");
                         _client.Dispose();
                         _client = null;
                     }
@@ -158,19 +159,11 @@ namespace nntpPoster
 
         public void Dispose()
         {
-            if (MyTask.Status == TaskStatus.Running)
-            {
-                lock (monitor)
-                {
-                    StopRequested = true;
-                    Finished = true;
-                    Monitor.Pulse(monitor);
-                }
-                MyTask.Wait();
-            }
-            
             if (_client != null)
+            {
+                Console.WriteLine("Disposing client because of dispose request.");
                 _client.Dispose();
+            }
         }
     }
 }
