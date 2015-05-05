@@ -158,13 +158,17 @@ namespace nntpPoster
 
         public void Dispose()
         {
-            lock (monitor)
+            if (MyTask.Status == TaskStatus.Running)
             {
-                StopRequested = true;
-                Finished = true;
-                Monitor.Pulse(monitor);
+                lock (monitor)
+                {
+                    StopRequested = true;
+                    Finished = true;
+                    Monitor.Pulse(monitor);
+                }
+                MyTask.Wait();
             }
-            MyTask.Wait();
+            
             if (_client != null)
                 _client.Dispose();
         }
