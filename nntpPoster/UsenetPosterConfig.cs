@@ -30,6 +30,7 @@ namespace nntpPoster
         public List<RarAndRecoveryRecommendation> RecommendationMap { get; set; }
         public String RarLocation { get; set; }
         public String ParLocation { get; set; }
+        public Int32 InactiveProcessTimeout { get; set; }
 
         public Int32 YEncPartSize 
         { 
@@ -72,6 +73,7 @@ namespace nntpPoster
             RecommendationMap = LoadReccomendationMap(ConfigurationManager.AppSettings["OptimalSizeRarAndPar"]);
             RarLocation = ConfigurationManager.AppSettings["RarLocation"];
             ParLocation = ConfigurationManager.AppSettings["ParLocation"];
+            InactiveProcessTimeout = Int32.Parse(ConfigurationManager.AppSettings["InactiveProcessTimeout"]);
         }
 
         private List<RarAndRecoveryRecommendation> LoadReccomendationMap(String configValue)

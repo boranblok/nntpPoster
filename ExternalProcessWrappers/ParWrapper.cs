@@ -15,11 +15,12 @@ namespace ExternalProcessWrappers
             get { return "par2"; }
         }
 
-        public ParWrapper() : base()
+        public ParWrapper(Int32 inactiveProcessTimeout)
+            : base(inactiveProcessTimeout)
         {
         }
 
-        public ParWrapper(String parLocation) :base(parLocation)
+        public ParWrapper(Int32 inactiveProcessTimeout, String parLocation) :base(inactiveProcessTimeout, parLocation)
         {
         }
 

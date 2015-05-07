@@ -127,11 +127,11 @@ namespace nntpPoster
                 .Where(rr => rr.FromFileSize < size)
                 .OrderByDescending(rr => rr.FromFileSize)
                 .First();
-            var rarWrapper = new RarWrapper(configuration.RarLocation);
+            var rarWrapper = new RarWrapper(configuration.InactiveProcessTimeout, configuration.RarLocation);
             rarWrapper.Compress(
                 toPost, processedFolder, nameWithoutExtension, rarSizeRecommendation.ReccomendedRarSize);
 
-            var parWrapper = new ParWrapper(configuration.ParLocation);
+            var parWrapper = new ParWrapper(configuration.InactiveProcessTimeout, configuration.ParLocation);
             parWrapper.CreateParFilesInDirectory(
                 processedFolder, nameWithoutExtension, configuration.YEncPartSize, rarSizeRecommendation.ReccomendedRecoveryPercentage);
         }

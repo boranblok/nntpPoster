@@ -15,11 +15,12 @@ namespace ExternalProcessWrappers
             get { return "ffmpeg"; }
         }
 
-        public FFmpegWrapper() : base()
+        public FFmpegWrapper(Int32 inactiveProcessTimeout)
+            : base(inactiveProcessTimeout)
         {
         }
 
-        public FFmpegWrapper(String ffmpegLocation) : base(ffmpegLocation)
+        public FFmpegWrapper(Int32 inactiveProcessTimeout, String ffmpegLocation) : base(inactiveProcessTimeout, ffmpegLocation)
         {
         }
 

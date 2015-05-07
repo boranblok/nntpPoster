@@ -16,7 +16,7 @@ namespace rarTester
             var target = new DirectoryInfo(@"/mnt/virtual/shareroot/ToSort/TestRarring/TargetFolder/");
             var targetName = "RarFilename";
 
-            var rarWrapper = new RarWrapper();
+            var rarWrapper = new RarWrapper(5);
 
             rarWrapper.Compress(source, target, targetName, 15*1000*1000);
 

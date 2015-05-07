@@ -15,11 +15,12 @@ namespace ExternalProcessWrappers
             get { return "mkvpropedit"; }
         }
 
-        public MkvPropEditWrapper() : base()
+        public MkvPropEditWrapper(Int32 inactiveProcessTimeout)
+            : base(inactiveProcessTimeout)
         {
         }
 
-        public MkvPropEditWrapper(String mkvPropEditLocation) : base(mkvPropEditLocation)
+        public MkvPropEditWrapper(Int32 inactiveProcessTimeout, String mkvPropEditLocation) : base(inactiveProcessTimeout, mkvPropEditLocation)
         {
         }
 

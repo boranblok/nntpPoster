@@ -26,13 +26,17 @@ namespace ExternalProcessWrappers
             }
         }
 
-        protected ExternalProcessWrapperBase()
+        public Int32 InactiveProcessTimeout { get; set; }
+
+        protected ExternalProcessWrapperBase(Int32 inactiveProcessTimeout)
         {
+            InactiveProcessTimeout = inactiveProcessTimeout;
             ProcessLocation = ProcessPathLocation;
         }
 
-        protected ExternalProcessWrapperBase(String processLocation)
+        protected ExternalProcessWrapperBase(Int32 inactiveProcessTimeout, String processLocation)
         {
+            InactiveProcessTimeout = inactiveProcessTimeout;
             ProcessLocation = processLocation;
         }
 
@@ -56,9 +60,9 @@ namespace ExternalProcessWrappers
 
                 while (!process.WaitForExit(60*1000))
                 {
-                    if ((DateTime.Now - LastOutputReceivedAt).TotalMinutes > 5)     //TODO: make a parameter to give slower systems more timeout ?
+                    if ((DateTime.Now - LastOutputReceivedAt).TotalMinutes > InactiveProcessTimeout)
                     {
-                        Console.WriteLine("No output received for 5 minutes, killing external process.");
+                        Console.WriteLine("No output received for {0} minutes, killing external process.", InactiveProcessTimeout);
                         process.Kill();
                         throw new Exception("External process had to be killed due to inactivity.");
                     }

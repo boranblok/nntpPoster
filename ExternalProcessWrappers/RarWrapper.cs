@@ -15,11 +15,12 @@ namespace ExternalProcessWrappers
             get { return "rar"; }
         }
 
-        public RarWrapper() : base()
+        public RarWrapper(Int32 inactiveProcessTimeout)
+            : base(inactiveProcessTimeout)
         {
         }
 
-        public RarWrapper(String rarLocation) : base(rarLocation)
+        public RarWrapper(Int32 inactiveProcessTimeout, String rarLocation) : base(inactiveProcessTimeout, rarLocation)
         {
         }
 
