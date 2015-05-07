@@ -153,14 +153,27 @@ namespace PostingNntpClient
 
         public void Dispose()
         {
-            if (_reader != null)
-                _reader.Dispose();
+            try
+            {
+                if (_reader != null)
+                    _reader.Dispose();
+            }
+            catch
+            { }
 
-            if (_writer != null)
-                _writer.Dispose();
+            try
+            {
+                if (_writer != null)
+                    _writer.Dispose();
+            }
+            catch { }
 
-            if (_stream != null)
-                _stream.Dispose();
+            try
+            {
+                if (_stream != null)
+                    _stream.Dispose();
+            }
+            catch { }
         }
     }
 }
