@@ -16,7 +16,7 @@ namespace nntpAutoposter
 {    
     class AutoPoster
     {
-        private static readonly String CharsToRemove = "()=@#$%^+,?<>{}|";
+        private static readonly String CharsToRemove = "()=@#$%^,?<>{}|";
         private static readonly String[] ffmpegHandledExtensions = new String[] {"mkv", "avi", "wmv", "mp4", 
                                                                                  "mov", "ogg", "ogm", "wav", 
                                                                                  "mka", "mks", "mpeg", "mpg", 
@@ -223,6 +223,7 @@ namespace nntpAutoposter
         {
             String cleanName = Regex.Replace(nameToClean, "^[:ascii:]", String.Empty);
             cleanName = cleanName.Replace(' ', '.');
+            cleanName = cleanName.Replace("+", ".");
             cleanName = cleanName.Replace("&", "and");
             foreach(var charToRemove in CharsToRemove)
             {
