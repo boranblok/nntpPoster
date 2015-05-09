@@ -60,6 +60,9 @@ namespace ExternalProcessWrappers
 
                 while (!process.WaitForExit(60*1000))
                 {
+                    process.Refresh();
+                    if (process.HasExited) break;
+
                     if ((DateTime.Now - LastOutputReceivedAt).TotalMinutes > InactiveProcessTimeout)
                     {
                         Console.WriteLine("No output received for {0} minutes, killing external process.", InactiveProcessTimeout);
