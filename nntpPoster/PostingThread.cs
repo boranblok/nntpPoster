@@ -4,12 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using log4net;
 using PostingNntpClient;
 
 namespace nntpPoster
 {
     class PostingThread : IDisposable
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private Object monitor = new Object();
         private Boolean StopRequested;
         private Boolean Finished;

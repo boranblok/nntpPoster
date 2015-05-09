@@ -8,11 +8,15 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
 
 namespace PostingNntpClient
 {
     public class SimpleNntpPostingClient : IDisposable
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private static readonly Encoding iso88591Encoding = Encoding.GetEncoding("iso-8859-1");
 
         public NewsHostConnectionInfo ConnectionInfo { get; private set; }

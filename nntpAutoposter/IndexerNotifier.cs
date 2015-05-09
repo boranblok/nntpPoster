@@ -8,11 +8,15 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using log4net;
 
 namespace nntpAutoposter
 {
     class IndexerNotifier
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private Object monitor = new Object();
         private AutoPosterConfig configuration;
         private Task MyTask;

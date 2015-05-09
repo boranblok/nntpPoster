@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using log4net;
 using nntpPoster;
 using Util;
 
@@ -13,6 +14,9 @@ namespace nntpAutoposter
 {
     class Program
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         static AutoPosterConfig configuration;
         static void Main(string[] args)
         {

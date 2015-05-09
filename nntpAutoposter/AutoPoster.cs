@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ExternalProcessWrappers;
+using log4net;
 using nntpPoster;
 using Util;
 
@@ -16,6 +17,9 @@ namespace nntpAutoposter
 {    
     class AutoPoster
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private static readonly String CharsToRemove = "()=@#$%^,?<>{}|";
         private static readonly String[] ffmpegHandledExtensions = new String[] {"mkv", "avi", "wmv", "mp4", 
                                                                                  "mov", "ogg", "ogm", "wav", 

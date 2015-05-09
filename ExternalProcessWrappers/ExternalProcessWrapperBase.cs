@@ -4,11 +4,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
 
 namespace ExternalProcessWrappers
 {
     public abstract class ExternalProcessWrapperBase
     {
+        protected static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         protected abstract String ProcessPathLocation { get; }
 
         protected DateTime LastOutputReceivedAt { get; set; }

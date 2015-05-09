@@ -10,12 +10,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using log4net;
 using Util;
 
 namespace nntpAutoposter
 {
     class IndexerVerifier
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private Object monitor = new Object();
         private AutoPosterConfig configuration;
         private Task MyTask;

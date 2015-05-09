@@ -4,12 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
 using nntpPoster.yEncLib;
 
 namespace nntpPoster
 {
     public class FileToPost
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private UsenetPosterConfig configuration;
         private Int32 partSize;
         private FileInfo file;

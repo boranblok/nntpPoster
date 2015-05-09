@@ -8,11 +8,15 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using log4net;
 
 namespace nntpPoster
 {
     class Program
-    {    
+    {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         static Int32 Main(string[] args)
         {
             if (args.Length < 1)

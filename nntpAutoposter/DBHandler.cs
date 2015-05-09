@@ -7,12 +7,16 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
 using Mono.Data.Sqlite;
 
 namespace nntpAutoposter
 {
     class DBHandler
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private static Object lockObject = new Object();
         private static DBHandler _instance;
         public static DBHandler Instance

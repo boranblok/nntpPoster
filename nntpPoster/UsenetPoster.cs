@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using ExternalProcessWrappers;
+using log4net;
 using nntpPoster.yEncLib;
 using Util;
 
@@ -13,6 +14,9 @@ namespace nntpPoster
 {
     public class UsenetPoster
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public event EventHandler<UploadSpeedReport> newUploadSpeedReport;
 
         private UsenetPosterConfig configuration;

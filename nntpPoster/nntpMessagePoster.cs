@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using log4net;
 using nntpPoster.yEncLib;
 using PostingNntpClient;
 
@@ -11,6 +12,9 @@ namespace nntpPoster
 {
     public class nntpMessagePoster : InntpMessagePoster, IDisposable
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private Object monitor = new Object();
         private UsenetPosterConfig configuration;
         private NewsHostConnectionInfo connectionInfo;
