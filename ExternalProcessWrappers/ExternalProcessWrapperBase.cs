@@ -69,7 +69,7 @@ namespace ExternalProcessWrappers
 
                     if ((DateTime.Now - LastOutputReceivedAt).TotalMinutes > InactiveProcessTimeout)
                     {
-                        Console.WriteLine("No output received for {0} minutes, killing external process.", InactiveProcessTimeout);
+                        log.WarnFormat("No output received for {0} minutes, killing external process.", InactiveProcessTimeout);
                         process.Kill();
                         throw new Exception("External process had to be killed due to inactivity.");
                     }
@@ -85,13 +85,13 @@ namespace ExternalProcessWrappers
         protected virtual void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             LastOutputReceivedAt = DateTime.Now;
-            Console.Out.WriteLine(DateTime.Now.ToString("HH:mm:ss,fff") + " " + e.Data);
+            log.Debug(e.Data);
         }
 
         protected virtual void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             LastOutputReceivedAt = DateTime.Now;
-            Console.Error.WriteLine(DateTime.Now.ToString("HH:mm:ss,fff") + " " + e.Data);
+            log.Warn(e.Data);
         }
     }
 }

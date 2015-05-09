@@ -77,7 +77,7 @@ namespace nntpPoster
                 {
                     if (processedFiles != null && processedFiles.Exists)
                     {
-                        Console.WriteLine("Deleting processed folder");
+                        log.Info("Deleting processed folder");
                         processedFiles.Delete(true);
                     }
                 }

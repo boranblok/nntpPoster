@@ -35,7 +35,7 @@ namespace nntpAutoposter
                 MoveToBackupFolderAndPost(toPost.FullName);
             }
             watcher.EnableRaisingEvents = true;
-            Console.WriteLine("Monitoring '{0}' for new files or folders to post.", configuration.WatchFolder.FullName);
+            log.InfoFormat("Monitoring '{0}' for new files or folders to post.", configuration.WatchFolder.FullName);
         }
 
         public void Stop()
@@ -45,7 +45,8 @@ namespace nntpAutoposter
 
         private void watcher_Error(object sender, ErrorEventArgs e)
         {
-            Console.WriteLine("The FileSystemWatcher got an error:");
+            log.Fatal("Fatal exception in the filesystemwatcher.", e.GetException());
+            Console.WriteLine("Fatal exception in the filesystemwatcher:");
             Console.WriteLine(e.GetException().ToString());
             Environment.Exit(1);
         }

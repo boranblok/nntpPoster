@@ -49,7 +49,7 @@ namespace nntpAutoposter
 
         private void InitializeEnvironment()
         {
-            Console.WriteLine("Cleaning out processing folder of any leftover files.");
+            log.Info("Cleaning out processing folder of any leftover files.");
             foreach(var fsi in posterConfiguration.WorkingFolder.EnumerateFileSystemInfos())
             {
                 FileAttributes attributes = File.GetAttributes(fsi.FullName);
@@ -112,7 +112,7 @@ namespace nntpAutoposter
                     }
                     catch (FileNotFoundException)
                     {
-                        Console.WriteLine("Can no longer find {0} in the backup folder, cancelling upload", nextUpload.Name);
+                        log.WarnFormat("Can no longer find {0} in the backup folder, cancelling upload", nextUpload.Name);
                         nextUpload.Cancelled = true;
                         DBHandler.Instance.UpdateUploadEntry(nextUpload);
                         return;
@@ -122,8 +122,7 @@ namespace nntpAutoposter
             }
             catch (Exception ex)
             {
-                Console.WriteLine("The upload failed to post. Retrying.");
-                Console.WriteLine(ex.ToString());
+                log.Error("The upload failed to post. Retrying.", ex);
             }
            
         }

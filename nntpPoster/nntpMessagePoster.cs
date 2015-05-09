@@ -117,7 +117,7 @@ namespace nntpPoster
 
         public void Dispose()
         {
-            Console.WriteLine("Disposing Posting threads.");
+            log.Debug("Disposing Posting threads.");
             PostingThreads.ForEach(t => t.Dispose());
         }
     }

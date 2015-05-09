@@ -69,14 +69,12 @@ namespace nntpAutoposter
                     NotifyIndexerOfObscufatedUpload(upload);
                     upload.NotifiedIndexerAt = DateTime.UtcNow;
                     DBHandler.Instance.UpdateUploadEntry(upload);
-                    Console.WriteLine("Notified indexer that obscufated release [{0}] is actually [{1}]", 
+                    log.InfoFormat("Notified indexer that obscufated release [{0}] is actually [{1}]", 
                         upload.ObscuredName, upload.CleanedName);
                 }
                 catch(Exception ex)
                 {
-                    Console.WriteLine("Could not notify indexer of obscufated release:");
-                    Console.WriteLine(ex.ToString());
-                    //TODO: Log.
+                    log.Error("Could not notify indexer of obscufated release.", ex);
                 }
             }
         }

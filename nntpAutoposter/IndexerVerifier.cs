@@ -78,7 +78,8 @@ namespace nntpAutoposter
 
                     if (!backupExists)
                     {
-                        Console.WriteLine("The upload [{0}] was removed from the backup folder, cancelling verification.", upload.Name);
+                        log.WarnFormat("The upload [{0}] was removed from the backup folder, cancelling verification.", 
+                            upload.Name);
                         upload.Cancelled = true;
                         DBHandler.Instance.UpdateUploadEntry(upload);
                         continue;
@@ -86,7 +87,7 @@ namespace nntpAutoposter
 
                     if ((DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes < configuration.MinRepostAgeMinutes)
                     {
-                        Console.WriteLine("The upload [{0}] is younger than {1} minutes. Skipping check.", 
+                        log.DebugFormat("The upload [{0}] is younger than {1} minutes. Skipping check.", 
                             upload.CleanedName, configuration.MinRepostAgeMinutes);
                         continue;
                     }
@@ -95,7 +96,7 @@ namespace nntpAutoposter
                     {
                         upload.SeenOnIndexAt = DateTime.UtcNow;
                         DBHandler.Instance.UpdateUploadEntry(upload);
-                        Console.WriteLine("Release [{0}] has been found on the indexer.", upload.CleanedName);
+                        log.InfoFormat("Release [{0}] has been found on the indexer.", upload.CleanedName);
 
                         if (upload.RemoveAfterVerify)
                         {
@@ -108,16 +109,15 @@ namespace nntpAutoposter
                     }
                     else
                     {
-                        Console.WriteLine("Release [{0}] has NOT been found on the indexer. Checking if a repost is required.", 
+                        log.WarnFormat(
+                            "Release [{0}] has NOT been found on the indexer. Checking if a repost is required.", 
                             upload.CleanedName);
                         RepostIfRequired(upload);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Could not verify release [{0}] on index:", upload.CleanedName);
-                    Console.WriteLine(ex.ToString());
-                    //TODO: Log.
+                    log.Error(String.Format("Could not verify release [{0}] on index:", upload.CleanedName), ex);
                 }
             }
         }
@@ -162,6 +162,7 @@ namespace nntpAutoposter
 
         private void RepostIfRequired(UploadEntry upload)
         {
+            //TODO: remake this, too complex, kiss.
             var AgeInMinutes = (DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes;
             var repostTreshold = Math.Pow(upload.Size, (1 / 2.45)) / 60; 
             //This is a bit of guesswork, a 15 MB item will repost after about 15 minutes, 
@@ -177,7 +178,7 @@ namespace nntpAutoposter
 
             if(AgeInMinutes > repostTreshold)
             {
-                Console.WriteLine("Could not find [{0}] after {1:F2} minutes, reposting.", upload.Name, repostTreshold);
+                log.WarnFormat("Could not find [{0}] after {1:F2} minutes, reposting.", upload.Name, repostTreshold);
                 UploadEntry repost = new UploadEntry();
                 repost.Name = upload.Name;
                 repost.RemoveAfterVerify = upload.RemoveAfterVerify;

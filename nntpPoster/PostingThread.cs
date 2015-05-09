@@ -108,12 +108,12 @@ namespace nntpPoster
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine("Posting yEnc message failed:");
-                            Console.WriteLine(ex.ToString());
+                            log.Warn("Posting yEnc message failed", ex);
+
                             if (retryCount++ < _configuration.MaxRetryCount)
-                                Console.WriteLine("Retrying to post message, attempt {0}", retryCount);
+                                log.InfoFormat("Retrying to post message, attempt {0}", retryCount);
                             else
-                                Console.WriteLine("Maximum retry attempts reached. Posting is probably corrupt.", retryCount);
+                                log.Error("Maximum retry attempts reached. Posting is probably corrupt.");
                         }
                     }
                 }
@@ -121,7 +121,7 @@ namespace nntpPoster
                 {
                     if (_client != null)         //If the queue runs dry we close the connection
                     {
-                        Console.WriteLine("Disposing client because of empty queue.");
+                        log.Debug("Disposing client because of empty queue.");
                         _client.Dispose();
                         _client = null;
                     }
@@ -157,7 +157,7 @@ namespace nntpPoster
                     return _messageQueue.Dequeue();
             }
             if (!StopRequested) //If stop is requested it is logical the queue gets empty.
-                Console.WriteLine("Warning, posting thread is starved, reduce threads to make more optimal use of resources.");
+                log.Warn("Posting thread is starved, reduce threads to make more optimal use of resources.");
             return null;
         }
 
@@ -165,7 +165,7 @@ namespace nntpPoster
         {
             if (_client != null)
             {
-                Console.WriteLine("Disposing client because of dispose request.");
+                log.Debug("Disposing client because of dispose request.");
                 _client.Dispose();
             }
         }

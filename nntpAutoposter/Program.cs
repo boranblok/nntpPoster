@@ -20,44 +20,60 @@ namespace nntpAutoposter
         static AutoPosterConfig configuration;
         static void Main(string[] args)
         {
-            configuration = new AutoPosterConfig();
-
-            Watcher watcher = new Watcher(configuration);
-            watcher.Start();
-            Console.WriteLine("FileSystemWatcher started");
-
-            AutoPoster poster = new AutoPoster(configuration);
-            poster.Start();
-            Console.WriteLine("Autoposter started");
-
-            IndexerNotifier notifier = new IndexerNotifier(configuration);
-            notifier.Start();
-            Console.WriteLine("Notifier started");
-
-            IndexerVerifier verifier = new IndexerVerifier(configuration);
-            verifier.Start();
-            Console.WriteLine("Verifier started");
-
-            Console.WriteLine("Press the \"s\" key to stop after the current operations have finished.");
-
-            Boolean stop = false;
-            while (!stop)
+            try
             {
-                var keyInfo = Console.ReadKey();
-                stop = keyInfo.KeyChar == 's' || keyInfo.KeyChar == 'S';
+                configuration = new AutoPosterConfig();
+
+                Watcher watcher = new Watcher(configuration);
+                watcher.Start();
+                log.Info("FileSystemWatcher started");
+                Console.WriteLine("FileSystemWatcher started");
+
+                AutoPoster poster = new AutoPoster(configuration);
+                poster.Start();
+                log.Info("Autoposter started");
+                Console.WriteLine("Autoposter started");
+
+                IndexerNotifier notifier = new IndexerNotifier(configuration);
+                notifier.Start();
+                log.Info("Notifier started");
+                Console.WriteLine("Notifier started");
+
+                IndexerVerifier verifier = new IndexerVerifier(configuration);
+                verifier.Start();
+                log.Info("Verifier started");
+                Console.WriteLine("Verifier started");
+
+                Console.WriteLine("Press the \"s\" key to stop after the current operations have finished.");
+
+                Boolean stop = false;
+                while (!stop)
+                {
+                    var keyInfo = Console.ReadKey();
+                    stop = keyInfo.KeyChar == 's' || keyInfo.KeyChar == 'S';
+                }
+
+                watcher.Stop();
+                log.Info("FileSystemWatcher stopped");
+                Console.WriteLine("FileSystemWatcher stopped");
+
+                verifier.Stop();
+                log.Info("Verifier stopped");
+                Console.WriteLine("Verifier stopped");
+
+                notifier.Stop();
+                log.Info("Notifier stopped");
+                Console.WriteLine("Notifier stopped");
+
+                poster.Stop();
+                log.Info("Autoposter stopped");
+                Console.WriteLine("Autoposter stopped");
             }
-
-            watcher.Stop();
-            Console.WriteLine("FileSystemWatcher stopped");
-
-            verifier.Stop();
-            Console.WriteLine("Verifier stopped");
-
-            notifier.Stop();
-            Console.WriteLine("Notifier stopped");
-
-            poster.Stop();
-            Console.WriteLine("Autoposter stopped");
+            catch(Exception ex)
+            {
+                log.Fatal("Fatal exception when starting the autoposter.", ex);
+                throw;
+            }
         }
     }
 }
