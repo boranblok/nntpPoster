@@ -44,6 +44,7 @@ namespace nntpPoster
                 DirectoryInfo processedFiles = null;
                 try
                 {
+                    DateTime StartTime = DateTime.Now;
                     processedFiles = MakeProcessingFolder(toPost.NameWithoutExtension());
                     MakeRarAndParFiles(toPost, toPost.NameWithoutExtension(), processedFiles);
 
@@ -66,6 +67,16 @@ namespace nntpPoster
                     }
 
                     poster.WaitTillCompletion();
+                    if (log.IsInfoEnabled)
+                    {
+                        TimeSpan totalTimeElapsed = DateTime.Now - StartTime;
+                        TimeSpan uploadTimeElapsed = DateTime.Now - UploadStartTime;
+                        Double speed = TotalUploadedBytes / totalTimeElapsed.TotalSeconds;
+                        Double ulSpeed = TotalUploadedBytes / uploadTimeElapsed.TotalSeconds;
+                        log.InfoFormat("Upload of [{0}] has completed at {1} with an upload speed of {2}",
+                            title, UploadSpeedReport.GetHumanReadableSpeed(speed), UploadSpeedReport.GetHumanReadableSpeed(ulSpeed));
+                    }
+
                     Console.WriteLine();
 
                     XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles);
