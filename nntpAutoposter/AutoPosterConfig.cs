@@ -25,8 +25,7 @@ namespace nntpAutoposter
         public String ObscufatedNotificationUrl { get; set; }
         public String SearchUrl { get; set; }
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
-        public Int32 MinRepostAgeMinutes { get; set; }
-        public Int32 MaxRepostAgeMinutes { get; set; }
+        public Int32 RepostAfterMinutes { get; set; }
 
         public Boolean StripFileMetadata { get; set; }
         public String MkvPropEditLocation { get; set; }
@@ -53,8 +52,7 @@ namespace nntpAutoposter
             ObscufatedNotificationUrl = ConfigurationManager.AppSettings["ObscufatedNotificationUrl"];
             SearchUrl = ConfigurationManager.AppSettings["SearchUrl"];
             VerifySimilarityPercentageTreshold = Int32.Parse(ConfigurationManager.AppSettings["VerifySimilarityPercentageTreshold"]);
-            MinRepostAgeMinutes = Int32.Parse(ConfigurationManager.AppSettings["MinRepostAgeMinutes"]);
-            MaxRepostAgeMinutes = Int32.Parse(ConfigurationManager.AppSettings["MaxRepostAgeMinutes"]);
+            RepostAfterMinutes = Int32.Parse(ConfigurationManager.AppSettings["RepostAfterMinutes"]);
 
             StripFileMetadata = Boolean.Parse(ConfigurationManager.AppSettings["StripFileMetadata"]);
             MkvPropEditLocation = ConfigurationManager.AppSettings["MkvPropEditLocation"];

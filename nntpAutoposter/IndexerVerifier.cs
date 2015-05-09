@@ -85,10 +85,10 @@ namespace nntpAutoposter
                         continue;
                     }
 
-                    if ((DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes < configuration.MinRepostAgeMinutes)
+                    if ((DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes < configuration.RepostAfterMinutes)
                     {
                         log.DebugFormat("The upload [{0}] is younger than {1} minutes. Skipping check.", 
-                            upload.CleanedName, configuration.MinRepostAgeMinutes);
+                            upload.CleanedName, configuration.RepostAfterMinutes);
                         continue;
                     }
 
@@ -162,23 +162,12 @@ namespace nntpAutoposter
 
         private void RepostIfRequired(UploadEntry upload)
         {
-            //TODO: remake this, too complex, kiss.
             var AgeInMinutes = (DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes;
-            var repostTreshold = Math.Pow(upload.Size, (1 / 2.45)) / 60; 
-            //This is a bit of guesswork, a 15 MB item will repost after about 15 minutes, 
-            // a  5 GB item will repost after about 2h30.
-            // a 15 GB item will repost after about 4h00.
-            // a 50 GB item will repost after about 6h30.
-            
-            //In any case, it gets overruled by the configuration here.
-            if (repostTreshold < configuration.MinRepostAgeMinutes)
-                repostTreshold = configuration.MinRepostAgeMinutes;
-            if (repostTreshold > configuration.MaxRepostAgeMinutes)
-                repostTreshold = configuration.MaxRepostAgeMinutes;
 
-            if(AgeInMinutes > repostTreshold)
+            if(AgeInMinutes > configuration.RepostAfterMinutes)
             {
-                log.WarnFormat("Could not find [{0}] after {1:F2} minutes, reposting.", upload.Name, repostTreshold);
+                log.WarnFormat("Could not find [{0}] after {1} minutes, reposting.", 
+                    upload.Name, configuration.RepostAfterMinutes);
                 UploadEntry repost = new UploadEntry();
                 repost.Name = upload.Name;
                 repost.RemoveAfterVerify = upload.RemoveAfterVerify;
