@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostingNntpClient", "Postin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalProcessWrappers", "ExternalProcessWrappers\ExternalProcessWrappers.csproj", "{80062F4F-5489-41C7-9B7E-BCB8A641E420}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoFileRenamer", "VideoFileRenamer\VideoFileRenamer.csproj", "{D2804E33-1180-43BF-BA2E-A855E1F99804}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,14 @@ Global
 		{80062F4F-5489-41C7-9B7E-BCB8A641E420}.Package|Any CPU.Build.0 = Release|Any CPU
 		{80062F4F-5489-41C7-9B7E-BCB8A641E420}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80062F4F-5489-41C7-9B7E-BCB8A641E420}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Mono|Any CPU.ActiveCfg = Release|Any CPU
+		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Mono|Any CPU.Build.0 = Release|Any CPU
+		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Package|Any CPU.ActiveCfg = Release|Any CPU
+		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Package|Any CPU.Build.0 = Release|Any CPU
+		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
