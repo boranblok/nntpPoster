@@ -158,7 +158,17 @@ namespace nntpAutoposter
                 {
                     toPost.Refresh();
                     if(toPost.Exists)
-                        toPost.Delete();
+                    {
+                        FileAttributes attributes = File.GetAttributes(toPost.FullName);
+                        if (attributes.HasFlag(FileAttributes.Directory))
+                        {
+                            Directory.Delete(toPost.FullName, true);
+                        }
+                        else
+                        {
+                            File.Delete(toPost.FullName);
+                        }
+                    }
                 }
             }
         }
