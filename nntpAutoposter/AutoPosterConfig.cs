@@ -17,6 +17,8 @@ namespace nntpAutoposter
         public DirectoryInfo BackupFolder { get; set; }
         public Boolean RemoveAfterVerify { get; set; }
 
+        public Int32 FilesystemCheckIntervalMillis { get; set; }
+        public Int32 FilesystemCheckTesholdMinutes { get; set; }
         public Int32 AutoposterIntervalMillis { get; set; }
         public Int32 NotifierIntervalMinutes { get; set; }
         public Int32 VerifierIntervalMinutes { get; set; }
@@ -44,6 +46,8 @@ namespace nntpAutoposter
                 BackupFolder.Create();
             RemoveAfterVerify = Boolean.Parse(ConfigurationManager.AppSettings["RemoveAfterVerify"]);
 
+            FilesystemCheckIntervalMillis = Int32.Parse(ConfigurationManager.AppSettings["FilesystemCheckIntervalMillis"]);
+            FilesystemCheckTesholdMinutes = Int32.Parse(ConfigurationManager.AppSettings["FilesystemCheckTesholdMinutes"]);
             AutoposterIntervalMillis = Int32.Parse(ConfigurationManager.AppSettings["AutoposterIntervalMillis"]);
             NotifierIntervalMinutes = Int32.Parse(ConfigurationManager.AppSettings["NotifierIntervalMinutes"]);
             VerifierIntervalMinutes = Int32.Parse(ConfigurationManager.AppSettings["VerifierIntervalMinutes"]);

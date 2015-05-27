@@ -15,61 +15,71 @@ namespace nntpAutoposter
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private Object monitor = new Object();
         private AutoPosterConfig configuration;
-        private FileSystemWatcher watcher;
+        private Task MyTask;
+        private Boolean StopRequested;
 
         public Watcher(AutoPosterConfig configuration)
         {
             this.configuration = configuration;
-            watcher = new FileSystemWatcher(configuration.WatchFolder.FullName);
-            watcher.IncludeSubdirectories = false;
-            watcher.Created += watcher_Created;
-            watcher.Error += watcher_Error;
+            StopRequested = false;
+            MyTask = new Task(WatcherTask, TaskCreationOptions.LongRunning);
+        }
 
+        private void WatcherTask()
+        {
+            while (!StopRequested)
+            {
+                foreach (FileSystemInfo toPost in configuration.WatchFolder.EnumerateFileSystemInfos())
+                {
+                    MoveToBackupFolderAndPost(toPost);
+                }
+                lock (monitor)
+                {
+                    if (StopRequested)
+                    {
+                        break;
+                    }
+                    Monitor.Wait(monitor, configuration.FilesystemCheckIntervalMillis);
+                }
+            }
         }
 
         public void Start()
         {
-            foreach (FileSystemInfo toPost in configuration.WatchFolder.EnumerateFileSystemInfos())
-            {
-                MoveToBackupFolderAndPost(toPost.FullName);
-            }
-            watcher.EnableRaisingEvents = true;
-            log.InfoFormat("Monitoring '{0}' for new files or folders to post.", configuration.WatchFolder.FullName);
+            log.InfoFormat("Monitoring '{0}' for new files or folders to post.", configuration.WatchFolder.FullName);      
+            MyTask.Start();
         }
 
         public void Stop()
         {
-            watcher.EnableRaisingEvents = false;
-        }
-
-        private void watcher_Error(object sender, ErrorEventArgs e)
-        {
-            log.Fatal("Fatal exception in the filesystemwatcher.", e.GetException());
-            Console.WriteLine("Fatal exception in the filesystemwatcher:");
-            Console.WriteLine(e.GetException().ToString());
-            Environment.Exit(1);
-        }
-
-        private void watcher_Created(object sender, FileSystemEventArgs e)
-        {
-            MoveToBackupFolderAndPost(e.FullPath);
-        }
-
-        private void MoveToBackupFolderAndPost(String fullPath)
-        {
-            FileSystemInfo backup;
-            FileAttributes attributes = File.GetAttributes(fullPath);
-            if (attributes.HasFlag(FileAttributes.Directory))
+            lock (monitor)
             {
-                backup = MoveFolderToBackup(fullPath);
+                StopRequested = true;
+                Monitor.Pulse(monitor);
             }
-            else
-            {
-                backup = MoveFileToBackup(fullPath);
-            }
+            MyTask.Wait();
+            log.InfoFormat("Monitoring '{0}' for files and folders stopped.", configuration.WatchFolder.FullName);
+        }
 
-            AddItemToPostingDb(backup);
+        private void MoveToBackupFolderAndPost(FileSystemInfo toPost)
+        {
+            if ((DateTime.Now - toPost.LastAccessTime).TotalMinutes > configuration.FilesystemCheckTesholdMinutes)
+            {
+                FileSystemInfo backup;
+                FileAttributes attributes = File.GetAttributes(toPost.FullName);
+                if (attributes.HasFlag(FileAttributes.Directory))
+                {
+                    backup = MoveFolderToBackup(toPost.FullName);
+                }
+                else
+                {
+                    backup = MoveFileToBackup(toPost.FullName);
+                }
+
+                AddItemToPostingDb(backup);
+            }
         }
 
         private FileSystemInfo MoveFolderToBackup(String fullPath)
@@ -79,23 +89,12 @@ namespace nntpAutoposter
             String destinationFolder = Path.Combine(configuration.BackupFolder.FullName, toPost.Name);
             backup = new DirectoryInfo(destinationFolder);
             if (backup.Exists)
-                backup.Delete();
-            Boolean retry = true;
-            while (retry)
             {
-                try
-                {
-                    Directory.Move(fullPath, destinationFolder);
-                    retry = false;
-                }
-                catch (IOException ex)
-                {
-                    if (ex.HResult == -2147024891)  //Only handle file locked events.
-                        Thread.Sleep(500);  //Sleep for half a second before retry.
-                    else
-                        throw;
-                }
+                log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toPost.Name);
+                backup.Delete();
             }
+            Directory.Move(fullPath, destinationFolder);
+
             return backup;
         }
 
@@ -106,23 +105,12 @@ namespace nntpAutoposter
             String destinationFile = Path.Combine(configuration.BackupFolder.FullName, toPost.Name);
             backup = new FileInfo(destinationFile);
             if (backup.Exists)
-                backup.Delete();
-            Boolean retry = true;
-            while (retry)
             {
-                try
-                {
-                    File.Move(fullPath, destinationFile);
-                    retry = false;
-                }
-                catch (IOException ex)
-                {
-                    if (ex.HResult == -2147024864)  //Only handle file locked events.
-                        Thread.Sleep(500);  //Sleep for half a second before retry.
-                    else
-                        throw;
-                }
+                log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toPost.Name);
+                backup.Delete();
             }
+
+            File.Move(fullPath, destinationFile);
             return backup;
         }
 
