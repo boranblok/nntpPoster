@@ -31,9 +31,17 @@ namespace nntpAutoposter
         {
             while (!StopRequested)
             {
-                foreach (FileSystemInfo toPost in configuration.WatchFolder.EnumerateFileSystemInfos())
+                try
                 {
-                    MoveToBackupFolderAndPost(toPost);
+                    foreach (FileSystemInfo toPost in configuration.WatchFolder.EnumerateFileSystemInfos())
+                    {
+                        MoveToBackupFolderAndPost(toPost);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    log.Fatal("Fatal exception in the watcher task.", ex);
+                    Environment.Exit(1);
                 }
                 lock (monitor)
                 {
@@ -65,20 +73,27 @@ namespace nntpAutoposter
 
         private void MoveToBackupFolderAndPost(FileSystemInfo toPost)
         {
-            if ((DateTime.Now - toPost.LastAccessTime).TotalMinutes > configuration.FilesystemCheckTesholdMinutes)
+            try
             {
-                FileSystemInfo backup;
-                FileAttributes attributes = File.GetAttributes(toPost.FullName);
-                if (attributes.HasFlag(FileAttributes.Directory))
+                if ((DateTime.Now - toPost.LastAccessTime).TotalMinutes > configuration.FilesystemCheckTesholdMinutes)
                 {
-                    backup = MoveFolderToBackup(toPost.FullName);
-                }
-                else
-                {
-                    backup = MoveFileToBackup(toPost.FullName);
-                }
+                    FileSystemInfo backup;
+                    FileAttributes attributes = File.GetAttributes(toPost.FullName);
+                    if (attributes.HasFlag(FileAttributes.Directory))
+                    {
+                        backup = MoveFolderToBackup(toPost.FullName);
+                    }
+                    else
+                    {
+                        backup = MoveFileToBackup(toPost.FullName);
+                    }
 
-                AddItemToPostingDb(backup);
+                    AddItemToPostingDb(backup);
+                }
+            }
+            catch(Exception ex)
+            {
+                log.Warn("Error when picking up a file/folder from the watch location.", ex);
             }
         }
 

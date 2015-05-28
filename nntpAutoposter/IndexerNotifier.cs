@@ -46,17 +46,24 @@ namespace nntpAutoposter
 
         private void IndexerNotifierTask()
         {
-            while (!StopRequested)
+            try
             {
-                NotifyIndexerOfNewObscufatedUploads();
-                lock (monitor)
+                while (!StopRequested)
                 {
-                    if (StopRequested)
+                    NotifyIndexerOfNewObscufatedUploads();
+                    lock (monitor)
                     {
-                        break;
+                        if (StopRequested)
+                        {
+                            break;
+                        }
+                        Monitor.Wait(monitor, configuration.NotifierIntervalMinutes * 60 * 1000);
                     }
-                    Monitor.Wait(monitor, configuration.NotifierIntervalMinutes * 60 * 1000);
                 }
+            }
+            catch(Exception ex)
+            {
+                log.Error("Serious error in the notifier thread.", ex);
             }
         }
 
