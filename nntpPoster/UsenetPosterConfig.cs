@@ -13,6 +13,7 @@ namespace nntpPoster
     {
         public String FromAddress { get; set; }
         public String NewsGroupAddress { get; set; }
+        public Int32 NewsGroupPort { get; set; }
         public String NewsGroupUsername { get; set; }
         public String NewsGroupPassword { get; set; }
         public Boolean NewsGroupUseSsl { get; set; }
@@ -45,6 +46,7 @@ namespace nntpPoster
             FromAddress = ConfigurationManager.AppSettings["FromAddress"];
 
             NewsGroupAddress = ConfigurationManager.AppSettings["NewsGroupAddress"];
+            NewsGroupPort = Int32.Parse(ConfigurationManager.AppSettings["NewsGroupPort"]);
             NewsGroupUsername = ConfigurationManager.AppSettings["NewsGroupUsername"];
             NewsGroupPassword = ConfigurationManager.AppSettings["NewsGroupPassword"];
             NewsGroupUseSsl = Boolean.Parse(ConfigurationManager.AppSettings["NewsGroupUseSsl"]);

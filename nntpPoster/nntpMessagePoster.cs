@@ -29,7 +29,7 @@ namespace nntpPoster
             connectionInfo = new NewsHostConnectionInfo()
             {
                 Address = configuration.NewsGroupAddress,
-                Port = 443,
+                Port = configuration.NewsGroupPort,
                 UseSsl = configuration.NewsGroupUseSsl,
                 Username = configuration.NewsGroupUsername,
                 Password = configuration.NewsGroupPassword
