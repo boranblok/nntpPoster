@@ -130,8 +130,11 @@ namespace nntpAutoposter
         private void PostRelease(UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
         {
             nextUpload.CleanedName = CleanName(toUpload.NameWithoutExtension()) + configuration.PostTag;
-            if(configuration.UseObscufation)
+            if (configuration.UseObscufation)
+            {
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
+                DBHandler.Instance.UpdateUploadEntry(nextUpload);   //This ensures we already notify the indexer of our obscufated post before we start posting.
+            }
 
             FileSystemInfo toPost = null;
             try
