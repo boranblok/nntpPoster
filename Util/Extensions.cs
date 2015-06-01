@@ -34,6 +34,15 @@ namespace Util
             return (Size);
         }
 
+        public static String GetRelativePath(this DirectoryInfo d, FileInfo f)
+        {
+            String fileFullName = f.FullName;
+            String dirFullName = d.FullName;
+            if (!fileFullName.StartsWith(dirFullName))
+                throw new ArgumentException("The file is not in the directory or a subdirectory.");
+            return fileFullName.Substring(dirFullName.Length);
+        }
+
         public static String NameWithoutExtension(this FileSystemInfo fsi)
         {
             FileAttributes attributes = File.GetAttributes(fsi.FullName);
