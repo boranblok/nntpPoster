@@ -74,48 +74,7 @@ namespace nntpPoster
                 var message = GetNextMessageToPost();
                 if (message != null)
                 {
-                    if (_client == null)
-                    {
-                        _client = new SimpleNntpPostingClient(_connectionInfo);
-                        _client.Connect();
-                    }
-
-                    var retryCount = 0;
-                    var retry = true;
-                    while (retry && retryCount < _configuration.MaxRetryCount)
-                    {
-                        try
-                        {
-                            var partMessageId = _client.PostYEncMessage(
-                                _configuration.FromAddress,
-                                message.Subject,
-                                message.PostInfo.PostedGroups,
-                                message.PostInfo.PostedDateTime,
-                                message.Prefix,
-                                message.YEncFilePart.EncodedLines,
-                                message.Suffix);
-                            lock (message.PostInfo.Segments)
-                            {
-                                message.PostInfo.Segments.Add(new PostedFileSegment
-                                {
-                                    MessageId = partMessageId,
-                                    Bytes = message.YEncFilePart.Size,
-                                    SegmentNumber = message.YEncFilePart.Number
-                                });
-                            }
-                            retry = false;
-                            OnMessagePosted(message);
-                        }
-                        catch (Exception ex)
-                        {
-                            log.Warn("Posting yEnc message failed", ex);
-
-                            if (retryCount++ < _configuration.MaxRetryCount)
-                                log.InfoFormat("Retrying to post message, attempt {0}", retryCount);
-                            else
-                                log.Error("Maximum retry attempts reached. Posting is probably corrupt.");
-                        }
-                    }
+                    PostMessage(message);
                 }
                 else
                 {
@@ -145,6 +104,58 @@ namespace nntpPoster
                             Monitor.Wait(monitor, 100);
                         }
                     }
+                }
+            }
+        }
+
+        private void PostMessage(nntpMessage message)
+        {
+            var retryCount = 0;
+            var retry = true;
+            while (retry && retryCount < _configuration.MaxRetryCount)
+            {
+                if (_client == null)
+                {
+                    log.Debug("Constructing new client.");
+                    _client = new SimpleNntpPostingClient(_connectionInfo);
+                    _client.Connect();
+                }
+                try
+                {
+                    var partMessageId = _client.PostYEncMessage(
+                        _configuration.FromAddress,
+                        message.Subject,
+                        message.PostInfo.PostedGroups,
+                        message.PostInfo.PostedDateTime,
+                        message.Prefix,
+                        message.YEncFilePart.EncodedLines,
+                        message.Suffix);
+                    lock (message.PostInfo.Segments)
+                    {
+                        message.PostInfo.Segments.Add(new PostedFileSegment
+                        {
+                            MessageId = partMessageId,
+                            Bytes = message.YEncFilePart.Size,
+                            SegmentNumber = message.YEncFilePart.Number
+                        });
+                    }
+                    retry = false;
+                    OnMessagePosted(message);
+                }
+                catch (Exception ex)
+                {
+                    if (_client != null)         //If we get an Exception we close the connection
+                    {
+                        log.Debug("Disposing client because of exception.");
+                        _client.Dispose();
+                        _client = null;
+                    }
+                    log.Warn("Posting yEnc message failed", ex);
+
+                    if (retryCount++ < _configuration.MaxRetryCount)
+                        log.InfoFormat("Retrying to post message, attempt {0}", retryCount);
+                    else
+                        log.Error("Maximum retry attempts reached. Posting is probably corrupt.");
                 }
             }
         }

@@ -16,7 +16,7 @@ namespace nntpPoster
 
         private UsenetPosterConfig configuration;
         private Int32 partSize;
-        private FileInfo file;
+        public FileInfo File { get; private set; }
 
         public Int32 TotalParts { get; private set; }
 
@@ -25,7 +25,7 @@ namespace nntpPoster
             this.configuration = configuration;
             partSize = configuration.YEncPartSize;
 
-            file = fileToPost;
+            File = fileToPost;
             DetermineTotalParts();
         }
 
@@ -34,7 +34,7 @@ namespace nntpPoster
             StringBuilder subject = new StringBuilder();
             if (!String.IsNullOrWhiteSpace(prefix))
                 subject.Append(prefix + " ");
-            subject.AppendFormat("\"" + file.Name + "\"");
+            subject.AppendFormat("\"" + File.Name + "\"");
             subject.Append(" yEnc ");
             subject.Append("({0}/");    //The {0}  placeholder here is for the format statement later.
             subject.Append(TotalParts);
@@ -47,8 +47,8 @@ namespace nntpPoster
 
         private void DetermineTotalParts()
         {
-            TotalParts = (Int32)(file.Length / partSize);
-            if (file.Length % partSize > 0)
+            TotalParts = (Int32)(File.Length / partSize);
+            if (File.Length % partSize > 0)
                 TotalParts += 1;
         }
 
@@ -63,7 +63,7 @@ namespace nntpPoster
             var yEncoder = new YEncEncoder();
             Int32 partNumber = 0;
 
-            using (var fileStream = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var fileStream = File.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 while (fileStream.Position < fileStream.Length - 1) //If we have more blocks to encode.
                 {
@@ -74,7 +74,7 @@ namespace nntpPoster
                     CRC32 partCRCCalculator = new CRC32();
 
                     var part = new YEncFilePart();
-                    part.SourcefileName = file.Name;
+                    part.SourcefileName = File.Name;
                     part.Number = partNumber;
                     part.Begin = fileStream.Position + 1;
 
@@ -111,7 +111,7 @@ namespace nntpPoster
             if (TotalParts > 1)
             {
                 message.Prefix.Add(String.Format("=ybegin part={0} total={1} line={2} size={3} name={4}",
-                    part.Number, TotalParts, configuration.YEncLineSize, file.Length, file.Name));
+                    part.Number, TotalParts, configuration.YEncLineSize, File.Length, File.Name));
 
                 message.Prefix.Add(String.Format("=ypart begin={0} end={1}",
                     part.Begin, part.End));
@@ -123,10 +123,10 @@ namespace nntpPoster
             else
             {
                 message.Prefix.Add(String.Format("=ybegin line={0} size={1} name={2}",
-                    configuration.YEncLineSize, file.Length, file.Name));
+                    configuration.YEncLineSize, File.Length, File.Name));
 
                 message.Suffix.Add(String.Format("=yend size={0} crc32={1}",
-                    file.Length, part.CRC32));
+                    File.Length, part.CRC32));
             }
 
             poster.PostMessage(message);
