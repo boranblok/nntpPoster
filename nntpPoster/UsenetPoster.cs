@@ -61,8 +61,13 @@ namespace nntpPoster
                     Int32 fileCount = 1;
                     foreach (var fileToPost in filesToPost)
                     {
+                        DateTime filestartTime = DateTime.Now;
                         String comment1 = String.Format("{0} [{1}/{2}]", title, fileCount++, filesToPost.Count);
                         PostedFileInfo postInfo = fileToPost.PostYEncFile(poster, comment1, "");
+                        TimeSpan fileTimeElapsed = DateTime.Now - filestartTime;
+                        Double fileSpeed = (Double) fileToPost.File.Length/fileTimeElapsed.TotalSeconds;
+                        log.InfoFormat("Posted file {0} with a speed of {1}",
+                            fileToPost.File.Name, UploadSpeedReport.GetHumanReadableSpeed(fileSpeed));
                         postedFiles.Add(postInfo);
                     }
 
