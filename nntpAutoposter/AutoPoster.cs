@@ -133,6 +133,7 @@ namespace nntpAutoposter
             if (configuration.UseObscufation)
             {
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
+                nextUpload.NotifiedIndexerAt = null;
                 DBHandler.Instance.UpdateUploadEntry(nextUpload);   //This ensures we already notify the indexer of our obscufated post before we start posting.
             }
 
