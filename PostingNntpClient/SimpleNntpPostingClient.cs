@@ -44,10 +44,12 @@ namespace PostingNntpClient
 
         public void Connect()
         {
+            log.Debug("Connecting to newshost.");
             _tcpClient = new TcpClient(ConnectionInfo.Address, ConnectionInfo.Port);
             var stream = _tcpClient.GetStream();
             if(ConnectionInfo.UseSsl)
             {
+                log.Debug("Using ssl.");
                 var sslStream = new SslStream(stream, true, CertValidationCallback);
                 sslStream.AuthenticateAsClient(ConnectionInfo.Address);
                 _stream = sslStream;
@@ -62,6 +64,7 @@ namespace PostingNntpClient
             _reader = new StreamReader(_stream, iso88591Encoding);
 
             var connectResponse = ReadResponse();
+            log.DebugFormat("NewsHost response: {0}", connectResponse);
             if (connectResponse.ResponseCode != Rfc977ResponseCodes.ServerReadyPostingAllowed)
                 throw new Exception("Could not open a posting connection: " + connectResponse.ResponseMessage);
 

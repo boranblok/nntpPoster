@@ -69,42 +69,49 @@ namespace nntpPoster
 
         private void PostingTask()
         {
-            while (!Finished)
+            try
             {
-                var message = GetNextMessageToPost();
-                if (message != null)
+                while (!Finished)
                 {
-                    PostMessage(message);
-                }
-                else
-                {
-                    if (_client != null)         //If the queue runs dry we close the connection
+                    var message = GetNextMessageToPost();
+                    if (message != null)
                     {
-                        log.Debug("Disposing client because of empty queue.");
-                        _client.Dispose();
-                        _client = null;
-                    }
-                    if (StopRequested)
-                    {
-                        Finished = true;
+                        PostMessage(message);
                     }
                     else
                     {
-                        lock (monitor)
+                        if (_client != null)         //If the queue runs dry we close the connection
                         {
-                            if (Finished)
+                            log.Debug("Disposing client because of empty queue.");
+                            _client.Dispose();
+                            _client = null;
+                        }
+                        if (StopRequested)
+                        {
+                            Finished = true;
+                        }
+                        else
+                        {
+                            lock (monitor)
                             {
-                                break;
+                                if (Finished)
+                                {
+                                    break;
+                                }
+                                if (StopRequested)
+                                {
+                                    Finished = true;
+                                    break;
+                                }
+                                Monitor.Wait(monitor, 100);
                             }
-                            if (StopRequested)
-                            {
-                                Finished = true;
-                                break;
-                            }
-                            Monitor.Wait(monitor, 100);
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Exception in the posting thread.", ex);
             }
         }
 
