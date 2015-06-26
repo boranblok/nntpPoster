@@ -11,6 +11,8 @@ namespace VideoFileRenamer
     class RenamerConfiguration
     {
         public DirectoryInfo RootWatchFolder { get; set; }
+        public Int32 WatchFolderCheckIntervalSeconds { get; set; }
+        public Int32 WatchFolderMinAgeMinutes { get; set; }
         public DirectoryInfo NoMatchFolder { get; set; }
         public String[] TagFolders { get; set; }
         public String[] HandledFileExtensions { get; set; }
@@ -27,6 +29,9 @@ namespace VideoFileRenamer
         public RenamerConfiguration()
         {
             RootWatchFolder = new DirectoryInfo(ConfigurationManager.AppSettings["RootWatchFolder"]);
+            WatchFolderCheckIntervalSeconds =
+                Int32.Parse(ConfigurationManager.AppSettings["WatchFolderCheckIntervalSeconds"]);
+            WatchFolderMinAgeMinutes = Int32.Parse(ConfigurationManager.AppSettings["WatchFolderMinAgeMinutes"]);
             NoMatchFolder = new DirectoryInfo(ConfigurationManager.AppSettings["NoMatchFolder"]);
             TagFolders = ConfigurationManager.AppSettings["TagFolders"].Split(',');
             HandledFileExtensions = ConfigurationManager.AppSettings["HandledFileExtensions"].Split(',');

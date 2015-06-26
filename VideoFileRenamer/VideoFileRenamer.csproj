@@ -45,10 +45,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtendedFileInfo.cs" />
+    <Compile Include="FileTypeDetector.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renamer.cs" />
     <Compile Include="RenamerConfiguration.cs" />
+    <Compile Include="VideoTypeEnum.cs" />
     <Compile Include="Watcher.cs" />
   </ItemGroup>
   <ItemGroup>

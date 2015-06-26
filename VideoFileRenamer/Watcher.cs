@@ -33,9 +33,10 @@ namespace VideoFileRenamer
             {
                 try
                 {
-                    foreach (FileSystemInfo toRename in configuration.WatchFolder.EnumerateFileSystemInfos())
+                    List<ExtendedFileInfo> filesToProcess = new List<ExtendedFileInfo>();
+                    foreach (FileSystemInfo toRename in configuration.RootWatchFolder.EnumerateFileSystemInfos())
                     {
-                        RenameFileSystemInfo(toRename);
+                        filesToProcess.AddRange(GetExtendedFileInfo(toRename));
                     }
                 }
                 catch(Exception ex)
@@ -49,14 +50,14 @@ namespace VideoFileRenamer
                     {
                         break;
                     }
-                    Monitor.Wait(monitor, configuration.FilesystemCheckIntervalMillis);
+                    Monitor.Wait(monitor, configuration.WatchFolderCheckIntervalSeconds * 1000);
                 }
             }
         }
 
         public void Start()
         {
-            log.InfoFormat("Monitoring '{0}' for new files or folders to post.", configuration.WatchFolder.FullName);      
+            log.InfoFormat("Monitoring '{0}' for new files or folders to rename.", configuration.RootWatchFolder.FullName);      
             MyTask.Start();
         }
 
@@ -68,45 +69,72 @@ namespace VideoFileRenamer
                 Monitor.Pulse(monitor);
             }
             MyTask.Wait();
-            log.InfoFormat("Monitoring '{0}' for files and folders stopped.", configuration.WatchFolder.FullName);
+            log.InfoFormat("Monitoring '{0}' for files and folders stopped.", configuration.RootWatchFolder.FullName);
         }
 
-        private void RenameFileSystemInfo(FileSystemInfo toRename)
+        private List<ExtendedFileInfo> GetExtendedFileInfo(FileSystemInfo toProcess)
         {
-            FileAttributes attributes = File.GetAttributes(toRename.FullName);
+            List<ExtendedFileInfo> filesToProcess = new List<ExtendedFileInfo>();
+            FileAttributes attributes = File.GetAttributes(toProcess.FullName);
             if (attributes.HasFlag(FileAttributes.Directory))
             {
-                RenameFilesInDirectory(new DirectoryInfo(toRename.FullName));
+                filesToProcess.AddRange(GetExtendedFileInfo(new DirectoryInfo(toProcess.FullName)));
             }
             else
             {
-                RenameFile(new FileInfo(toRename.FullName));
+                filesToProcess.Add(GetExtendedFileInfo(new FileInfo(toProcess.FullName)));
             }
+            return filesToProcess;
         }
 
-        private void RenameFilesInDirectory(DirectoryInfo directoryInfo)
+        private List<ExtendedFileInfo> GetExtendedFileInfo(DirectoryInfo directoryInfo)
         {
-            foreach(FileInfo file in directoryInfo.GetFiles("*", SearchOption.AllDirectories))
+            List<ExtendedFileInfo> filesToProcess = new List<ExtendedFileInfo>();
+            if (configuration.TagFolders.Contains(directoryInfo.Name))
             {
-                RenameFile(file);
+                foreach (FileSystemInfo toRename in directoryInfo.EnumerateFileSystemInfos())
+                {
+                    filesToProcess.AddRange(GetExtendedFileInfo(toRename));
+                }
             }
+            else
+            {
+                foreach (FileInfo file in directoryInfo.GetFiles("*", SearchOption.AllDirectories))
+                {
+                    filesToProcess.Add(GetExtendedFileInfo(file));
+                }
+            }
+            return filesToProcess;
         }
 
-        private void RenameFile(FileInfo fileInfo)
+        private ExtendedFileInfo GetExtendedFileInfo(FileInfo fileInfo)
         {
-            if (!configuration.HandledFileExtensions.Contains(fileInfo.Extension))
-            {
-                MoveFileToUnhanded(fileInfo);
-                return;
-            }
+            FileType type = DetectFileType(fileInfo);
 
+            return new ExtendedFileInfo
+            {
+                FileInfo = fileInfo,
+                FileType = type
+            };
+        }
+
+        private FileType DetectFileType(FileInfo fileInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void MoveFileToNoMatch(FileInfo fileInfo)
+        {
+            String destination = Path.Combine(configuration.NoMatchFolder.FullName,
+                configuration.RootWatchFolder.GetRelativePath(fileInfo));
+            File.Move(fileInfo.FullName, destination);
         }
 
         private void MoveFileToUnhanded(FileInfo fileInfo)
         {
             String destination = Path.Combine(configuration.UnhandledFilesFolder.FullName,
-                configuration.RootWatchFolder.GetRelativePath(fileInfo))
-            File.Move(fileInfo.FullName, destination)
+                configuration.RootWatchFolder.GetRelativePath(fileInfo));
+            File.Move(fileInfo.FullName, destination);
         }
     }
 }
