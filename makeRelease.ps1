@@ -1,9 +1,21 @@
+#requires -version 3
+#this script can only run on Poweshell Version 3 or higher.
+
 $version = "0.01"
-$baseDir = $MyInvocation.MyCommand.Path
-$outputFolder = $baseDir + "Build"
+$baseDir = $PSScriptRoot
+$outputFolder = Join-Path $baseDir "Build"
 $msbuild = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe"
-$options = "/noconsolelogger /p:Configuration=Package"
+$options = "/p:Configuration=Package"
 $releaseFolder = $baseDir + "Releases"
+
+function ZipFiles( $zipfilename, $sourcedir )
+{
+
+   Add-Type -Path "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.IO.Compression.FileSystem.dll"
+   $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+   [System.IO.Compression.ZipFile]::CreateFromDirectory($sourcedir,
+        $zipfilename, $compressionLevel, $false)
+}
 
 # if the output folder exists, delete it
 if ([System.IO.Directory]::Exists($outputFolder))
@@ -22,5 +34,6 @@ $build = $msbuild + " ""nntpPoster.sln"" " + $options + " /t:Build"
 Invoke-Expression $clean
 Invoke-Expression $build
 
-# move all the files that were built to the output folder
-[System.IO.Directory]::Move($releaseFolder, $outputFolder)
+# zip all the files that were built into a release.
+echo "Output folder: " + $outputFolder
+#ZipFiles($version + ".zip", $outputFolder)

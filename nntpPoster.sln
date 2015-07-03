@@ -19,11 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalProcessWrappers", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoFileRenamer", "VideoFileRenamer\VideoFileRenamer.csproj", "{D2804E33-1180-43BF-BA2E-A855E1F99804}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AF5BE8BE-226A-402E-8A16-0C7D3B0807E9}"
-	ProjectSection(SolutionItems) = preProject
-		makeRelease.ps1 = makeRelease.ps1
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
