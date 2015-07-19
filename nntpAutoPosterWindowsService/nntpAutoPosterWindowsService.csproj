@@ -79,8 +79,12 @@
     <None Include="..\nntpAutoposter\App.Release.config">
       <Link>App.Release.config</Link>
     </None>
-    <None Include="UninstallService.cmd" />
-    <None Include="InstallService.cmd" />
+    <None Include="UninstallService.cmd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="InstallService.cmd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

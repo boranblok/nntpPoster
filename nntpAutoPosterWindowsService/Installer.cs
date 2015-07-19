@@ -22,7 +22,7 @@ namespace nntpAutoPosterWindowsService
 
         private void RegisterServiceInstaller()
         {
-            String serviceName = "NNTPAutoPosted";
+            String serviceName = "NNTPAutoPoster";
             String serviceDisplayName = "NNTP Auto Poster";
 
             process = new ServiceProcessInstaller();
