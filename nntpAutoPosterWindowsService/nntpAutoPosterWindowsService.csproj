@@ -31,6 +31,26 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mono|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Mono\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Package|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Package\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
@@ -69,15 +89,19 @@
     </None>
     <None Include="..\nntpAutoposter\App.Debug.config">
       <Link>App.Debug.config</Link>
+      <DependentUpon>App.config</DependentUpon>
     </None>
     <None Include="..\nntpAutoposter\App.Mono.config">
       <Link>App.Mono.config</Link>
+      <DependentUpon>App.config</DependentUpon>
     </None>
     <None Include="..\nntpAutoposter\App.Package.config">
       <Link>App.Package.config</Link>
+      <DependentUpon>App.config</DependentUpon>
     </None>
     <None Include="..\nntpAutoposter\App.Release.config">
       <Link>App.Release.config</Link>
+      <DependentUpon>App.config</DependentUpon>
     </None>
     <None Include="UninstallService.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -106,4 +130,24 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll" />
+  <Target Name="AfterCompile" Condition="Exists('..\nntpAutoposter\App.$(Configuration).config')">
+    <!--Generate transformed app config in the intermediate directory-->
+    <TransformXml Source="..\nntpAutoposter\App.config" Destination="$(IntermediateOutputPath)$(TargetFileName).config" Transform="..\nntpAutoposter\App.$(Configuration).config" />
+    <!--Force build process to use the transformed configuration file from now on.-->
+    <ItemGroup>
+      <AppConfigWithTargetPath Remove="App.config" />
+      <AppConfigWithTargetPath Include="$(IntermediateOutputPath)$(TargetFileName).config">
+        <TargetPath>$(TargetFileName).config</TargetPath>
+      </AppConfigWithTargetPath>
+    </ItemGroup>
+  </Target>
+  <!--Override After Publish to support ClickOnce AfterPublish. Target replaces the untransformed config file copied to the deployment directory with the transformed one.-->
+  <Target Name="AfterPublish">
+    <PropertyGroup>
+      <DeployedConfig>$(_DeploymentApplicationDir)$(TargetName)$(TargetExt).config$(_DeploymentFileMappingExtension)</DeployedConfig>
+    </PropertyGroup>
+    <!--Publish copies the untransformed App.config to deployment directory so overwrite it-->
+    <Copy Condition="Exists('$(DeployedConfig)')" SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(DeployedConfig)" />
+  </Target>
 </Project>
