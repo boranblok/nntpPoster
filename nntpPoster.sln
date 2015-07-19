@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Releases", "Releases", "{41
 		Releases\0.1.zip = Releases\0.1.zip
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nntpAutoPosterWindowsService", "nntpAutoPosterWindowsService\nntpAutoPosterWindowsService.csproj", "{523CACA4-A579-45D1-84F9-A3A9695D21BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,6 +98,14 @@ Global
 		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Package|Any CPU.Build.0 = Debug|Any CPU
 		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2804E33-1180-43BF-BA2E-A855E1F99804}.Release|Any CPU.Build.0 = Release|Any CPU
+		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Mono|Any CPU.ActiveCfg = Release|Any CPU
+		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Mono|Any CPU.Build.0 = Release|Any CPU
+		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Package|Any CPU.ActiveCfg = Release|Any CPU
+		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Package|Any CPU.Build.0 = Release|Any CPU
+		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

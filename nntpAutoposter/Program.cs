@@ -17,12 +17,11 @@ namespace nntpAutoposter
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        static AutoPosterConfig configuration;
         static void Main(string[] args)
         {
             try
             {
-                configuration = new AutoPosterConfig();
+                var configuration = new AutoPosterConfig();
 
                 Watcher watcher = new Watcher(configuration);
                 watcher.Start();

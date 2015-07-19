@@ -12,7 +12,7 @@ using log4net;
 
 namespace nntpAutoposter
 {
-    class IndexerNotifier
+    public class IndexerNotifier
     {
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -34,14 +34,14 @@ namespace nntpAutoposter
             MyTask.Start();
         }
 
-        public void Stop()
+        public void Stop(Int32 millisecondsTimeout = Timeout.Infinite)
         {
             lock (monitor)
             {
                 StopRequested = true;
                 Monitor.Pulse(monitor);
             }
-            MyTask.Wait();
+            MyTask.Wait(millisecondsTimeout);
         }
 
         private void IndexerNotifierTask()
