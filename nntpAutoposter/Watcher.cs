@@ -10,7 +10,7 @@ using Util;
 
 namespace nntpAutoposter
 {
-    class Watcher
+    public class Watcher
     {
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -60,14 +60,14 @@ namespace nntpAutoposter
             MyTask.Start();
         }
 
-        public void Stop()
+        public void Stop(Int32 millisecondsTimeout = Timeout.Infinite)
         {
             lock (monitor)
             {
                 StopRequested = true;
                 Monitor.Pulse(monitor);
             }
-            MyTask.Wait();
+            MyTask.Wait(millisecondsTimeout);
             log.InfoFormat("Monitoring '{0}' for files and folders stopped.", configuration.WatchFolder.FullName);
         }
 

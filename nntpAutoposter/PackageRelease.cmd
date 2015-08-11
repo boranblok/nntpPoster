@@ -1,0 +1,1 @@
+7z a ..\..\..\Releases\0.1.zip *

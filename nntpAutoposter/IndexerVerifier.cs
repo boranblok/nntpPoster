@@ -15,7 +15,7 @@ using Util;
 
 namespace nntpAutoposter
 {
-    class IndexerVerifier
+    public class IndexerVerifier
     {
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -37,14 +37,14 @@ namespace nntpAutoposter
             MyTask.Start();
         }
 
-        public void Stop()
+        public void Stop(Int32 millisecondsTimeout = Timeout.Infinite)
         {
             lock (monitor)
             {
                 StopRequested = true;
                 Monitor.Pulse(monitor);
-            }            
-            MyTask.Wait();
+            }
+            MyTask.Wait(millisecondsTimeout);
         }
 
         private void IndexerVerifierTask()

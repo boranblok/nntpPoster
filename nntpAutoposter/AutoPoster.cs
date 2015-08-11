@@ -15,7 +15,7 @@ using Util;
 
 namespace nntpAutoposter
 {    
-    class AutoPoster
+    public class AutoPoster
     {
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -60,14 +60,14 @@ namespace nntpAutoposter
             }
         }
 
-        public void Stop()
+        public void Stop(Int32 millisecondsTimeout = Timeout.Infinite)
         {
             lock (monitor)
             {
                 StopRequested = true;
                 Monitor.Pulse(monitor);
             }
-            MyTask.Wait();
+            MyTask.Wait(millisecondsTimeout);
         }
 
         private void AutopostingTask()
