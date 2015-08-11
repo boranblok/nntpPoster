@@ -100,7 +100,9 @@
     <Compile Include="Watcher.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="App.Debug.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
@@ -193,7 +195,7 @@
     <Copy Condition="Exists('$(DeployedConfig)')" SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(DeployedConfig)" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>if not exist log\ mkdir log\
+    <PostBuildEvent>if not exist log\ mkdir logs\
 if not exist watch\ mkdir watch\
 if not exist working\ mkdir working\
 if not exist backup\ mkdir backup\

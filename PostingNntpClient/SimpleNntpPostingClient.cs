@@ -64,7 +64,7 @@ namespace PostingNntpClient
             _reader = new StreamReader(_stream, iso88591Encoding);
 
             var connectResponse = ReadResponse();
-            log.DebugFormat("NewsHost response: {0}", connectResponse);
+            log.DebugFormat("NewsHost response: [{0}] {1}", connectResponse.ResponseCode, connectResponse.ResponseMessage);
             if (connectResponse.ResponseCode != Rfc977ResponseCodes.ServerReadyPostingAllowed)
                 throw new Exception("Could not open a posting connection: " + connectResponse.ResponseMessage);
 
