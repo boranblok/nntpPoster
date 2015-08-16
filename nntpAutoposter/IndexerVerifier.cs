@@ -124,7 +124,7 @@ namespace nntpAutoposter
 
         private Boolean UploadIsOnIndexer(UploadEntry upload)
         {
-            var postAge = (Int32)Math.Ceiling((DateTime.UtcNow - upload.UploadedAt.Value).TotalDays);
+            var postAge = (Int32)Math.Ceiling((DateTime.UtcNow - upload.UploadedAt.Value).TotalDays + 1);
             String verificationGetUrl = String.Format(
                 configuration.SearchUrl,
                 Uri.EscapeDataString(upload.CleanedName),
