@@ -130,11 +130,11 @@ namespace nntpAutoposter
         private void PostRelease(UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
         {
             nextUpload.CleanedName = CleanName(toUpload.NameWithoutExtension()) + configuration.PostTag;
-            if (configuration.UseObscufation)
+            if (configuration.UseObfuscation)
             {
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
                 nextUpload.NotifiedIndexerAt = null;
-                DBHandler.Instance.UpdateUploadEntry(nextUpload);   //This ensures we already notify the indexer of our obscufated post before we start posting.
+                DBHandler.Instance.UpdateUploadEntry(nextUpload);   //This ensures we already notify the indexer of our obfuscated post before we start posting.
             }
 
             FileSystemInfo toPost = null;
@@ -181,7 +181,7 @@ namespace nntpAutoposter
         private DirectoryInfo PrepareDirectoryForPosting(UploadEntry nextUpload, DirectoryInfo toUpload)
         {
             String destination;
-            if (configuration.UseObscufation)
+            if (configuration.UseObfuscation)
                 destination = Path.Combine(posterConfiguration.WorkingFolder.FullName, nextUpload.ObscuredName);
             else
                 destination = Path.Combine(posterConfiguration.WorkingFolder.FullName, nextUpload.CleanedName);
@@ -193,7 +193,7 @@ namespace nntpAutoposter
         private FileInfo PrepareFileForPosting(UploadEntry nextUpload, FileInfo toUpload)
         {
             String destination;
-            if (configuration.UseObscufation)
+            if (configuration.UseObfuscation)
                 destination = Path.Combine(posterConfiguration.WorkingFolder.FullName,
                     nextUpload.ObscuredName + toUpload.Extension);
             else

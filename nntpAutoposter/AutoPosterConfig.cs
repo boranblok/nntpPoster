@@ -23,8 +23,8 @@ namespace nntpAutoposter
         public Int32 NotifierIntervalMinutes { get; set; }
         public Int32 VerifierIntervalMinutes { get; set; }
 
-        public Boolean UseObscufation { get; set; }
-        public String ObscufatedNotificationUrl { get; set; }
+        public Boolean UseObfuscation { get; set; }
+        public String ObfuscatedNotificationUrl { get; set; }
         public String SearchUrl { get; set; }
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
         public Int32 RepostAfterMinutes { get; set; }
@@ -52,8 +52,8 @@ namespace nntpAutoposter
             NotifierIntervalMinutes = Int32.Parse(ConfigurationManager.AppSettings["NotifierIntervalMinutes"]);
             VerifierIntervalMinutes = Int32.Parse(ConfigurationManager.AppSettings["VerifierIntervalMinutes"]);
 
-            UseObscufation = Boolean.Parse(ConfigurationManager.AppSettings["UseObscufation"]);
-            ObscufatedNotificationUrl = ConfigurationManager.AppSettings["ObscufatedNotificationUrl"];
+            UseObfuscation = Boolean.Parse(ConfigurationManager.AppSettings["UseObfuscation"]);
+            ObfuscatedNotificationUrl = ConfigurationManager.AppSettings["ObfuscatedNotificationUrl"];
             SearchUrl = ConfigurationManager.AppSettings["SearchUrl"];
             VerifySimilarityPercentageTreshold = Int32.Parse(ConfigurationManager.AppSettings["VerifySimilarityPercentageTreshold"]);
             RepostAfterMinutes = Int32.Parse(ConfigurationManager.AppSettings["RepostAfterMinutes"]);

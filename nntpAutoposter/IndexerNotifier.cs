@@ -50,7 +50,7 @@ namespace nntpAutoposter
             {
                 while (!StopRequested)
                 {
-                    NotifyIndexerOfNewObscufatedUploads();
+                    NotifyIndexerOfNewObfuscatedUploads();
                     lock (monitor)
                     {
                         if (StopRequested)
@@ -67,29 +67,29 @@ namespace nntpAutoposter
             }
         }
 
-        private void NotifyIndexerOfNewObscufatedUploads()
+        private void NotifyIndexerOfNewObfuscatedUploads()
         {
             foreach(var upload in DBHandler.Instance.GetUploadEntriesToNotifyIndexer())
             {
                 try
                 {
-                    NotifyIndexerOfObscufatedUpload(upload);
+                    NotifyIndexerOfObfuscatedUpload(upload);
                     upload.NotifiedIndexerAt = DateTime.UtcNow;
                     DBHandler.Instance.UpdateUploadEntry(upload);
-                    log.InfoFormat("Notified indexer that obscufated release [{0}] is actually [{1}]", 
+                    log.InfoFormat("Notified indexer that obfuscated release [{0}] is actually [{1}]", 
                         upload.ObscuredName, upload.CleanedName);
                 }
                 catch(Exception ex)
                 {
-                    log.Error("Could not notify indexer of obscufated release.", ex);
+                    log.Error("Could not notify indexer of obfuscated release.", ex);
                 }
             }
         }
 
-        private void NotifyIndexerOfObscufatedUpload(UploadEntry upload)
+        private void NotifyIndexerOfObfuscatedUpload(UploadEntry upload)
         {
             String notificationGetUrl = String.Format(
-                configuration.ObscufatedNotificationUrl, 
+                configuration.ObfuscatedNotificationUrl, 
                 Uri.EscapeDataString(upload.ObscuredName), 
                 Uri.EscapeDataString(upload.CleanedName));
 
