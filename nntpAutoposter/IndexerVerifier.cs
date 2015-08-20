@@ -141,17 +141,24 @@ namespace nntpAutoposter
                 throw new Exception("Error when verifying on indexer: "
                                 + response.StatusCode + " " + response.StatusDescription);
 
-            using (XmlReader xmlReader = XmlReader.Create(response.GetResponseStream()))
+            using(var reader = new StreamReader(response.GetResponseStream()))
             {
-                SyndicationFeed feed = SyndicationFeed.Load(xmlReader);
-                foreach (var item in feed.Items)
+                var responseBody = reader.ReadToEnd();
+                if(responseBody.IndexOf("error") >= 0)
+                    throw new Exception("Error when verifying on indexer: " + responseBody);
+
+                using (XmlReader xmlReader = XmlReader.Create(new StringReader(responseBody)))
                 {
-                    Decimal similarityPercentage =
-                        LevenshteinDistance.SimilarityPercentage(item.Title.Text, upload.CleanedName);
-                    if (similarityPercentage > configuration.VerifySimilarityPercentageTreshold)
-                        return true;
+                    SyndicationFeed feed = SyndicationFeed.Load(xmlReader);
+                    foreach (var item in feed.Items)
+                    {
+                        Decimal similarityPercentage =
+                            LevenshteinDistance.SimilarityPercentage(item.Title.Text, upload.CleanedName);
+                        if (similarityPercentage > configuration.VerifySimilarityPercentageTreshold)
+                            return true;
+                    }
                 }
-            }
+            }           
             return false;
         }
 
