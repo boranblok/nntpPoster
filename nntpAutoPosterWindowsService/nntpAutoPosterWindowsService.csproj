@@ -103,6 +103,7 @@
       <Link>App.Release.config</Link>
       <DependentUpon>App.config</DependentUpon>
     </None>
+    <None Include="init.d.sh" />
     <None Include="UninstallService.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
