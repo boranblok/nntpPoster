@@ -38,7 +38,8 @@ By default the configured folder paths are relative to the application and are a
 
 If you want to run the service in a screen session you can use `start.sh` this script will also ensure the service runs in the correct environment (as it switched the current working folder)
 
-Additionally an init.d shell script is included. (`init.d.sh`) This has been tested on Debian 7 If you have any issues with this on other systems or have a working autostart script for another linux derivate, please let me know I will include it in the package.
+Additionally an init.d shell script is included. (`init.d.sh`) you will need to modify the application path and executing user in this file before you can use it.  
+This has been tested on Debian 7 If you have any issues with this on other systems or have a working autostart script for another linux derivate, please let me know I will include it in the package.
 
 #### On Windows
 
