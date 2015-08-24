@@ -195,7 +195,7 @@
     <Copy Condition="Exists('$(DeployedConfig)')" SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(DeployedConfig)" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>if not exist log\ mkdir logs\
+    <PostBuildEvent>if not exist logs\ mkdir logs\
 if not exist watch\ mkdir watch\
 if not exist working\ mkdir working\
 if not exist backup\ mkdir backup\

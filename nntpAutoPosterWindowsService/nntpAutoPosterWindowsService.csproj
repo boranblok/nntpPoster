@@ -103,7 +103,9 @@
       <Link>App.Release.config</Link>
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <None Include="init.d.sh" />
+    <None Include="init.d.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="UninstallService.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -152,7 +154,7 @@
     <Copy Condition="Exists('$(DeployedConfig)')" SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(DeployedConfig)" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>if not exist log\ mkdir logs\
+    <PostBuildEvent>if not exist logs\ mkdir logs\
 if not exist watch\ mkdir watch\
 if not exist working\ mkdir working\
 if not exist backup\ mkdir backup\
