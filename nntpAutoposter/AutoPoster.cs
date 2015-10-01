@@ -129,7 +129,7 @@ namespace nntpAutoposter
 
         private void PostRelease(UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
         {
-            nextUpload.CleanedName = CleanName(toUpload.NameWithoutExtension()) + configuration.PostTag;
+            nextUpload.CleanedName = toUpload.NameWithoutExtension() + configuration.PostTag;
             if (configuration.UseObfuscation)
             {
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
