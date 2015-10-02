@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using log4net;
 using nntpPoster.yEncLib;
 using PostingNntpClient;
+using Util.Configuration;
 
 namespace nntpPoster
 {
@@ -16,16 +17,18 @@ namespace nntpPoster
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private Object monitor = new Object();
-        private UsenetPosterConfig configuration;
+        private Settings configuration;
+        private WatchFolderSettings folderConfiguration;
         private NewsHostConnectionInfo connectionInfo;
 
         private Queue<nntpMessage> MessagesToPost;
         private List<PostingThread> PostingThreads;
         private Boolean IsPosting;
 
-        public nntpMessagePoster(UsenetPosterConfig configuration)
+        public nntpMessagePoster(Settings configuration, WatchFolderSettings folderConfiguration)
         {
             this.configuration = configuration;
+            this.folderConfiguration = folderConfiguration;
             connectionInfo = new NewsHostConnectionInfo()
             {
                 Address = configuration.NewsGroupAddress,
@@ -45,7 +48,7 @@ namespace nntpPoster
             List<PostingThread> postingThreads = new List<PostingThread>();
             for (int i = 0; i < configuration.MaxConnectionCount; i++)
             {
-                var postingThread = new PostingThread(configuration, connectionInfo, MessagesToPost);
+                var postingThread = new PostingThread(configuration, folderConfiguration, connectionInfo, MessagesToPost);
                 postingThread.MessagePosted += postingThread_MessagePosted;
                 postingThreads.Add(postingThread);
             }

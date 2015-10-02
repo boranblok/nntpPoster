@@ -95,7 +95,6 @@
     <Compile Include="IndexerVerifier.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AutoPosterConfig.cs" />
     <Compile Include="UploadEntry.cs" />
     <Compile Include="Watcher.cs" />
   </ItemGroup>

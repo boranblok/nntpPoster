@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 using PostingNntpClient;
+using Util.Configuration;
 
 namespace nntpPoster
 {
@@ -22,7 +23,8 @@ namespace nntpPoster
         private SimpleNntpPostingClient _client;
         private Boolean _continuePosting;
 
-        private UsenetPosterConfig _configuration;
+        private Settings _configuration;
+        private WatchFolderSettings _folderConfiguration;
         private NewsHostConnectionInfo _connectionInfo;        
         private Queue<nntpMessage> _messageQueue;
 
@@ -32,10 +34,11 @@ namespace nntpPoster
             if (MessagePosted != null) MessagePosted(this, e);
         }        
 
-        public PostingThread(UsenetPosterConfig configuration, NewsHostConnectionInfo connectionInfo, 
+        public PostingThread(Settings configuration, WatchFolderSettings folderConfiguration, NewsHostConnectionInfo connectionInfo, 
             Queue<nntpMessage> messageQueue)
         {
             _configuration = configuration;
+            _folderConfiguration = folderConfiguration;
             _connectionInfo = connectionInfo;
             _messageQueue = messageQueue;
             MyTask = new Task(PostingTask, TaskCreationOptions.LongRunning);
@@ -130,7 +133,7 @@ namespace nntpPoster
                 try
                 {
                     var partMessageId = _client.PostYEncMessage(
-                        _configuration.FromAddress,
+                        _folderConfiguration.FromAddress,
                         message.Subject,
                         message.PostInfo.PostedGroups,
                         message.PostInfo.PostedDateTime,

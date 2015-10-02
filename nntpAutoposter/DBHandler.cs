@@ -83,9 +83,12 @@ namespace nntpAutoposter
                                             UploadedAt TEXT,
                                             NotifiedIndexerAt TEXT,
                                             SeenOnIndexerAt TEXT,
-                                            Cancelled INTEGER)";
+                                            Cancelled INTEGER,
+                                            WatchFolderShortName TEXT)";
                         ddlCmd.ExecuteNonQuery();
                         ddlCmd.CommandText = "CREATE INDEX IF NOT EXISTS UploadEntries_Name_idx ON UploadEntries (Name)";
+                        ddlCmd.ExecuteNonQuery();
+                        ddlCmd.CommandText = "PRAGMA database.user_version = 3";    //In the future we can check this version for updates.
                         ddlCmd.ExecuteNonQuery();
                     }
                     trans.Commit();
@@ -223,7 +226,8 @@ namespace nntpAutoposter
                                                             UploadedAt,
                                                             NotifiedIndexerAt,
                                                             SeenOnIndexerAt,
-                                                            Cancelled)
+                                                            Cancelled,
+                                                            WatchFolderShortName)
                                                     VALUES(
                                                             @name,
                                                             @size,
@@ -234,7 +238,8 @@ namespace nntpAutoposter
                                                             @uploadedAt,
                                                             @notifiedIndexerAt,
                                                             @seenOnIndexerAt,
-                                                            @cancelled)";
+                                                            @cancelled,
+                                                            @watchFolderShortName)";
                         cmd.Parameters.Add(new SqliteParameter("@name", uploadentry.Name));
                         cmd.Parameters.Add(new SqliteParameter("@size", uploadentry.Size));
                         cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadentry.CleanedName));
@@ -245,6 +250,7 @@ namespace nntpAutoposter
                         cmd.Parameters.Add(new SqliteParameter("@notifiedIndexerAt", GetDbValue(uploadentry.NotifiedIndexerAt)));
                         cmd.Parameters.Add(new SqliteParameter("@seenOnIndexerAt", GetDbValue(uploadentry.SeenOnIndexAt)));
                         cmd.Parameters.Add(new SqliteParameter("@cancelled", GetDbValue(uploadentry.Cancelled)));
+                        cmd.Parameters.Add(new SqliteParameter("@watchFolderShortName", uploadentry.WatchFolderShortName));
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = "select last_insert_rowid()";
@@ -272,6 +278,7 @@ namespace nntpAutoposter
                                             NotifiedIndexerAt = @notifiedIndexerAt,
                                             SeenOnIndexerAt = @seenOnIndexerAt,
                                             Cancelled = @cancelled
+                                            WatchFolderShortName = @watchFolderShortName
                                         WHERE ROWID = @rowId";
                     cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                     cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
@@ -281,6 +288,7 @@ namespace nntpAutoposter
                     cmd.Parameters.Add(new SqliteParameter("@notifiedIndexerAt", GetDbValue(uploadEntry.NotifiedIndexerAt)));
                     cmd.Parameters.Add(new SqliteParameter("@seenOnIndexerAt", GetDbValue(uploadEntry.SeenOnIndexAt)));
                     cmd.Parameters.Add(new SqliteParameter("@cancelled", GetDbValue(uploadEntry.Cancelled)));
+                    cmd.Parameters.Add(new SqliteParameter("@watchFolderShortName", uploadEntry.WatchFolderShortName));
                     cmd.Parameters.Add(new SqliteParameter("@rowId", uploadEntry.ID));
                     
                     cmd.ExecuteNonQuery();                   
@@ -303,6 +311,7 @@ namespace nntpAutoposter
             uploadEntry.NotifiedIndexerAt = GetNullableDateTime(reader["NotifiedIndexerAt"]);
             uploadEntry.SeenOnIndexAt = GetNullableDateTime(reader["SeenOnIndexerAt"]);
             uploadEntry.Cancelled = GetBoolean(reader["Cancelled"]);
+            uploadEntry.WatchFolderShortName = reader["WatchFolderShortName"] as String;
 
             return uploadEntry;
         }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using log4net;
 using nntpPoster;
 using Util;
+using Util.Configuration;
 
 namespace nntpAutoposter
 {
@@ -21,7 +22,7 @@ namespace nntpAutoposter
         {
             try
             {
-                var configuration = new AutoPosterConfig();
+                var configuration = Settings.LoadSettings();
 
                 Watcher watcher = new Watcher(configuration);
                 watcher.Start();
