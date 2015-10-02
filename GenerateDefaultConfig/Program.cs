@@ -42,8 +42,8 @@ namespace GenerateDefaultConfig
             settings.RepostAfterMinutes = 240;
             settings.MaxRetryCount = 3;
             settings.InactiveProcessTimeout = 5;
-            settings.yEncLineSize = 128;
-            settings.yEncLinesPerMessage = 6000;
+            settings.YEncLineSize = 128;
+            settings.YEncLinesPerMessage = 6000;
             settings.DatabaseFile = "";
 
 

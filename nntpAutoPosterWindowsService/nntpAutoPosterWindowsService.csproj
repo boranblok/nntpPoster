@@ -119,6 +119,10 @@
       <Project>{df3f2c45-6232-41fa-a214-6a1ebc3ca2d7}</Project>
       <Name>nntpAutoposter</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Util\Util.csproj">
+      <Project>{f9427f11-11d3-4157-8876-c8dd1f62d009}</Project>
+      <Name>Util</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\nntpAutoposter\log4netConfig.xml">

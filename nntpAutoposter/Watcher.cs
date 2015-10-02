@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 using Util;
+using Util.Configuration;
 
 namespace nntpAutoposter
 {
@@ -16,11 +17,11 @@ namespace nntpAutoposter
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private Object monitor = new Object();
-        private AutoPosterConfig configuration;
+        private Settings configuration;
         private Task MyTask;
         private Boolean StopRequested;
 
-        public Watcher(AutoPosterConfig configuration)
+        public Watcher(Settings configuration)
         {
             this.configuration = configuration;
             StopRequested = false;
@@ -33,9 +34,10 @@ namespace nntpAutoposter
             {
                 try
                 {
-                    foreach (FileSystemInfo toPost in configuration.WatchFolder.EnumerateFileSystemInfos())
+                    foreach(WatchFolderSettings watchFolderSetting in configuration.WatchFolderSettings)
+                        foreach (FileSystemInfo toPost in watchFolderSetting.Path.EnumerateFileSystemInfos())
                     {
-                        MoveToBackupFolderAndPost(toPost);
+                        MoveToBackupFolderAndPost(toPost, watchFolderSetting);
                     }
                 }
                 catch(Exception ex)
@@ -56,7 +58,8 @@ namespace nntpAutoposter
 
         public void Start()
         {
-            log.InfoFormat("Monitoring '{0}' for new files or folders to post.", configuration.WatchFolder.FullName);      
+            foreach (WatchFolderSettings watchFolderSetting in configuration.WatchFolderSettings)
+                log.InfoFormat("Monitoring '{0}' for new files or folders to post.", watchFolderSetting.Path.FullName);      
             MyTask.Start();
         }
 
@@ -68,10 +71,12 @@ namespace nntpAutoposter
                 Monitor.Pulse(monitor);
             }
             MyTask.Wait(millisecondsTimeout);
-            log.InfoFormat("Monitoring '{0}' for files and folders stopped.", configuration.WatchFolder.FullName);
+
+            foreach (WatchFolderSettings watchFolderSetting in configuration.WatchFolderSettings)
+                log.InfoFormat("Monitoring '{0}' for files and folders stopped.", watchFolderSetting.Path.FullName);
         }
 
-        private void MoveToBackupFolderAndPost(FileSystemInfo toPost)
+        private void MoveToBackupFolderAndPost(FileSystemInfo toPost, WatchFolderSettings folderConfiguration)
         {
             try
             {
@@ -81,14 +86,14 @@ namespace nntpAutoposter
                     FileAttributes attributes = File.GetAttributes(toPost.FullName);
                     if (attributes.HasFlag(FileAttributes.Directory))
                     {
-                        backup = MoveFolderToBackup(toPost.FullName);
+                        backup = MoveFolderToBackup(toPost.FullName, folderConfiguration);
                     }
                     else
                     {
-                        backup = MoveFileToBackup(toPost.FullName);
+                        backup = MoveFileToBackup(toPost.FullName, folderConfiguration);
                     }
 
-                    AddItemToPostingDb(backup);
+                    AddItemToPostingDb(backup, folderConfiguration);
                 }
             }
             catch(Exception ex)
@@ -97,11 +102,11 @@ namespace nntpAutoposter
             }
         }
 
-        private FileSystemInfo MoveFolderToBackup(String fullPath)
+        private FileSystemInfo MoveFolderToBackup(String fullPath, WatchFolderSettings folderConfiguration)
         {
             FileSystemInfo backup;
             DirectoryInfo toPost = new DirectoryInfo(fullPath);
-            String destinationFolder = Path.Combine(configuration.BackupFolder.FullName, toPost.Name);
+            String destinationFolder = Path.Combine(configuration.BackupFolder.FullName, folderConfiguration.ShortName, toPost.Name);
             backup = new DirectoryInfo(destinationFolder);
             if (backup.Exists)
             {
@@ -113,11 +118,11 @@ namespace nntpAutoposter
             return backup;
         }
 
-        private FileSystemInfo MoveFileToBackup(String fullPath)
+        private FileSystemInfo MoveFileToBackup(String fullPath, WatchFolderSettings folderConfiguration)
         {
             FileSystemInfo backup;
             FileInfo toPost = new FileInfo(fullPath);
-            String destinationFile = Path.Combine(configuration.BackupFolder.FullName, toPost.Name);
+            String destinationFile = Path.Combine(configuration.BackupFolder.FullName, folderConfiguration.ShortName, toPost.Name);
             backup = new FileInfo(destinationFile);
             if (backup.Exists)
             {
@@ -129,9 +134,10 @@ namespace nntpAutoposter
             return backup;
         }
 
-        private void AddItemToPostingDb(FileSystemInfo toPost)
+        private void AddItemToPostingDb(FileSystemInfo toPost, WatchFolderSettings folderConfiguration)
         {
             UploadEntry newUploadentry = new UploadEntry();
+            newUploadentry.WatchFolderShortName = folderConfiguration.ShortName;
             newUploadentry.CreatedAt = DateTime.UtcNow;
             newUploadentry.Name = toPost.Name;
             newUploadentry.RemoveAfterVerify = configuration.RemoveAfterVerify;

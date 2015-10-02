@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using log4net;
 using nntpPoster.yEncLib;
+using Util.Configuration;
 
 namespace nntpPoster
 {
@@ -14,15 +15,17 @@ namespace nntpPoster
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private UsenetPosterConfig configuration;
+        private Settings configuration;
+        private WatchFolderSettings folderConfiguration;
         private Int32 partSize;
         public FileInfo File { get; private set; }
 
         public Int32 TotalParts { get; private set; }
 
-        public FileToPost(UsenetPosterConfig configuration, FileInfo fileToPost)
+        public FileToPost(Settings configuration, WatchFolderSettings folderConfiguration, FileInfo fileToPost)
         {
             this.configuration = configuration;
+            this.folderConfiguration = folderConfiguration;
             partSize = configuration.YEncPartSize;
 
             File = fileToPost;
@@ -57,7 +60,7 @@ namespace nntpPoster
             PostedFileInfo postedFileInfo = new PostedFileInfo();
             String subjectNameBase = ConstructSubjectNameBase(prefix, suffix);
             postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
-            postedFileInfo.PostedGroups.AddRange(configuration.TargetNewsgroups);
+            postedFileInfo.PostedGroups.AddRange(folderConfiguration.TargetNewsgroups);
             postedFileInfo.PostedDateTime = DateTime.Now;
 
             var yEncoder = new YEncEncoder();

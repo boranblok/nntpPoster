@@ -9,6 +9,7 @@ using ExternalProcessWrappers;
 using log4net;
 using nntpPoster.yEncLib;
 using Util;
+using Util.Configuration;
 
 namespace nntpPoster
 {
@@ -19,10 +20,12 @@ namespace nntpPoster
 
         public event EventHandler<UploadSpeedReport> newUploadSpeedReport;
 
-        private UsenetPosterConfig configuration;
-        public UsenetPoster(UsenetPosterConfig configuration)
+        private Settings configuration;
+        private WatchFolderSettings folderConfiguration;
+        public UsenetPoster(Settings configuration, WatchFolderSettings folderConfiguration)
         {
             this.configuration = configuration;
+            this.folderConfiguration = folderConfiguration;
         }
         
         private Int32 TotalPartCount { get; set; }
@@ -38,7 +41,7 @@ namespace nntpPoster
 
         public XDocument PostToUsenet(FileSystemInfo toPost, String title, Boolean saveNzb = true)
         {
-            using (nntpMessagePoster poster = new nntpMessagePoster(configuration))
+            using (nntpMessagePoster poster = new nntpMessagePoster(configuration, folderConfiguration))
             {
                 poster.PartPosted += poster_PartPosted;
                 DirectoryInfo processedFiles = null;
@@ -50,7 +53,7 @@ namespace nntpPoster
 
                     List<FileToPost> filesToPost = processedFiles.GetFiles()
                         .OrderBy(f => f.Name)
-                        .Select(f => new FileToPost(configuration, f)).ToList();
+                        .Select(f => new FileToPost(configuration, folderConfiguration, f)).ToList();
 
                     List<PostedFileInfo> postedFiles = new List<PostedFileInfo>();
                     TotalPartCount = filesToPost.Sum(f => f.TotalParts);
@@ -88,8 +91,8 @@ namespace nntpPoster
                     Console.WriteLine();
 
                     XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles);
-                    if (saveNzb && !String.IsNullOrWhiteSpace(configuration.NzbOutputFolder))
-                        nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder, toPost.NameWithoutExtension() + ".nzb"));
+                    if (saveNzb && configuration.NzbOutputFolder != null)
+                        nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder.FullName, toPost.NameWithoutExtension() + ".nzb"));
                     return nzbDoc;
                 }
                 finally
@@ -146,17 +149,18 @@ namespace nntpPoster
             DirectoryInfo processedFolder)
         {
             Int64 size = toPost.Size();
-            var rarSizeRecommendation = configuration.RecommendationMap
-                .Where(rr => rr.FromFileSize < size)
-                .OrderByDescending(rr => rr.FromFileSize)
+            var rarSizeRecommendation = configuration.RarNParSettings
+                .Where(rr => rr.FromSize < size)
+                .OrderByDescending(rr => rr.FromSize)
                 .First();
             var rarWrapper = new RarWrapper(configuration.InactiveProcessTimeout, configuration.RarLocation);
             rarWrapper.Compress(
-                toPost, processedFolder, nameWithoutExtension, rarSizeRecommendation.ReccomendedRarSize);
+                toPost, processedFolder, nameWithoutExtension, 
+                Settings.DetermineOptimalRarSize(rarSizeRecommendation.RarSize, configuration.YEncLineSize, configuration.YEncLinesPerMessage));
 
             var parWrapper = new ParWrapper(configuration.InactiveProcessTimeout, configuration.ParLocation);
             parWrapper.CreateParFilesInDirectory(
-                processedFolder, nameWithoutExtension, configuration.YEncPartSize, rarSizeRecommendation.ReccomendedRecoveryPercentage);
+                processedFolder, nameWithoutExtension, configuration.YEncPartSize, rarSizeRecommendation.Par2Percentage);
         }
 
         private XDocument GenerateNzbFromPostInfo(String title, List<PostedFileInfo> postedFiles)
@@ -175,7 +179,7 @@ namespace nntpPoster
                         ),
                     postedFiles.Select(f =>
                         new XElement(ns + "file",
-                            new XAttribute("poster", configuration.FromAddress),
+                            new XAttribute("poster", folderConfiguration.FromAddress),
                             new XAttribute("date", f.GetUnixPostedDateTime()),
                             new XAttribute("subject", f.NzbSubjectName),
                             new XElement(ns + "groups",

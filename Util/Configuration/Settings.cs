@@ -82,6 +82,21 @@ namespace Util.Configuration
             return optimalNumberOfBlocks * blockSizeBytes;
         }
 
+        public Int32 YEncPartSize
+        {
+            get
+            {
+                return YEncLineSize * YEncLinesPerMessage;
+            }
+        }
+
+        public WatchFolderSettings GetwWatchFolderSettings(String shortName)
+        {
+            if (WatchFolderSettings.Any(s => s.ShortName == shortName))
+                return WatchFolderSettings.First(s => s.ShortName == shortName);
+            return WatchFolderSettings.First();
+        }
+
 
         //Settings the user must change
 
@@ -188,10 +203,10 @@ namespace Util.Configuration
         public Int32 InactiveProcessTimeout { get; set; }
 
         [DataMember(Order = 26)]
-        public Int32 yEncLineSize { get; set; }
+        public Int32 YEncLineSize { get; set; }
 
         [DataMember(Order = 27)]
-        public Int32 yEncLinesPerMessage { get; set; }
+        public Int32 YEncLinesPerMessage { get; set; }
 
         [DataMember(Order = 28)]
         public String DatabaseFile { get; set; }

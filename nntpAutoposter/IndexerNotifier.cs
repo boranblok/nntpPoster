@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using log4net;
+using Util.Configuration;
 
 namespace nntpAutoposter
 {
@@ -19,11 +20,11 @@ namespace nntpAutoposter
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private Object monitor = new Object();
-        private AutoPosterConfig configuration;
+        private Settings configuration;
         private Task MyTask;
         private Boolean StopRequested;
 
-        public IndexerNotifier(AutoPosterConfig configuration)
+        public IndexerNotifier(Settings configuration)
         {
             this.configuration = configuration;
             StopRequested = false;

@@ -12,6 +12,7 @@ using ExternalProcessWrappers;
 using log4net;
 using nntpPoster;
 using Util;
+using Util.Configuration;
 
 namespace nntpAutoposter
 {    
@@ -26,17 +27,13 @@ namespace nntpAutoposter
                                                                                  "mka", "mks", "mpeg", "mpg", 
                                                                                  "vob", "mp3", "asf", "ape", "flac"};
         private Object monitor = new Object();
-        private AutoPosterConfig configuration;
-        private UsenetPosterConfig posterConfiguration;
-        private UsenetPoster poster;
+        private Settings configuration;
         private Task MyTask;
         private Boolean StopRequested;
 
-        public AutoPoster(AutoPosterConfig configuration)
+        public AutoPoster(Settings configuration)
         {
             this.configuration = configuration;
-            posterConfiguration = new UsenetPosterConfig();
-            poster = new UsenetPoster(posterConfiguration);
             StopRequested = false;
             MyTask = new Task(AutopostingTask, TaskCreationOptions.LongRunning);
         }
@@ -50,7 +47,7 @@ namespace nntpAutoposter
         private void InitializeEnvironment()
         {
             log.Info("Cleaning out processing folder of any leftover files.");
-            foreach(var fsi in posterConfiguration.WorkingFolder.EnumerateFileSystemInfos())
+            foreach(var fsi in configuration.WorkingFolder.EnumerateFileSystemInfos())
             {
                 FileAttributes attributes = File.GetAttributes(fsi.FullName);
                 if (attributes.HasFlag(FileAttributes.Directory))
@@ -129,8 +126,11 @@ namespace nntpAutoposter
 
         private void PostRelease(UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
         {
-            nextUpload.CleanedName = toUpload.NameWithoutExtension() + configuration.PostTag;
-            if (configuration.UseObfuscation)
+            WatchFolderSettings folderConfiguration =
+                configuration.GetWatchFolderSettings(nextUpload.WatchFolderShortName);
+            UsenetPoster poster = new UsenetPoster(configuration, folderConfiguration);
+            nextUpload.CleanedName = toUpload.NameWithoutExtension() + folderConfiguration.PostTag;
+            if (folderConfiguration.UseObfuscation)
             {
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
                 nextUpload.NotifiedIndexerAt = null;
@@ -142,16 +142,16 @@ namespace nntpAutoposter
             {
                 if (isDirectory)
                 {
-                    toPost = PrepareDirectoryForPosting(nextUpload, (DirectoryInfo)toUpload);
+                    toPost = PrepareDirectoryForPosting(folderConfiguration, nextUpload, (DirectoryInfo)toUpload);
                 }
                 else
                 {
-                    toPost = PrepareFileForPosting(nextUpload, (FileInfo)toUpload);
+                    toPost = PrepareFileForPosting(folderConfiguration, nextUpload, (FileInfo)toUpload);
                 }
 
                 var nzbFile = poster.PostToUsenet(toPost, false);
-                if (!String.IsNullOrWhiteSpace(posterConfiguration.NzbOutputFolder))
-                    nzbFile.Save(Path.Combine(posterConfiguration.NzbOutputFolder, nextUpload.CleanedName + ".nzb"));
+                if (configuration.NzbOutputFolder != null)
+                    nzbFile.Save(Path.Combine(configuration.NzbOutputFolder.FullName, nextUpload.CleanedName + ".nzb"));
 
                 nextUpload.UploadedAt = DateTime.UtcNow;
                 DBHandler.Instance.UpdateUploadEntry(nextUpload);
@@ -178,33 +178,36 @@ namespace nntpAutoposter
         }
 
 
-        private DirectoryInfo PrepareDirectoryForPosting(UploadEntry nextUpload, DirectoryInfo toUpload)
+        private DirectoryInfo PrepareDirectoryForPosting(WatchFolderSettings folderConfiguration, 
+            UploadEntry nextUpload, DirectoryInfo toUpload)
         {
             String destination;
-            if (configuration.UseObfuscation)
-                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName, nextUpload.ObscuredName);
+            if (folderConfiguration.UseObfuscation)
+                destination = Path.Combine(configuration.WorkingFolder.FullName, folderConfiguration.ShortName, nextUpload.ObscuredName);
             else
-                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName, nextUpload.CleanedName);
+                destination = Path.Combine(configuration.WorkingFolder.FullName, folderConfiguration.ShortName, nextUpload.CleanedName);
 
             ((DirectoryInfo)toUpload).Copy(destination, true);
             return new DirectoryInfo(destination);
         }
 
-        private FileInfo PrepareFileForPosting(UploadEntry nextUpload, FileInfo toUpload)
+        private FileInfo PrepareFileForPosting(WatchFolderSettings folderConfiguration, UploadEntry nextUpload, FileInfo toUpload)
         {
             String destination;
-            if (configuration.UseObfuscation)
-                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName,
+            if (folderConfiguration.UseObfuscation)
+                destination = Path.Combine(configuration.WorkingFolder.FullName,
+                    folderConfiguration.ShortName,
                     nextUpload.ObscuredName + toUpload.Extension);
             else
-                destination = Path.Combine(posterConfiguration.WorkingFolder.FullName,
+                destination = Path.Combine(configuration.WorkingFolder.FullName,
+                    folderConfiguration.ShortName,
                     nextUpload.CleanedName + toUpload.Extension);
 
 
             ((FileInfo)toUpload).CopyTo(destination, true);
             FileInfo preparedFile = new FileInfo(destination);
 
-            if(configuration.StripFileMetadata)
+            if(folderConfiguration.StripFileMetadata)
             {
                 StripMetaDataFromFile(preparedFile);
             }
@@ -226,13 +229,13 @@ namespace nntpAutoposter
 
         private void StripMkvMetaDataFromFile(FileInfo preparedFile)
         {
-            var mkvPropEdit = new MkvPropEditWrapper(posterConfiguration.InactiveProcessTimeout, configuration.MkvPropEditLocation);
+            var mkvPropEdit = new MkvPropEditWrapper(configuration.InactiveProcessTimeout, configuration.MkvPropEditLocation);
             mkvPropEdit.SetTitle(preparedFile, "g33k");
         }
 
         private void StripMetaDataWithFFmpeg(FileInfo preparedFile)
         {
-            var ffmpeg = new FFmpegWrapper(posterConfiguration.InactiveProcessTimeout, configuration.FFmpegLocation);
+            var ffmpeg = new FFmpegWrapper(configuration.InactiveProcessTimeout, configuration.FFmpegLocation);
             ffmpeg.TryStripMetadata(preparedFile);
         }
 

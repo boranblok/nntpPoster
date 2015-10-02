@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using log4net;
+using Util.Configuration;
 
 namespace nntpPoster
 {
@@ -30,8 +31,9 @@ namespace nntpPoster
                 Console.WriteLine("The supplied file does not exist.");
                 return 2;
             }
-            UsenetPosterConfig config = new UsenetPosterConfig();
-            UsenetPoster poster = new UsenetPoster(config);
+            Settings config = Settings.LoadSettings();
+
+            UsenetPoster poster = new UsenetPoster(config, config.GetWatchFolderSettings("Default"));
             poster.newUploadSpeedReport += poster_newUploadSpeedReport;
             poster.PostToUsenet(file);
 
