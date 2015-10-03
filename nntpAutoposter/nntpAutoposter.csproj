@@ -134,6 +134,7 @@
     <None Include="settings.Mono.config">
       <DependentUpon>settings.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
+      <SubType>Designer</SubType>
     </None>
     <None Include="settings.Package.config">
       <DependentUpon>settings.config</DependentUpon>

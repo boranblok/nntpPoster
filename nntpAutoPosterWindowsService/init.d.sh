@@ -16,7 +16,6 @@ RUN_AS=<USER>
 
 
 
-
 ### DO NOT CHANGE ANYTHING BELOW
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
