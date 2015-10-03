@@ -129,7 +129,14 @@ namespace nntpAutoposter
             WatchFolderSettings folderConfiguration =
                 configuration.GetWatchFolderSettings(nextUpload.WatchFolderShortName);
             UsenetPoster poster = new UsenetPoster(configuration, folderConfiguration);
-            nextUpload.CleanedName = toUpload.NameWithoutExtension() + folderConfiguration.PostTag;
+            if (folderConfiguration.CleanName)
+            {
+                nextUpload.CleanedName = CleanName(toUpload.NameWithoutExtension()) + folderConfiguration.PostTag;
+            }
+            else
+            {
+                nextUpload.CleanedName = toUpload.NameWithoutExtension() + folderConfiguration.PostTag;
+            }
             if (folderConfiguration.UseObfuscation)
             {
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
