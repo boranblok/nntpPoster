@@ -80,8 +80,7 @@ namespace nntpAutoPosterWindowsService
                   throw;
               }
         }
-        }
-
+        
         protected override void OnStop()
         {
             try
