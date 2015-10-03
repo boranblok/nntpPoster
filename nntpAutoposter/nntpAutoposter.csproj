@@ -118,6 +118,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="settings.Debug.config">
+      <DependentUpon>settings.config</DependentUpon>
+    </None>
+    <None Include="settings.Mono.config">
+      <DependentUpon>settings.config</DependentUpon>
+    </None>
+    <None Include="settings.Package.config">
+      <DependentUpon>settings.config</DependentUpon>
+    </None>
+    <None Include="settings.Release.config">
+      <DependentUpon>settings.config</DependentUpon>
+    </None>
     <None Include="start.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -203,4 +215,15 @@ if not exist working\ mkdir working\
 if not exist backup\ mkdir backup\
 </PostBuildEvent>
   </PropertyGroup>
+  <Target Name="AfterCompile" Condition="Exists('settings.$(Configuration).config')">
+    <!--Generate transformed app config in the intermediate directory-->
+    <TransformXml Source="settings.config" Destination="$(IntermediateOutputPath)$(TargetFileName).config" Transform="settings.$(Configuration).config" />
+    <!--Force build process to use the transformed configuration file from now on.-->
+    <ItemGroup>
+      <AppConfigWithTargetPath Remove="settings.config" />
+      <AppConfigWithTargetPath Include="$(IntermediateOutputPath)$(TargetFileName).config">
+        <TargetPath>$(TargetFileName).config</TargetPath>
+      </AppConfigWithTargetPath>
+    </ItemGroup>
+  </Target>
 </Project>
