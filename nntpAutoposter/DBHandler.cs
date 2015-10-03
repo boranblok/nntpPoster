@@ -88,7 +88,7 @@ namespace nntpAutoposter
                         ddlCmd.ExecuteNonQuery();
                         ddlCmd.CommandText = "CREATE INDEX IF NOT EXISTS UploadEntries_Name_idx ON UploadEntries (Name)";
                         ddlCmd.ExecuteNonQuery();
-                        ddlCmd.CommandText = "PRAGMA database.user_version = 3";    //In the future we can check this version for updates.
+                        ddlCmd.CommandText = "PRAGMA user_version = 3";    //In the future we can check this version for updates.
                         ddlCmd.ExecuteNonQuery();
                     }
                     trans.Commit();
