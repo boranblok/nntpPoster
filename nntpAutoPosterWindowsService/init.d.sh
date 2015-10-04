@@ -79,17 +79,16 @@ case "$1" in
             kill -0 $(cat $PIDFILE)
             if [ $? -eq 0 ]; then
                 echo "Stopping $DESC..." >&2
-                kill $(cat $PIDFILE)
-                rm $PIDFILE
+                kill $(cat $PIDFILE)                
                 echo "$DESC Stopped" >&2
-				echo "Starting $DESC..." >&2
-				su -c "$SERVICEHOST -d:$APPROOT -l:$PIDFILE -m:$DESC $APPPATH" - $RUN_AS
-				echo "$DESC started" >&2
             else
                 echo "$DESC is not running" >&2
-                return 1
             fi
+			rm $PIDFILE
         fi
+        echo "Starting $DESC..." >&2
+        su -c "$SERVICEHOST -d:$APPROOT -l:$PIDFILE -m:$DESC $APPPATH" - $RUN_AS
+        echo "$DESC started" >&2
 
     ;;
     status)
