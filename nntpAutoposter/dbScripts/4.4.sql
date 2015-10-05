@@ -1,0 +1,1 @@
+﻿ALTER TABLE UploadEntries_tmp RENAME TO UploadEntries
