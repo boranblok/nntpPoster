@@ -46,7 +46,9 @@ namespace Util.Configuration
 
         public WatchFolderSettings GetWatchFolderSettings(String shortName)
         {
-            return WatchFolderSettings.First(s => s.ShortName == shortName);
+            if(WatchFolderSettings.Any(s => s.ShortName == shortName))
+                return WatchFolderSettings.First(s => s.ShortName == shortName);
+            return WatchFolderSettings.First();
         }
 
         private void ValidateSettings()
@@ -89,14 +91,6 @@ namespace Util.Configuration
                 return YEncLineSize * YEncLinesPerMessage;
             }
         }
-
-        public WatchFolderSettings GetwWatchFolderSettings(String shortName)
-        {
-            if (WatchFolderSettings.Any(s => s.ShortName == shortName))
-                return WatchFolderSettings.First(s => s.ShortName == shortName);
-            return WatchFolderSettings.First();
-        }
-
 
         //Settings the user must change
 
