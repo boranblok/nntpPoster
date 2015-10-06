@@ -144,8 +144,11 @@ namespace nntpAutoposter
             newUploadentry.Cancelled = false;
             newUploadentry.Size = toPost.Size();
             if (newUploadentry.Size == 0)
-                log.ErrorFormat("File added with a size of 0 bytes, This cannot be uploaded! File name: [{0}]", 
+            {
+                log.ErrorFormat("File added with a size of 0 bytes, This cannot be uploaded! File name: [{0}]",
                     toPost.FullName);
+                return;
+            }
             DBHandler.Instance.AddNewUploadEntry(newUploadentry);
         }
     }

@@ -177,6 +177,8 @@ namespace nntpAutoposter
                 log.WarnFormat("Could not find [{0}] after {1} minutes, reposting.", 
                     upload.Name, configuration.RepostAfterMinutes);
                 UploadEntry repost = new UploadEntry();
+                repost.WatchFolderShortName = upload.WatchFolderShortName;
+                repost.CreatedAt = DateTime.UtcNow;
                 repost.Name = upload.Name;
                 repost.RemoveAfterVerify = upload.RemoveAfterVerify;
                 repost.Cancelled = false;
