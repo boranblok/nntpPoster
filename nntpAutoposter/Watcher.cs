@@ -129,7 +129,8 @@ namespace nntpAutoposter
                 log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toPost.Name);
                 backup.Delete();
             }
-
+            if(!Directory.Exists(Path.Combine(configuration.BackupFolder.FullName, folderConfiguration.ShortName)))
+                Directory.CreateDirectory(Path.Combine(configuration.BackupFolder.FullName, folderConfiguration.ShortName));
             File.Move(fullPath, destinationFile);
             return backup;
         }

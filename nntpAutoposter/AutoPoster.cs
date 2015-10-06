@@ -90,9 +90,12 @@ namespace nntpAutoposter
                 UploadEntry nextUpload = DBHandler.Instance.GetNextUploadEntryToUpload();
                 if (nextUpload != null)
                 {
+                    WatchFolderSettings folderConfiguration =
+                        configuration.GetWatchFolderSettings(nextUpload.WatchFolderShortName);
                     FileSystemInfo toUpload;
                     Boolean isDirectory;
-                    String fullPath = Path.Combine(configuration.BackupFolder.FullName, nextUpload.Name);
+                    String fullPath = Path.Combine(
+                        configuration.BackupFolder.FullName, folderConfiguration.ShortName, nextUpload.Name);
                     try
                     {
                         FileAttributes attributes = File.GetAttributes(fullPath);
@@ -114,7 +117,7 @@ namespace nntpAutoposter
                         DBHandler.Instance.UpdateUploadEntry(nextUpload);
                         return;
                     }
-                    PostRelease(nextUpload, toUpload, isDirectory);
+                    PostRelease(folderConfiguration, nextUpload, toUpload, isDirectory);
                 }
             }
             catch (Exception ex)
@@ -124,12 +127,17 @@ namespace nntpAutoposter
            
         }
 
-        private void PostRelease(UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
+        private void PostRelease(WatchFolderSettings folderConfiguration, UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
         {
-            WatchFolderSettings folderConfiguration =
-                configuration.GetWatchFolderSettings(nextUpload.WatchFolderShortName);
             UsenetPoster poster = new UsenetPoster(configuration, folderConfiguration);
-            nextUpload.CleanedName = toUpload.NameWithoutExtension() + folderConfiguration.PostTag;
+            if (folderConfiguration.CleanName)
+            {
+                nextUpload.CleanedName = CleanName(toUpload.NameWithoutExtension()) + folderConfiguration.PostTag;
+            }
+            else
+            {
+                nextUpload.CleanedName = toUpload.NameWithoutExtension() + folderConfiguration.PostTag;
+            }
             if (folderConfiguration.UseObfuscation)
             {
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
@@ -187,6 +195,9 @@ namespace nntpAutoposter
             else
                 destination = Path.Combine(configuration.WorkingFolder.FullName, folderConfiguration.ShortName, nextUpload.CleanedName);
 
+            if (!Directory.Exists(Path.Combine(configuration.WorkingFolder.FullName, folderConfiguration.ShortName)))
+                Directory.CreateDirectory(Path.Combine(configuration.WorkingFolder.FullName, folderConfiguration.ShortName));
+
             ((DirectoryInfo)toUpload).Copy(destination, true);
             return new DirectoryInfo(destination);
         }
@@ -202,6 +213,9 @@ namespace nntpAutoposter
                 destination = Path.Combine(configuration.WorkingFolder.FullName,
                     folderConfiguration.ShortName,
                     nextUpload.CleanedName + toUpload.Extension);
+
+            if (!Directory.Exists(Path.Combine(configuration.WorkingFolder.FullName, folderConfiguration.ShortName)))
+                Directory.CreateDirectory(Path.Combine(configuration.WorkingFolder.FullName, folderConfiguration.ShortName));
 
 
             ((FileInfo)toUpload).CopyTo(destination, true);

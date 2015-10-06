@@ -16,7 +16,6 @@ RUN_AS=<USER>
 
 
 
-
 ### DO NOT CHANGE ANYTHING BELOW
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
@@ -56,6 +55,42 @@ case "$1" in
         fi
 
     ;;
+	cleanstop)
+        if [ ! -f $PIDFILE ]; then
+            echo "$DESC is not running" >&2
+        else
+            kill -0 $(cat $PIDFILE)
+            if [ $? -eq 0 ]; then
+                echo "Stopping $DESC..." >&2
+                kill -USR1 $(cat $PIDFILE)
+                rm $PIDFILE
+                echo "$DESC Stopped" >&2
+            else
+                echo "$DESC is not running" >&2
+                return 1
+            fi
+        fi
+
+    ;;
+	restart)
+		if [ ! -f $PIDFILE ]; then
+            echo "$DESC is not running" >&2
+        else
+            kill -0 $(cat $PIDFILE)
+            if [ $? -eq 0 ]; then
+                echo "Stopping $DESC..." >&2
+                kill $(cat $PIDFILE)                
+                echo "$DESC Stopped" >&2
+            else
+                echo "$DESC is not running" >&2
+            fi
+			rm $PIDFILE
+        fi
+        echo "Starting $DESC..." >&2
+        su -c "$SERVICEHOST -d:$APPROOT -l:$PIDFILE -m:$DESC $APPPATH" - $RUN_AS
+        echo "$DESC started" >&2
+
+    ;;
     status)
         if [ ! -f $PIDFILE ]; then
             echo "$DESC is not running" >&2
@@ -70,7 +105,7 @@ case "$1" in
 
     ;;
     *)
-        echo "Usage: `basename $0` {start|stop|status}" >&2
+        echo "Usage: `basename $0` {start|stop|cleanstop|restart|status}" >&2
         exit 1
     ;;
 esac

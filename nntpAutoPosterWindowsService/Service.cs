@@ -58,6 +58,29 @@ namespace nntpAutoPosterWindowsService
             }
         }
 
+        protected override void OnPause()
+        {
+            try
+            {
+                watcher.Stop(2000);
+                log.Info("FileSystemWatcher stopped");
+
+                poster.Stop();  //This call will block until the current item is done posting.
+                log.Info("Autoposter stopped");
+
+                verifier.Stop(2000);
+                log.Info("Verifier stopped");
+
+                notifier.Stop(2000);
+                log.Info("Notifier stopped");
+            }
+              catch (Exception ex)
+              {
+                  log.Fatal("Fatal exception when stopping the autoposter.", ex);
+                  throw;
+              }
+        }
+        
         protected override void OnStop()
         {
             try

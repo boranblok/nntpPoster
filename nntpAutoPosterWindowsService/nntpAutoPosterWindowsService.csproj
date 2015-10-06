@@ -103,9 +103,34 @@
       <Link>App.Release.config</Link>
       <DependentUpon>App.config</DependentUpon>
     </None>
+    <None Include="..\nntpAutoposter\settings.config">
+      <Link>settings.config</Link>
+      <TransformOnBuild>true</TransformOnBuild>
+    </None>
+    <None Include="..\nntpAutoposter\settings.Debug.config">
+      <Link>settings.Debug.config</Link>
+      <DependentUpon>settings.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
+    <None Include="..\nntpAutoposter\settings.Mono.config">
+      <Link>settings.Mono.config</Link>
+      <DependentUpon>settings.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
+    <None Include="..\nntpAutoposter\settings.Package.config">
+      <Link>settings.Package.config</Link>
+      <DependentUpon>settings.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
+    <None Include="..\nntpAutoposter\settings.Release.config">
+      <Link>settings.Release.config</Link>
+      <DependentUpon>settings.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
     <None Include="init.d.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
     <None Include="UninstallService.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -164,4 +189,11 @@ if not exist working\ mkdir working\
 if not exist backup\ mkdir backup\
 </PostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup Label="SlowCheetah">
+    <SlowCheetahToolsPath>$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\..\packages\SlowCheetah.2.5.15\tools\))</SlowCheetahToolsPath>
+    <SlowCheetah_EnableImportFromNuGet Condition=" '$(SlowCheetah_EnableImportFromNuGet)'=='' ">true</SlowCheetah_EnableImportFromNuGet>
+    <SlowCheetah_NuGetImportPath Condition=" '$(SlowCheetah_NuGetImportPath)'=='' ">$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\Properties\SlowCheetah\SlowCheetah.Transforms.targets ))</SlowCheetah_NuGetImportPath>
+    <SlowCheetahTargets Condition=" '$(SlowCheetah_EnableImportFromNuGet)'=='true' and Exists('$(SlowCheetah_NuGetImportPath)') ">$(SlowCheetah_NuGetImportPath)</SlowCheetahTargets>
+  </PropertyGroup>
+  <Import Project="$(SlowCheetahTargets)" Condition="Exists('$(SlowCheetahTargets)')" Label="SlowCheetah" />
 </Project>

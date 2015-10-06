@@ -70,7 +70,8 @@ namespace nntpAutoposter
             {
                 try
                 {
-                    String fullPath = Path.Combine(configuration.BackupFolder.FullName, upload.Name);
+                    String fullPath = Path.Combine(configuration.BackupFolder.FullName,
+                        upload.WatchFolderShortName, upload.Name);
                     
                     Boolean backupExists = false;
                     backupExists = Directory.Exists(fullPath);

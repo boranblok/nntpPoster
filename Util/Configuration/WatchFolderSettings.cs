@@ -33,15 +33,18 @@ namespace Util.Configuration
         public Boolean UseObfuscation { get; set; }
 
         [DataMember(Order = 3)]
-        public String PostTag { get; set; }
+        public Boolean CleanName { get; set; }
 
         [DataMember(Order = 4)]
-        public List<String> TargetNewsgroups { get; set; }
+        public String PostTag { get; set; }
 
         [DataMember(Order = 5)]
-        public Boolean StripFileMetadata { get; set; }
+        public List<String> TargetNewsgroups { get; set; }
 
         [DataMember(Order = 6)]
+        public Boolean StripFileMetadata { get; set; }
+
+        [DataMember(Order = 7)]
         public String FromAddress { get; set; }
     }
 }

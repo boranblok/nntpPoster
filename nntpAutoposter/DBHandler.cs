@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using log4net;
 using Mono.Data.Sqlite;
+using Util;
 
 namespace nntpAutoposter
 {
@@ -40,7 +41,7 @@ namespace nntpAutoposter
         private DBHandler()
         {
             DetermineConnectionString();
-            InitializeDataBase();
+            InitializeDatabase();
         }
 
         private void DetermineConnectionString()
@@ -62,38 +63,72 @@ namespace nntpAutoposter
             _connectionString = String.Format("URI=file:{0},version=3", dbFilePath);
         }
 
-        private void InitializeDataBase()
+        private void InitializeDatabase()
         {
+            List<DBScript> dbScripts = LoadDbScripts();
+            Int64 highestScriptVersion = (Int64)Math.Floor(
+                dbScripts.OrderByDescending(s => s.ScriptNumber).First().ScriptNumber);
+
             using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
+
+                Int64 dbVersion;
+
+                using(SqliteCommand versionCmd = conn.CreateCommand())
+                {
+                    versionCmd.CommandText = "PRAGMA user_version";
+                    dbVersion = (Int64) versionCmd.ExecuteScalar();
+                }
+
+                if (dbVersion >= highestScriptVersion)
+                    return;
+
+                var scriptsToApply = dbScripts.Where(s => s.ScriptNumber >= dbVersion + 1).OrderBy(s => s.ScriptNumber);
+
                 using (SqliteTransaction trans = conn.BeginTransaction())
                 {
                     using (SqliteCommand ddlCmd = conn.CreateCommand())
                     {
                         ddlCmd.Transaction = trans;
-                        ddlCmd.CommandText = @"CREATE TABLE IF NOT EXISTS 
-                                           UploadEntries(
-                                            Name TEXT, 
-                                            Size INTEGER,
-                                            CleanedName TEXT, 
-                                            ObscuredName TEXT, 
-                                            RemoveAfterVerify INTEGER,
-                                            CreatedAt TEXT,
-                                            UploadedAt TEXT,
-                                            NotifiedIndexerAt TEXT,
-                                            SeenOnIndexerAt TEXT,
-                                            Cancelled INTEGER,
-                                            WatchFolderShortName TEXT)";
-                        ddlCmd.ExecuteNonQuery();
-                        ddlCmd.CommandText = "CREATE INDEX IF NOT EXISTS UploadEntries_Name_idx ON UploadEntries (Name)";
-                        ddlCmd.ExecuteNonQuery();
-                        ddlCmd.CommandText = "PRAGMA database.user_version = 3";    //In the future we can check this version for updates.
+                        foreach(var script in scriptsToApply)
+                        {
+                            ddlCmd.CommandText = script.DdlStatement;
+                            ddlCmd.ExecuteNonQuery();
+                        }
+                        ddlCmd.CommandText = "PRAGMA user_version = " + highestScriptVersion;
                         ddlCmd.ExecuteNonQuery();
                     }
                     trans.Commit();
                 }
             }
+        }
+
+        private List<DBScript> LoadDbScripts()
+        {
+            List<DBScript> scripts = new List<DBScript>();
+            DirectoryInfo scriptFolder = new DirectoryInfo("dbScripts");
+            if (!scriptFolder.Exists)
+                return scripts;
+
+            foreach (FileInfo scriptFile in scriptFolder.GetFileSystemInfos("*.sql"))
+            {
+                Decimal scriptNumber;
+                if (Decimal.TryParse(scriptFile.NameWithoutExtension(), 
+                    NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out scriptNumber))
+                {
+                    using(StreamReader reader = scriptFile.OpenText())
+                    {
+                        String ddl = reader.ReadToEnd();
+                        scripts.Add(new DBScript{
+                            ScriptNumber = scriptNumber,
+                            DdlStatement = ddl
+                        });
+                    }
+                }
+            }
+
+            return scripts;
         }
 
         public UploadEntry GetNextUploadEntryToUpload()
@@ -277,7 +312,7 @@ namespace nntpAutoposter
                                             UploadedAt = @uploadedAt,
                                             NotifiedIndexerAt = @notifiedIndexerAt,
                                             SeenOnIndexerAt = @seenOnIndexerAt,
-                                            Cancelled = @cancelled
+                                            Cancelled = @cancelled,
                                             WatchFolderShortName = @watchFolderShortName
                                         WHERE ROWID = @rowId";
                     cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));

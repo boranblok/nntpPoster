@@ -191,3 +191,4 @@ ModelManifest.xml
 #Configuration modifications (to keep sensetive data out of GIT)
 App.*.config
 Web.*.config
+settings.*.config
