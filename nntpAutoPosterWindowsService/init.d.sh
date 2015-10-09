@@ -20,7 +20,7 @@ RUN_AS=<USER>
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 SERVICEHOST=$(which mono-service)
 
-PIDFILE=$APPROOT/nntpAutoposterWindowsService.pid
+PIDFILE=$APPROOT/nntpAutoPosterWindowsService.pid
 APPPATH=$APPROOT/nntpAutoPosterWindowsService.exe
 DESC=nntpAutoPoster
 
