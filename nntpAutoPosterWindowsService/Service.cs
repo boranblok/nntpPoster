@@ -83,6 +83,7 @@ namespace nntpAutoPosterWindowsService
                 log.Fatal("Fatal exception when stopping the autoposter.", ex);
                 throw;
             }
+            log.Info("Shuttong down the service after a clean stop (pause) request");
             Environment.Exit(0);
         }
 
