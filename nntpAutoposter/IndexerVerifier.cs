@@ -146,7 +146,7 @@ namespace nntpAutoposter
             using(var reader = new StreamReader(response.GetResponseStream()))
             {
                 var responseBody = reader.ReadToEnd();
-                if(responseBody.IndexOf("error") >= 0)
+                if (responseBody.IndexOf("<error code=") >= 0)
                     throw new Exception("Error when verifying on indexer: " + responseBody);
 
                 using (XmlReader xmlReader = XmlReader.Create(new StringReader(responseBody)))
