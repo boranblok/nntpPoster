@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
@@ -26,12 +27,15 @@ namespace nntpAutoPosterWindowsService
         public Service()
         {
             InitializeComponent();
+            this.CanPauseAndContinue = true;
         }
 
         protected override void OnStart(string[] args)
         {
             try
             {
+                Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
                 var configuration = Settings.LoadSettings();
 
                 watcher = new Watcher(configuration);
@@ -74,11 +78,17 @@ namespace nntpAutoPosterWindowsService
                 notifier.Stop(2000);
                 log.Info("Notifier stopped");
             }
-              catch (Exception ex)
-              {
-                  log.Fatal("Fatal exception when stopping the autoposter.", ex);
-                  throw;
-              }
+            catch (Exception ex)
+            {
+                log.Fatal("Fatal exception when stopping the autoposter.", ex);
+                throw;
+            }
+            Environment.Exit(0);
+        }
+
+        protected override void OnContinue()
+        {
+            OnStart(null);
         }
         
         protected override void OnStop()
