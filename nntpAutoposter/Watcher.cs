@@ -82,16 +82,9 @@ namespace nntpAutoposter
             {
                 if ((DateTime.Now - toPost.LastAccessTime).TotalMinutes > configuration.FilesystemCheckTesholdMinutes)
                 {
-                    FileSystemInfo backup;
-                    FileAttributes attributes = File.GetAttributes(toPost.FullName);
-                    if (attributes.HasFlag(FileAttributes.Directory))
-                    {
-                        backup = MoveFolderToBackup(toPost.FullName, folderConfiguration);
-                    }
-                    else
-                    {
-                        backup = MoveFileToBackup(toPost.FullName, folderConfiguration);
-                    }
+                    DirectoryInfo destination = new DirectoryInfo(
+                        Path.Combine(configuration.BackupFolder.FullName, folderConfiguration.ShortName));
+                    FileSystemInfo backup = toPost.Move(destination);
 
                     AddItemToPostingDb(backup, folderConfiguration);
                 }
@@ -100,39 +93,6 @@ namespace nntpAutoposter
             {
                 log.Warn("Error when picking up a file/folder from the watch location.", ex);
             }
-        }
-
-        private FileSystemInfo MoveFolderToBackup(String fullPath, WatchFolderSettings folderConfiguration)
-        {
-            FileSystemInfo backup;
-            DirectoryInfo toPost = new DirectoryInfo(fullPath);
-            String destinationFolder = Path.Combine(configuration.BackupFolder.FullName, folderConfiguration.ShortName, toPost.Name);
-            backup = new DirectoryInfo(destinationFolder);
-            if (backup.Exists)
-            {
-                log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toPost.Name);
-                backup.Delete();
-            }
-            Directory.Move(fullPath, destinationFolder);
-
-            return backup;
-        }
-
-        private FileSystemInfo MoveFileToBackup(String fullPath, WatchFolderSettings folderConfiguration)
-        {
-            FileSystemInfo backup;
-            FileInfo toPost = new FileInfo(fullPath);
-            String destinationFile = Path.Combine(configuration.BackupFolder.FullName, folderConfiguration.ShortName, toPost.Name);
-            backup = new FileInfo(destinationFile);
-            if (backup.Exists)
-            {
-                log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toPost.Name);
-                backup.Delete();
-            }
-            if(!Directory.Exists(Path.Combine(configuration.BackupFolder.FullName, folderConfiguration.ShortName)))
-                Directory.CreateDirectory(Path.Combine(configuration.BackupFolder.FullName, folderConfiguration.ShortName));
-            File.Move(fullPath, destinationFile);
-            return backup;
         }
 
         private void AddItemToPostingDb(FileSystemInfo toPost, WatchFolderSettings folderConfiguration)

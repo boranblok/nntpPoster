@@ -88,37 +88,46 @@ namespace nntpAutoposter
             try
             {
                 UploadEntry nextUpload = DBHandler.Instance.GetNextUploadEntryToUpload();
-                if (nextUpload != null)
+                if (nextUpload == null) return;
+
+                WatchFolderSettings folderConfiguration =
+                    configuration.GetWatchFolderSettings(nextUpload.WatchFolderShortName);
+                FileSystemInfo toUpload;
+                Boolean isDirectory;
+                String fullPath = Path.Combine(
+                    configuration.BackupFolder.FullName, folderConfiguration.ShortName, nextUpload.Name);
+                try
                 {
-                    WatchFolderSettings folderConfiguration =
-                        configuration.GetWatchFolderSettings(nextUpload.WatchFolderShortName);
-                    FileSystemInfo toUpload;
-                    Boolean isDirectory;
-                    String fullPath = Path.Combine(
-                        configuration.BackupFolder.FullName, folderConfiguration.ShortName, nextUpload.Name);
-                    try
+                    FileAttributes attributes = File.GetAttributes(fullPath);
+                    if (attributes.HasFlag(FileAttributes.Directory))
                     {
-                        FileAttributes attributes = File.GetAttributes(fullPath);
-                        if (attributes.HasFlag(FileAttributes.Directory))
-                        {
-                            isDirectory = true;
-                            toUpload = new DirectoryInfo(fullPath);
-                        }
-                        else
-                        {
-                            isDirectory = false;
-                            toUpload = new FileInfo(fullPath);
-                        }
+                        isDirectory = true;
+                        toUpload = new DirectoryInfo(fullPath);
                     }
-                    catch (FileNotFoundException)
+                    else
                     {
-                        log.WarnFormat("Can no longer find {0} in the backup folder, cancelling upload", nextUpload.Name);
-                        nextUpload.Cancelled = true;
-                        DBHandler.Instance.UpdateUploadEntry(nextUpload);
-                        return;
+                        isDirectory = false;
+                        toUpload = new FileInfo(fullPath);
                     }
-                    PostRelease(folderConfiguration, nextUpload, toUpload, isDirectory);
                 }
+                catch (FileNotFoundException)
+                {
+                    log.WarnFormat("Can no longer find {0} in the backup folder, cancelling upload", nextUpload.Name);
+                    nextUpload.Cancelled = true;
+                    DBHandler.Instance.UpdateUploadEntry(nextUpload);
+                    return;
+                }
+                if (nextUpload.UploadAttempts >= configuration.MaxRepostCount)
+                {
+                    log.WarnFormat("Cancelling the upload after {0} retry attempts.",
+                        nextUpload.UploadAttempts);
+                    nextUpload.Cancelled = true;
+                    DirectoryInfo failedPostFolder = new DirectoryInfo(
+                        Path.Combine(configuration.PostFailedFolderString, folderConfiguration.ShortName));
+                    toUpload.Move(failedPostFolder);
+                    DBHandler.Instance.UpdateUploadEntry(nextUpload);
+                }
+                PostRelease(folderConfiguration, nextUpload, toUpload, isDirectory);
             }
             catch (Exception ex)
             {
@@ -129,7 +138,7 @@ namespace nntpAutoposter
 
         private void PostRelease(WatchFolderSettings folderConfiguration, UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
         {
-            UsenetPoster poster = new UsenetPoster(configuration, folderConfiguration);
+            nextUpload.UploadAttempts++;
             if (folderConfiguration.CleanName)
             {
                 nextUpload.CleanedName = CleanName(toUpload.NameWithoutExtension()) + folderConfiguration.PostTag;
@@ -142,9 +151,10 @@ namespace nntpAutoposter
             {
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
                 nextUpload.NotifiedIndexerAt = null;
-                DBHandler.Instance.UpdateUploadEntry(nextUpload);   //This ensures we already notify the indexer of our obfuscated post before we start posting.
             }
+            DBHandler.Instance.UpdateUploadEntry(nextUpload);   //This ensures we already notify the indexer of our obfuscated post before we start posting.
 
+            UsenetPoster poster = new UsenetPoster(configuration, folderConfiguration);
             FileSystemInfo toPost = null;
             try
             {

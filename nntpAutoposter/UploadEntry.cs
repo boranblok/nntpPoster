@@ -20,5 +20,6 @@ namespace nntpAutoposter
         public Nullable<DateTime> SeenOnIndexAt { get; set; }
         public Boolean Cancelled { get; set; }
         public String WatchFolderShortName { get; set; }
+        public Int64 UploadAttempts { get; set; }
     }
 }

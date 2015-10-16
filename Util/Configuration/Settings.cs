@@ -151,61 +151,74 @@ namespace Util.Configuration
         }
 
         [DataMember(Order = 12)]
-        public String RarLocation { get; set; }
+        [DefaultValue(3)]
+        public Int32 MaxRepostCount { get; set; }
 
-        [DataMember(Order = 13)]
-        public String ParLocation { get; set; }
+        [DataMember(Order = 13, Name = "PostFailedFolder")]
+        [DefaultValue("uploadfailed")]
+        public String PostFailedFolderString { get; set; }
+        public DirectoryInfo PostFailedFolder
+        {
+            get { return GetOrCreateFolder(PostFailedFolderString); }
+            set { PostFailedFolderString = value.FullName; }
+        }
 
         [DataMember(Order = 14)]
-        public String MkvPropEditLocation { get; set; }
+        public String RarLocation { get; set; }
 
         [DataMember(Order = 15)]
+        public String ParLocation { get; set; }
+
+        [DataMember(Order = 16)]
+        public String MkvPropEditLocation { get; set; }
+
+        [DataMember(Order = 17)]
         public String FFmpegLocation { get; set; }
 
 
         // Settings the user probably shouldnt change.
 
 
-        [DataMember(Order = 16)]
+        [DataMember(Order = 18)]
         public Boolean RemoveAfterVerify { get; set; }
 
-        [DataMember(Order = 17)]
+        [DataMember(Order = 19)]
         public Int32 FilesystemCheckIntervalMillis { get; set; }
 
-        [DataMember(Order = 18)]
+        [DataMember(Order = 20)]
         public Int32 FilesystemCheckTesholdMinutes { get; set; }
 
-        [DataMember(Order = 19)]
+        [DataMember(Order = 21)]
         public Int32 AutoposterIntervalMillis { get; set; }
 
-        [DataMember(Order = 20)]
+        [DataMember(Order = 22)]
         public Int32 NotifierIntervalMinutes { get; set; }
 
-        [DataMember(Order = 21)]
+        [DataMember(Order = 23)]
         public Int32 VerifierIntervalMinutes { get; set; }
 
-        [DataMember(Order = 22)]
+        [DataMember(Order = 24)]
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
 
-        [DataMember(Order = 23)]
+        [DataMember(Order = 25)]
         public Int32 RepostAfterMinutes { get; set; }
 
-        [DataMember(Order = 24)]
+        [DataMember(Order = 26)]
         public Int32 MaxRetryCount { get; set; }
 
-        [DataMember(Order = 25)]
+        [DataMember(Order = 27)]
         public Int32 InactiveProcessTimeout { get; set; }
 
-        [DataMember(Order = 26)]
+        [DataMember(Order = 28)]
         public Int32 YEncLineSize { get; set; }
 
-        [DataMember(Order = 27)]
+        [DataMember(Order = 29)]
         public Int32 YEncLinesPerMessage { get; set; }
 
-        [DataMember(Order = 28)]
+        [DataMember(Order = 30)]
         public String DatabaseFile { get; set; }
 
-        [DataMember(IsRequired = true, Order = 29)]
+        [DataMember(IsRequired = true, Order = 31)]
         public List<RarNParSetting> RarNParSettings { get; set; }
     }
 }

@@ -28,6 +28,8 @@ namespace GenerateDefaultConfig
             settings.WorkingFolderString = "working";
             settings.NzbOutputFolderString = "";
             settings.BackupFolderString = "backup";
+            settings.MaxRepostCount = 3;
+            settings.PostFailedFolderString = "uploadfailed";
             settings.RarLocation = "";
             settings.ParLocation = "";
             settings.MkvPropEditLocation = "";

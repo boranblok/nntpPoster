@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using log4net;
 
 namespace Util
 {
     public static class Extensions
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static Int64 Size(this FileSystemInfo fsi)
         {
             FileAttributes attributes = File.GetAttributes(fsi.FullName);
@@ -20,18 +20,18 @@ namespace Util
 
         public static Int64 Size(this DirectoryInfo d)
         {
-            Int64 Size = 0;
+            Int64 size = 0;
             foreach (FileInfo fi in d.GetFiles())
             {
-                Size += fi.Length;
+                size += fi.Length;
             }
 
             foreach (DirectoryInfo di in d.GetDirectories())
             {
-                Size += di.Size();
+                size += di.Size();
             }
 
-            return (Size);
+            return (size);
         }
 
         public static String GetRelativePath(this DirectoryInfo d, FileInfo f)
@@ -54,7 +54,7 @@ namespace Util
 
         public static String NameWithoutExtension(this FileInfo f)
         {
-            Int32 extensionPosition = f.Name.LastIndexOf(f.Extension);
+            Int32 extensionPosition = f.Name.LastIndexOf(f.Extension, StringComparison.Ordinal);
             if (extensionPosition > 0)
                 return f.Name.Substring(0, extensionPosition);
             return f.Name;
@@ -91,6 +91,51 @@ namespace Util
                     subdir.Copy(subDirDest, copySubDirs);
                 }
             }
+        }
+
+        public static FileSystemInfo Move(this FileSystemInfo fsi, DirectoryInfo destination)
+        {
+            FileSystemInfo movedFsi;
+            FileAttributes attributes = File.GetAttributes(fsi.FullName);
+            if(!destination.Exists)
+                Directory.CreateDirectory(destination.FullName);
+            if (attributes.HasFlag(FileAttributes.Directory))
+            {
+                movedFsi = MoveFolder(fsi.FullName, destination);
+            }
+            else
+            {
+                movedFsi = MoveFile(fsi.FullName, destination);
+            }
+            return movedFsi;
+        }
+
+        private static FileSystemInfo MoveFolder(String sourceFolder, DirectoryInfo destination)
+        {
+            DirectoryInfo toMove = new DirectoryInfo(sourceFolder);
+            String destinationFolder = Path.Combine(destination.FullName, toMove.Name);
+            DirectoryInfo moved = new DirectoryInfo(destinationFolder);
+            if (moved.Exists)
+            {
+                log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toMove.Name);
+                moved.Delete();
+            }
+            Directory.Move(sourceFolder, destinationFolder);
+            return moved;
+        }
+
+        private static FileSystemInfo MoveFile(String sourceFile, DirectoryInfo destination)
+        {
+            FileInfo toMove = new FileInfo(sourceFile);
+            String destinationFile = Path.Combine(destination.FullName, toMove.Name);
+            FileSystemInfo moved = new FileInfo(destinationFile);
+            if (moved.Exists)
+            {
+                log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toMove.Name);
+                moved.Delete();
+            }
+            File.Move(sourceFile, destinationFile);
+            return moved;
         }
     }
 }

@@ -171,22 +171,16 @@ namespace nntpAutoposter
 
         private void RepostIfRequired(UploadEntry upload)
         {
-            var AgeInMinutes = (DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes;
+            var ageInMinutes = (DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes;
 
-            if(AgeInMinutes > configuration.RepostAfterMinutes)
-            {
-                log.WarnFormat("Could not find [{0}] after {1} minutes, reposting.", 
-                    upload.Name, configuration.RepostAfterMinutes);
-                UploadEntry repost = new UploadEntry();
-                repost.WatchFolderShortName = upload.WatchFolderShortName;
-                repost.CreatedAt = DateTime.UtcNow;
-                repost.Name = upload.Name;
-                repost.RemoveAfterVerify = upload.RemoveAfterVerify;
-                repost.Cancelled = false;
-                repost.Size = upload.Size;
-                DBHandler.Instance.AddNewUploadEntry(repost);   
-                //This implicitly cancels all other uploads with the same name so no need to update the upload itself.
-            }
+            if (!(ageInMinutes > configuration.RepostAfterMinutes)) return;
+            
+            log.WarnFormat("Could not find [{0}] after {1} minutes, reposting, attempt {2}",
+                upload.Name, configuration.RepostAfterMinutes, upload.UploadAttempts);
+            upload.UploadedAt = null;
+
+            DBHandler.Instance.UpdateUploadEntry(upload);
+           
         }
     }
 }

@@ -237,7 +237,7 @@ namespace nntpAutoposter
             }
         }
 
-        public void AddNewUploadEntry(UploadEntry uploadentry)
+        public void AddNewUploadEntry(UploadEntry uploadEntry)
         {
             using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
@@ -248,7 +248,7 @@ namespace nntpAutoposter
                     {
                         cmd.Transaction = trans;
                         cmd.CommandText = @"UPDATE UploadEntries SET Cancelled = 1 WHERE Name = @name";
-                        cmd.Parameters.Add(new SqliteParameter("@name", uploadentry.Name));
+                        cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                         cmd.ExecuteNonQuery(); //TODO: log here how many other entries were cancelled.
 
                         cmd.CommandText = @"INSERT INTO UploadEntries(
@@ -262,7 +262,8 @@ namespace nntpAutoposter
                                                             NotifiedIndexerAt,
                                                             SeenOnIndexerAt,
                                                             Cancelled,
-                                                            WatchFolderShortName)
+                                                            WatchFolderShortName,
+                                                            UploadAttempts)
                                                     VALUES(
                                                             @name,
                                                             @size,
@@ -274,23 +275,25 @@ namespace nntpAutoposter
                                                             @notifiedIndexerAt,
                                                             @seenOnIndexerAt,
                                                             @cancelled,
-                                                            @watchFolderShortName)";
-                        cmd.Parameters.Add(new SqliteParameter("@name", uploadentry.Name));
-                        cmd.Parameters.Add(new SqliteParameter("@size", uploadentry.Size));
-                        cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadentry.CleanedName));
-                        cmd.Parameters.Add(new SqliteParameter("@ObscuredName", uploadentry.ObscuredName));
-                        cmd.Parameters.Add(new SqliteParameter("@removeAfterVerify", uploadentry.RemoveAfterVerify));
-                        cmd.Parameters.Add(new SqliteParameter("@createdAt", GetDbValue(uploadentry.CreatedAt)));
-                        cmd.Parameters.Add(new SqliteParameter("@uploadedAt", GetDbValue(uploadentry.UploadedAt)));
-                        cmd.Parameters.Add(new SqliteParameter("@notifiedIndexerAt", GetDbValue(uploadentry.NotifiedIndexerAt)));
-                        cmd.Parameters.Add(new SqliteParameter("@seenOnIndexerAt", GetDbValue(uploadentry.SeenOnIndexAt)));
-                        cmd.Parameters.Add(new SqliteParameter("@cancelled", GetDbValue(uploadentry.Cancelled)));
-                        cmd.Parameters.Add(new SqliteParameter("@watchFolderShortName", uploadentry.WatchFolderShortName));
+                                                            @watchFolderShortName,
+                                                            @uploadAttempts)";
+                        cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
+                        cmd.Parameters.Add(new SqliteParameter("@size", uploadEntry.Size));
+                        cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
+                        cmd.Parameters.Add(new SqliteParameter("@ObscuredName", uploadEntry.ObscuredName));
+                        cmd.Parameters.Add(new SqliteParameter("@removeAfterVerify", uploadEntry.RemoveAfterVerify));
+                        cmd.Parameters.Add(new SqliteParameter("@createdAt", GetDbValue(uploadEntry.CreatedAt)));
+                        cmd.Parameters.Add(new SqliteParameter("@uploadedAt", GetDbValue(uploadEntry.UploadedAt)));
+                        cmd.Parameters.Add(new SqliteParameter("@notifiedIndexerAt", GetDbValue(uploadEntry.NotifiedIndexerAt)));
+                        cmd.Parameters.Add(new SqliteParameter("@seenOnIndexerAt", GetDbValue(uploadEntry.SeenOnIndexAt)));
+                        cmd.Parameters.Add(new SqliteParameter("@cancelled", GetDbValue(uploadEntry.Cancelled)));
+                        cmd.Parameters.Add(new SqliteParameter("@watchFolderShortName", uploadEntry.WatchFolderShortName));
+                        cmd.Parameters.Add(new SqliteParameter("@uploadAttempts", uploadEntry.UploadAttempts));
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = "select last_insert_rowid()";
                         cmd.Parameters.Clear();
-                        uploadentry.ID = (Int64)cmd.ExecuteScalar();                        
+                        uploadEntry.ID = (Int64)cmd.ExecuteScalar();                        
                     }
                     trans.Commit();
                 }
@@ -314,6 +317,7 @@ namespace nntpAutoposter
                                             SeenOnIndexerAt = @seenOnIndexerAt,
                                             Cancelled = @cancelled,
                                             WatchFolderShortName = @watchFolderShortName
+                                            UploadAttempts = @uploadAttempts
                                         WHERE ROWID = @rowId";
                     cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                     cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
@@ -324,6 +328,7 @@ namespace nntpAutoposter
                     cmd.Parameters.Add(new SqliteParameter("@seenOnIndexerAt", GetDbValue(uploadEntry.SeenOnIndexAt)));
                     cmd.Parameters.Add(new SqliteParameter("@cancelled", GetDbValue(uploadEntry.Cancelled)));
                     cmd.Parameters.Add(new SqliteParameter("@watchFolderShortName", uploadEntry.WatchFolderShortName));
+                    cmd.Parameters.Add(new SqliteParameter("@uploadAttempts", uploadEntry.UploadAttempts));
                     cmd.Parameters.Add(new SqliteParameter("@rowId", uploadEntry.ID));
                     
                     cmd.ExecuteNonQuery();                   
@@ -347,6 +352,7 @@ namespace nntpAutoposter
             uploadEntry.SeenOnIndexAt = GetNullableDateTime(reader["SeenOnIndexerAt"]);
             uploadEntry.Cancelled = GetBoolean(reader["Cancelled"]);
             uploadEntry.WatchFolderShortName = reader["WatchFolderShortName"] as String;
+            uploadEntry.UploadAttempts = (Int64) reader["UploadAttempts"];
 
             return uploadEntry;
         }
