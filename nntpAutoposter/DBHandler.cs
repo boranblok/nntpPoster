@@ -316,7 +316,7 @@ namespace nntpAutoposter
                                             NotifiedIndexerAt = @notifiedIndexerAt,
                                             SeenOnIndexerAt = @seenOnIndexerAt,
                                             Cancelled = @cancelled,
-                                            WatchFolderShortName = @watchFolderShortName
+                                            WatchFolderShortName = @watchFolderShortName,
                                             UploadAttempts = @uploadAttempts
                                         WHERE ROWID = @rowId";
                     cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
