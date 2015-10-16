@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nntpPoster", "nntpPoster\nntpPoster.csproj", "{52EDE790-8BC6-4CF3-AAF5-A2EA7A281F30}"
 EndProject
@@ -24,12 +24,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Releases", "Releases", "{41
 		Releases\0.1.zip = Releases\0.1.zip
 		Releases\0.2.zip = Releases\0.2.zip
 		Releases\0.3.zip = Releases\0.3.zip
+		Releases\0.4.1.zip = Releases\0.4.1.zip
+		Releases\0.4.2.zip = Releases\0.4.2.zip
 		Releases\0.4.zip = Releases\0.4.zip
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nntpAutoPosterWindowsService", "nntpAutoPosterWindowsService\nntpAutoPosterWindowsService.csproj", "{523CACA4-A579-45D1-84F9-A3A9695D21BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateDefaultConfig", "GenerateDefaultConfig\GenerateDefaultConfig.csproj", "{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggingExtensions", "LoggingExtensions\LoggingExtensions.csproj", "{B1310D73-74CE-419C-BF35-3E0CFE80A91B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLoggingExtensions", "TestLoggingExtensions\TestLoggingExtensions.csproj", "{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,6 +125,22 @@ Global
 		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Package|Any CPU.Build.0 = Release|Any CPU
 		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1310D73-74CE-419C-BF35-3E0CFE80A91B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1310D73-74CE-419C-BF35-3E0CFE80A91B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1310D73-74CE-419C-BF35-3E0CFE80A91B}.Mono|Any CPU.ActiveCfg = Release|Any CPU
+		{B1310D73-74CE-419C-BF35-3E0CFE80A91B}.Mono|Any CPU.Build.0 = Release|Any CPU
+		{B1310D73-74CE-419C-BF35-3E0CFE80A91B}.Package|Any CPU.ActiveCfg = Release|Any CPU
+		{B1310D73-74CE-419C-BF35-3E0CFE80A91B}.Package|Any CPU.Build.0 = Release|Any CPU
+		{B1310D73-74CE-419C-BF35-3E0CFE80A91B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1310D73-74CE-419C-BF35-3E0CFE80A91B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Mono|Any CPU.ActiveCfg = Release|Any CPU
+		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Mono|Any CPU.Build.0 = Release|Any CPU
+		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Package|Any CPU.ActiveCfg = Release|Any CPU
+		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Package|Any CPU.Build.0 = Release|Any CPU
+		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

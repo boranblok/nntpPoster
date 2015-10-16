@@ -241,14 +241,21 @@ namespace nntpAutoposter
 
         private void StripMetaDataFromFile(FileInfo preparedFile)
         {
-            if(preparedFile.Extension.Length < 1)
-                return;
+            try
+            {
+                if (preparedFile.Extension.Length < 1)
+                    return;
 
-            String rawExt = preparedFile.Extension.Substring(1);
-            if ("mkv".Equals(rawExt, StringComparison.InvariantCultureIgnoreCase))
-                StripMkvMetaDataFromFile(preparedFile);
-            if (ffmpegHandledExtensions.Any(ext => ext.Equals(rawExt, StringComparison.InvariantCultureIgnoreCase)))
-                StripMetaDataWithFFmpeg(preparedFile);
+                String rawExt = preparedFile.Extension.Substring(1);
+                if ("mkv".Equals(rawExt, StringComparison.InvariantCultureIgnoreCase))
+                    StripMkvMetaDataFromFile(preparedFile);
+                if (ffmpegHandledExtensions.Any(ext => ext.Equals(rawExt, StringComparison.InvariantCultureIgnoreCase)))
+                    StripMetaDataWithFFmpeg(preparedFile);
+            }
+            catch(Exception ex)
+            {
+                log.Warn("Could not strip metadata from file. Posting with metadata.", ex);
+            }
         }
 
         private void StripMkvMetaDataFromFile(FileInfo preparedFile)

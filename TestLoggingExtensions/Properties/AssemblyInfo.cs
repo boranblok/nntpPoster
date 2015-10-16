@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("nntpAutoposter")]
+[assembly: AssemblyTitle("TestLoggingExtensions")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("nntpAutoposter")]
+[assembly: AssemblyProduct("TestLoggingExtensions")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1aa6d7c2-3dfb-4011-9277-bc6f48556cc8")]
+[assembly: Guid("767802ef-e967-4639-a39c-7ae638c96fb8")]
 
 // Version information for an assembly consists of the following four values:
 //
