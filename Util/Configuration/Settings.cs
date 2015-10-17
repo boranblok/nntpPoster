@@ -151,11 +151,9 @@ namespace Util.Configuration
         }
 
         [DataMember(Order = 12)]
-        [DefaultValue(3)]
         public Int32 MaxRepostCount { get; set; }
 
         [DataMember(Order = 13, Name = "PostFailedFolder")]
-        [DefaultValue("uploadfailed")]
         public String PostFailedFolderString { get; set; }
         public DirectoryInfo PostFailedFolder
         {
@@ -220,5 +218,17 @@ namespace Util.Configuration
 
         [DataMember(IsRequired = true, Order = 31)]
         public List<RarNParSetting> RarNParSettings { get; set; }
+
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+            SetDefaults();
+        }
+
+        private void SetDefaults()
+        {
+            MaxRepostCount = 3;
+            PostFailedFolderString = "uploadfailed";
+        }
     }
 }
