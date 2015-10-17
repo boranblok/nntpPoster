@@ -85,13 +85,15 @@ namespace ExternalProcessWrappers
         protected virtual void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             LastOutputReceivedAt = DateTime.Now;
-            log.Debug(e.Data);
+            if(!String.IsNullOrWhiteSpace(e.Data))
+                log.Debug(e.Data);
         }
 
         protected virtual void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             LastOutputReceivedAt = DateTime.Now;
-            log.Warn(e.Data);
+            if (!String.IsNullOrWhiteSpace(e.Data))
+                log.Warn(e.Data);
         }
     }
 }

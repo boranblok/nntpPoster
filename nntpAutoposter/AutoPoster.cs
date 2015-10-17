@@ -174,6 +174,8 @@ namespace nntpAutoposter
 
                 nextUpload.UploadedAt = DateTime.UtcNow;
                 DBHandler.Instance.UpdateUploadEntry(nextUpload);
+                log.InfoFormat("[{0}] was uploaded as obfuscated release [{1}] to usenet."
+                    , nextUpload.CleanedName, nextUpload.ObscuredName)
             }
             finally
             {
