@@ -120,6 +120,7 @@ namespace Util
                 log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toMove.Name);
                 moved.Delete();
             }
+            log.DebugFormat("Moving folder [{0}] to [{1}]", sourceFolder, destinationFolder);
             Directory.Move(sourceFolder, destinationFolder);
             return moved;
         }
@@ -134,6 +135,7 @@ namespace Util
                 log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toMove.Name);
                 moved.Delete();
             }
+            log.DebugFormat("Moving file [{0}] to [{1}]", sourceFile, destinationFile);
             File.Move(sourceFile, destinationFile);
             return moved;
         }
