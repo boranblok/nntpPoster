@@ -36,9 +36,9 @@ namespace ExternalProcessWrappers
 
             String passwordParam = String.Empty;
             if (!String.IsNullOrWhiteSpace(password))
-                passwordParam = "-p\"" + password + "\"";
+                passwordParam = "-hp\"" + password + "\"";
 
-            String rarParameters = String.Format("a -ep1 -m0 {0} -v{1}b \"{2}\" \"{3}\"",
+            String rarParameters = String.Format("a -ep1 {0} -m0 -v{1}b \"{2}\" \"{3}\"",
                 passwordParam,
                 partSize,
                 Path.Combine(destination.FullName, archiveName),

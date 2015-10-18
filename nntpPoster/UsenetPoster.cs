@@ -183,7 +183,7 @@ namespace nntpPoster
                             String.IsNullOrWhiteSpace(rarPassword) ? null :
                                 new XElement(ns + "meta",
                                     new XAttribute("type", "password"),
-                                    title
+                                    rarPassword
                                 )
                         ),
                     postedFiles.Select(f =>
