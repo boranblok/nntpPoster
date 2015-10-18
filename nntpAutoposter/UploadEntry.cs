@@ -21,5 +21,6 @@ namespace nntpAutoposter
         public Boolean Cancelled { get; set; }
         public String WatchFolderShortName { get; set; }
         public Int64 UploadAttempts { get; set; }
+        public String RarPassword { get; set; }
     }
 }

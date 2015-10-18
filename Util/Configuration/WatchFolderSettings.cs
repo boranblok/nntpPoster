@@ -46,5 +46,24 @@ namespace Util.Configuration
 
         [DataMember(Order = 7)]
         public String FromAddress { get; set; }
+
+        [DataMember(Order = 8)]
+        public Boolean ApplyRandomPassword { get; set; }
+
+        [DataMember(Order = 9)]
+        public String RarPassword { get; set; }
+
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+            SetDefaults();
+        }
+
+        private void SetDefaults()
+        {
+            //This is redundant, but added for clarity.
+            ApplyRandomPassword = false;
+            RarPassword = null;
+        }
     }
 }

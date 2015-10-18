@@ -1,0 +1,1 @@
+﻿CREATE INDEX UploadEntries_Name_idx ON UploadEntries (Name)
