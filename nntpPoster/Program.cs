@@ -35,7 +35,7 @@ namespace nntpPoster
 
             UsenetPoster poster = new UsenetPoster(config, config.GetWatchFolderSettings("Default"));
             poster.newUploadSpeedReport += poster_newUploadSpeedReport;
-            poster.PostToUsenet(file);
+            poster.PostToUsenet(file, null);
 
 #if DEBUG       //VS does not halt after execution in debug mode.
             Console.WriteLine("Finished");

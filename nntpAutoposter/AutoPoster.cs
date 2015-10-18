@@ -168,10 +168,15 @@ namespace nntpAutoposter
                     toPost = PrepareFileForPosting(folderConfiguration, nextUpload, (FileInfo)toUpload);
                 }
 
-                var nzbFile = poster.PostToUsenet(toPost, false);
+                String password = folderConfiguration.RarPassword;
+                if (folderConfiguration.ApplyRandomPassword)
+                    password = Guid.NewGuid().ToString("N");
+
+                var nzbFile = poster.PostToUsenet(toPost, password, false);
                 if (configuration.NzbOutputFolder != null)
                     nzbFile.Save(Path.Combine(configuration.NzbOutputFolder.FullName, nextUpload.CleanedName + ".nzb"));
 
+                nextUpload.RarPassword = password;
                 nextUpload.UploadedAt = DateTime.UtcNow;
                 DBHandler.Instance.UpdateUploadEntry(nextUpload);
                 log.InfoFormat("[{0}] was uploaded as obfuscated release [{1}] to usenet."

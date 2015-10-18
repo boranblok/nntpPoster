@@ -34,12 +34,12 @@ namespace nntpPoster
         private Int64 TotalUploadedBytes { get; set; }
         private DateTime UploadStartTime { get; set; }
 
-        public XDocument PostToUsenet(FileSystemInfo toPost, Boolean saveNzb = true)
+        public XDocument PostToUsenet(FileSystemInfo toPost, String rarPassword, Boolean saveNzb = true)
         {
-            return PostToUsenet(toPost, toPost.NameWithoutExtension(), saveNzb);
+            return PostToUsenet(toPost, toPost.NameWithoutExtension(), rarPassword, saveNzb);
         }
 
-        public XDocument PostToUsenet(FileSystemInfo toPost, String title, Boolean saveNzb = true)
+        public XDocument PostToUsenet(FileSystemInfo toPost, String title, String rarPassword, Boolean saveNzb = true)
         {
             using (nntpMessagePoster poster = new nntpMessagePoster(configuration, folderConfiguration))
             {
@@ -49,7 +49,7 @@ namespace nntpPoster
                 {
                     DateTime StartTime = DateTime.Now;
                     processedFiles = MakeProcessingFolder(toPost.NameWithoutExtension());
-                    MakeRarAndParFiles(toPost, toPost.NameWithoutExtension(), processedFiles);
+                    MakeRarAndParFiles(toPost, toPost.NameWithoutExtension(), processedFiles, rarPassword);
 
                     List<FileToPost> filesToPost = processedFiles.GetFiles()
                         .OrderBy(f => f.Name)
@@ -90,7 +90,7 @@ namespace nntpPoster
 
                     Console.WriteLine();
 
-                    XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles);
+                    XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles, rarPassword);
                     if (saveNzb && configuration.NzbOutputFolder != null)
                         nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder.FullName, toPost.NameWithoutExtension() + ".nzb"));
                     return nzbDoc;
@@ -146,7 +146,7 @@ namespace nntpPoster
         }
 
         private void MakeRarAndParFiles(FileSystemInfo toPost, String nameWithoutExtension,
-            DirectoryInfo processedFolder)
+            DirectoryInfo processedFolder, String password)
         {
             Int64 size = toPost.Size();
             var rarSizeRecommendation = configuration.RarNParSettings
@@ -155,15 +155,19 @@ namespace nntpPoster
                 .First();
             var rarWrapper = new RarWrapper(configuration.InactiveProcessTimeout, configuration.RarLocation);
             rarWrapper.Compress(
-                toPost, processedFolder, nameWithoutExtension, 
-                Settings.DetermineOptimalRarSize(rarSizeRecommendation.RarSize, configuration.YEncLineSize, configuration.YEncLinesPerMessage));
+                toPost, 
+                processedFolder, 
+                nameWithoutExtension, 
+                Settings.DetermineOptimalRarSize(rarSizeRecommendation.RarSize, 
+                    configuration.YEncLineSize, configuration.YEncLinesPerMessage),
+                password);
 
             var parWrapper = new ParWrapper(configuration.InactiveProcessTimeout, configuration.ParLocation);
             parWrapper.CreateParFilesInDirectory(
                 processedFolder, nameWithoutExtension, configuration.YEncPartSize, rarSizeRecommendation.Par2Percentage);
         }
 
-        private XDocument GenerateNzbFromPostInfo(String title, List<PostedFileInfo> postedFiles)
+        private XDocument GenerateNzbFromPostInfo(String title, List<PostedFileInfo> postedFiles, String rarPassword)
         {
             XNamespace ns = "http://www.newzbin.com/DTD/2003/nzb";
 
@@ -175,7 +179,12 @@ namespace nntpPoster
                         new XElement(ns + "meta",
                             new XAttribute("type", "title"),
                             title
-                            )
+                            ),
+                            String.IsNullOrWhiteSpace(rarPassword) ? null :
+                                new XElement(ns + "meta",
+                                    new XAttribute("type", "password"),
+                                    title
+                                )
                         ),
                     postedFiles.Select(f =>
                         new XElement(ns + "file",

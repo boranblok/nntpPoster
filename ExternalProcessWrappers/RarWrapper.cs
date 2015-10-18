@@ -24,7 +24,8 @@ namespace ExternalProcessWrappers
         {
         }
 
-        public void Compress(FileSystemInfo source, DirectoryInfo destination, String archiveName, Int32 partSize)
+        public void Compress(FileSystemInfo source, DirectoryInfo destination, String archiveName, 
+            Int32 partSize, String password)
         {
             String toCompress;
             FileAttributes attributes = File.GetAttributes(source.FullName);
@@ -33,7 +34,12 @@ namespace ExternalProcessWrappers
             else
                 toCompress = source.FullName;
 
-            String rarParameters = String.Format("a -ep1 -m0 -v{0}b \"{1}\" \"{2}\"",
+            String passwordParam = String.Empty;
+            if (!String.IsNullOrWhiteSpace(password))
+                passwordParam = "-p\"" + password + "\"";
+
+            String rarParameters = String.Format("a -ep1 -m0 {0} -v{1}b \"{2}\" \"{3}\"",
+                passwordParam,
                 partSize,
                 Path.Combine(destination.FullName, archiveName),
                 toCompress

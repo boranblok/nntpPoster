@@ -18,7 +18,7 @@ namespace rarTester
 
             var rarWrapper = new RarWrapper(5);
 
-            rarWrapper.Compress(source, target, targetName, 15*1000*1000);
+            rarWrapper.Compress(source, target, targetName, 15*1000*1000, null);
 
 #if DEBUG       //VS does not halt after execution in debug mode.
             Console.WriteLine("Finished");
