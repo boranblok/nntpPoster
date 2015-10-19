@@ -66,7 +66,7 @@ namespace Util.Configuration
             if(WatchFolderSettings.Any(s => s.ApplyRandomPassword) && String.IsNullOrWhiteSpace(NzbOutputFolderString))
             {
                 log.Warn("ApplyRandomPassword is set to true for a watchfolder but NZB output folder is not set.");
-                lof.Warn("You will have to check the SQLite3 database to know what password was used for a release.");
+                log.Warn("You will have to check the SQLite3 database to know what password was used for a release.");
             }
         }
 
