@@ -60,7 +60,9 @@ namespace GenerateDefaultConfig
                 StripFileMetadata = false,
                 UseObfuscation = false,
                 FromAddress = "bob@bobbers.bob",
-                PostTag = ""
+                PostTag = "",
+                ApplyRandomPassword=false,
+                RarPassword=""
             };
             watchfolder.TargetNewsgroups.Add("alt.binaries.multimedia");
             settings.WatchFolderSettings.Add(watchfolder);
