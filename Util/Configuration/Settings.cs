@@ -7,12 +7,16 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using log4net;
 
 namespace Util.Configuration
 {
     [DataContract(Namespace = "Util.Configuration")]
     public class Settings
     {
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private static readonly DataContractSerializer Serializer = new DataContractSerializer(typeof(Settings));
         private static readonly XmlWriterSettings WriterSettings = new XmlWriterSettings { Indent = true };
 
@@ -53,12 +57,17 @@ namespace Util.Configuration
 
         private void ValidateSettings()
         {
-            //TODO: test
             if(WatchFolderSettings.GroupBy(s => s.ShortName).Any(g => g.Count() > 1))
                 throw  new Exception("The watchfolder short name has to be unique.");
 
             if (WatchFolderSettings.GroupBy(s => s.PathString).Any(g => g.Count() > 1))
                 throw new Exception("The watchfolder path has to be unique.");
+
+            if(WatchFolderSettings.Any(s => s.ApplyRandomPassword) && String.IsNullOrWhiteSpace(NzbOutputFolderString))
+            {
+                log.Warn("ApplyRandomPassword is set to true for a watchfolder but NZB output folder is not set.");
+                lof.Warn("You will have to check the SQLite3 database to know what password was used for a release.");
+            }
         }
 
         internal static DirectoryInfo GetOrCreateFolder(String workingFolderString)
