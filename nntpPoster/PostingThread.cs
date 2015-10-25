@@ -124,14 +124,14 @@ namespace nntpPoster
             var retry = true;
             while (retry && retryCount < _configuration.MaxRetryCount)
             {
-                if (_client == null)
-                {
-                    log.Debug("Constructing new client.");
-                    _client = new SimpleNntpPostingClient(_connectionInfo);
-                    _client.Connect();
-                }
                 try
                 {
+                    if (_client == null)
+                    {
+                        log.Debug("Constructing new client.");
+                        _client = new SimpleNntpPostingClient(_connectionInfo);
+                        _client.Connect();
+                    }
                     var partMessageId = _client.PostYEncMessage(
                         _folderConfiguration.FromAddress,
                         message.Subject,
