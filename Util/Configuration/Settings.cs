@@ -63,6 +63,24 @@ namespace Util.Configuration
             if (WatchFolderSettings.GroupBy(s => s.PathString).Any(g => g.Count() > 1))
                 throw new Exception("The watchfolder path has to be unique.");
 
+            if (IndexerRenameMapSource != null && IndexerRenameMapTarget != null)
+            {
+                if(IndexerRenameMapSource.Length != IndexerRenameMapTarget.Length)
+                    throw new Exception("IndexerRenameMapSource and IndexerRenameMap target need to be of same length.");
+            }
+
+            if (IndexerRenameMapSource == null)
+            {
+                if (IndexerRenameMapTarget != null)
+                    throw new Exception("IndexerRenameMapSource and IndexerRenameMap target need to be of same length.");
+            }
+
+            if (IndexerRenameMapTarget == null)
+            {
+                if(IndexerRenameMapSource != null)
+                    throw new Exception("IndexerRenameMapSource and IndexerRenameMap target need to be of same length.");
+            }
+
             if(WatchFolderSettings.Any(s => s.ApplyRandomPassword) && String.IsNullOrWhiteSpace(NzbOutputFolderString))
             {
                 log.Warn("ApplyRandomPassword is set to true for a watchfolder but NZB output folder is not set.");
@@ -124,18 +142,24 @@ namespace Util.Configuration
         [DataMember(Order = 6)]
         public String SearchUrl { get; set; }
 
-        [DataMember(IsRequired = true, Order = 7)]
+        [DataMember(Order = 7)]
+        public String IndexerRenameMapSource { get; set; }
+
+        [DataMember(Order = 8)]
+        public String IndexerRenameMapTarget { get; set; }
+
+        [DataMember(IsRequired = true, Order = 9)]
         public List<WatchFolderSettings> WatchFolderSettings { get; set; }
 
 
 
         //Settings that the user might want to change
 
-        [DataMember(Order = 8)]
+        [DataMember(Order = 10)]
         public Int32 MaxConnectionCount { get; set; }
 
         
-        [DataMember(Order = 9, Name = "WorkingFolder")]
+        [DataMember(Order = 11, Name = "WorkingFolder")]
         public String WorkingFolderString { get; set; }
         public DirectoryInfo WorkingFolder
         {
@@ -143,7 +167,7 @@ namespace Util.Configuration
             set { WorkingFolderString = value.FullName; }
         }
 
-        [DataMember(Order = 10, Name = "NzbOutputFolder")]
+        [DataMember(Order = 12, Name = "NzbOutputFolder")]
         public String NzbOutputFolderString { get; set; }
         public DirectoryInfo NzbOutputFolder
         {
@@ -151,7 +175,7 @@ namespace Util.Configuration
             set { NzbOutputFolderString = value.FullName; }
         }
 
-        [DataMember(Order = 11, Name = "BackupFolder")]
+        [DataMember(Order = 13, Name = "BackupFolder")]
         public String BackupFolderString { get; set; }
         public DirectoryInfo BackupFolder
         {
@@ -159,10 +183,10 @@ namespace Util.Configuration
             set { BackupFolderString = value.FullName; }
         }
 
-        [DataMember(Order = 12)]
+        [DataMember(Order = 14)]
         public Int32 MaxRepostCount { get; set; }
 
-        [DataMember(Order = 13, Name = "PostFailedFolder")]
+        [DataMember(Order = 15, Name = "PostFailedFolder")]
         public String PostFailedFolderString { get; set; }
         public DirectoryInfo PostFailedFolder
         {
@@ -170,62 +194,62 @@ namespace Util.Configuration
             set { PostFailedFolderString = value.FullName; }
         }
 
-        [DataMember(Order = 14)]
+        [DataMember(Order = 16)]
         public String RarLocation { get; set; }
 
-        [DataMember(Order = 15)]
+        [DataMember(Order = 17)]
         public String ParLocation { get; set; }
 
-        [DataMember(Order = 16)]
+        [DataMember(Order = 18)]
         public String MkvPropEditLocation { get; set; }
 
-        [DataMember(Order = 17)]
+        [DataMember(Order = 19)]
         public String FFmpegLocation { get; set; }
 
 
         // Settings the user probably shouldnt change.
 
 
-        [DataMember(Order = 18)]
+        [DataMember(Order = 20)]
         public Boolean RemoveAfterVerify { get; set; }
 
-        [DataMember(Order = 19)]
+        [DataMember(Order = 21)]
         public Int32 FilesystemCheckIntervalMillis { get; set; }
 
-        [DataMember(Order = 20)]
+        [DataMember(Order = 22)]
         public Int32 FilesystemCheckTesholdMinutes { get; set; }
 
-        [DataMember(Order = 21)]
+        [DataMember(Order = 23)]
         public Int32 AutoposterIntervalMillis { get; set; }
 
-        [DataMember(Order = 22)]
+        [DataMember(Order = 24)]
         public Int32 NotifierIntervalMinutes { get; set; }
 
-        [DataMember(Order = 23)]
+        [DataMember(Order = 25)]
         public Int32 VerifierIntervalMinutes { get; set; }
 
-        [DataMember(Order = 24)]
+        [DataMember(Order = 26)]
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
 
-        [DataMember(Order = 25)]
+        [DataMember(Order = 27)]
         public Int32 RepostAfterMinutes { get; set; }
 
-        [DataMember(Order = 26)]
+        [DataMember(Order = 28)]
         public Int32 MaxRetryCount { get; set; }
 
-        [DataMember(Order = 27)]
+        [DataMember(Order = 29)]
         public Int32 InactiveProcessTimeout { get; set; }
 
-        [DataMember(Order = 28)]
+        [DataMember(Order = 30)]
         public Int32 YEncLineSize { get; set; }
 
-        [DataMember(Order = 29)]
+        [DataMember(Order = 31)]
         public Int32 YEncLinesPerMessage { get; set; }
 
-        [DataMember(Order = 30)]
+        [DataMember(Order = 32)]
         public String DatabaseFile { get; set; }
 
-        [DataMember(IsRequired = true, Order = 31)]
+        [DataMember(IsRequired = true, Order = 33)]
         public List<RarNParSetting> RarNParSettings { get; set; }
 
         [OnDeserializing]

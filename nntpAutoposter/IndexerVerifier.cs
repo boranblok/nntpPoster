@@ -127,9 +127,10 @@ namespace nntpAutoposter
         private Boolean UploadIsOnIndexer(UploadEntry upload)
         {
             var postAge = (Int32)Math.Ceiling((DateTime.UtcNow - upload.UploadedAt.Value).TotalDays + 1);
+            String searchName = GetIndexerSearchName(upload.CleanedName);
             String verificationGetUrl = String.Format(
                 configuration.SearchUrl,
-                Uri.EscapeDataString(upload.CleanedName),
+                Uri.EscapeDataString(searchName),
                 postAge);
 
             ServicePointManager.ServerCertificateValidationCallback = ServerCertificateValidationCallback;
@@ -158,10 +159,38 @@ namespace nntpAutoposter
                             LevenshteinDistance.SimilarityPercentage(item.Title.Text, upload.CleanedName);
                         if (similarityPercentage > configuration.VerifySimilarityPercentageTreshold)
                             return true;
+
+                        Decimal similarityPercentageWithIndexCleanedName =
+                            LevenshteinDistance.SimilarityPercentage(item.Title.Text, searchName);
+                        if (similarityPercentageWithIndexCleanedName > configuration.VerifySimilarityPercentageTreshold)
+                            return true;
                     }
                 }
             }           
             return false;
+        }
+
+        private String GetIndexerSearchName(String cleanedName)
+        {
+            StringBuilder sb = new StringBuilder(cleanedName);
+            if (String.IsNullOrEmpty(configuration.IndexerRenameMapSource))
+                return cleanedName;
+
+            for (int i = 0; i < configuration.IndexerRenameMapSource.Length; i++)
+            {
+                char source = configuration.IndexerRenameMapSource[i];
+                char target = configuration.IndexerRenameMapTarget[i];
+                if (source == target)
+                {
+                    sb.Replace(new string(new char[] {source}), String.Empty);
+                }
+                else
+                {
+                    sb.Replace(source, target);
+                }
+            }
+
+            return sb.ToString();
         }
 
         private bool ServerCertificateValidationCallback(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
