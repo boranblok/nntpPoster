@@ -156,18 +156,24 @@ namespace nntpAutoposter
                     foreach (var item in feed.Items)
                     {
                         Decimal similarityPercentage =
-                            LevenshteinDistance.SimilarityPercentage(item.Title.Text, upload.CleanedName);
+                            LevenshteinDistance.SimilarityPercentage(CleanGeekBug(item.Title.Text), upload.CleanedName);
                         if (similarityPercentage > configuration.VerifySimilarityPercentageTreshold)
                             return true;
 
                         Decimal similarityPercentageWithIndexCleanedName =
-                            LevenshteinDistance.SimilarityPercentage(item.Title.Text, searchName);
+                            LevenshteinDistance.SimilarityPercentage(CleanGeekBug(item.Title.Text), searchName);
                         if (similarityPercentageWithIndexCleanedName > configuration.VerifySimilarityPercentageTreshold)
                             return true;
                     }
                 }
             }           
             return false;
+        }
+
+        //HACK: nzbgeek does a double escape of ampersands in the returned RSS feed. I dont think this is intended.
+        private string CleanGeekBug(String title)
+        {
+            return title.Replace("&amp;amp;", "&");
         }
 
         private String GetIndexerSearchName(String cleanedName)
