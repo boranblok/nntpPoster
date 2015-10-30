@@ -51,6 +51,8 @@ namespace ExternalProcessWrappers
                 process.StartInfo.Arguments = parameters;
                 process.StartInfo.FileName = ProcessLocation;
 
+                log.DebugFormat("Executing process: [{0} {1}]", ProcessLocation, parameters);
+
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
