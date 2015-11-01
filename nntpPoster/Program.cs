@@ -22,25 +22,32 @@ namespace nntpPoster
         {
             if (args.Length < 1)
             {
-                Console.WriteLine("Please supply a filename to upload.");
+                Console.WriteLine("Please supply a file or folder to upload.");
                 return 1;
             }
-            FileInfo file = new FileInfo(args[0]);
-            if (!file.Exists)
+            var fullPath = args[0];
+            FileSystemInfo toUpload;
+
+            FileAttributes attributes = File.GetAttributes(fullPath);
+            if (attributes.HasFlag(FileAttributes.Directory))
             {
-                Console.WriteLine("The supplied file does not exist.");
+                toUpload = new DirectoryInfo(fullPath);
+            }
+            else
+            {
+                toUpload = new FileInfo(fullPath);
+            }
+
+            if (!toUpload.Exists)
+            {
+                Console.WriteLine("The supplied file or folder does not exist.");
                 return 2;
             }
             Settings config = Settings.LoadSettings();
 
             UsenetPoster poster = new UsenetPoster(config, config.GetWatchFolderSettings("Default"));
             poster.newUploadSpeedReport += poster_newUploadSpeedReport;
-            poster.PostToUsenet(file, null);
-
-#if DEBUG       //VS does not halt after execution in debug mode.
-            Console.WriteLine("Finished");
-            Console.ReadKey();
-#endif
+            poster.PostToUsenet(toUpload, null);
 
             return 0;
         }
