@@ -140,10 +140,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LoggingExtensions\LoggingExtensions.csproj">
-      <Project>{b1310d73-74ce-419c-bf35-3e0cfe80a91b}</Project>
-      <Name>LoggingExtensions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\nntpAutoposter\nntpAutoposter.csproj">
       <Project>{df3f2c45-6232-41fa-a214-6a1ebc3ca2d7}</Project>
       <Name>nntpAutoposter</Name>

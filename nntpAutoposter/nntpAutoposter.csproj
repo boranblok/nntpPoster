@@ -154,10 +154,6 @@
       <Project>{80062f4f-5489-41c7-9b7e-bcb8a641e420}</Project>
       <Name>ExternalProcessWrappers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LoggingExtensions\LoggingExtensions.csproj">
-      <Project>{b1310d73-74ce-419c-bf35-3e0cfe80a91b}</Project>
-      <Name>LoggingExtensions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\nntpPoster\nntpPoster.csproj">
       <Project>{52ede790-8bc6-4cf3-aaf5-a2ea7a281f30}</Project>
       <Name>nntpPoster</Name>
