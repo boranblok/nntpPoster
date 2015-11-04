@@ -34,6 +34,9 @@ namespace Util.Configuration
 
         [DataMember]
         public Boolean CleanName { get; set; }
+        
+        [DataMember]
+        public String PreTag { get; set; }
 
         [DataMember]
         public String PostTag { get; set; }

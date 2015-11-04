@@ -142,11 +142,13 @@ namespace nntpAutoposter
             nextUpload.UploadAttempts++;
             if (folderConfiguration.CleanName)
             {
-                nextUpload.CleanedName = CleanName(toUpload.NameWithoutExtension()) + folderConfiguration.PostTag;
+                nextUpload.CleanedName = 
+                    folderConfiguration.PreTag + CleanName(toUpload.NameWithoutExtension()) + folderConfiguration.PostTag;
             }
             else
             {
-                nextUpload.CleanedName = toUpload.NameWithoutExtension() + folderConfiguration.PostTag;
+                nextUpload.CleanedName = 
+                    folderConfiguration.PreTag + toUpload.NameWithoutExtension() + folderConfiguration.PostTag;
             }
             if (folderConfiguration.UseObfuscation)
             {
