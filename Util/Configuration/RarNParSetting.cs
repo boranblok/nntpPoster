@@ -11,7 +11,7 @@ namespace Util.Configuration
     [DataContract(Namespace = "Util.Configuration")]
     public class RarNParSetting
     {
-        [DataMember(Order = 0)]
+        [DataMember]
         public Int32 FromSize { get; set; }
 
         public Int64 FromSizeBytes
@@ -19,10 +19,10 @@ namespace Util.Configuration
             get { return FromSize*1024*1024; }
         }
 
-        [DataMember(Order = 1)]
+        [DataMember]
         public Int32 RarSize { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember]
         public Int32 Par2Percentage { get; set; }
     }
 }

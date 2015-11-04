@@ -17,10 +17,10 @@ namespace Util.Configuration
             TargetNewsgroups = new List<string>();
         }
 
-        [DataMember(Order = 0)]
+        [DataMember]
         public String ShortName { get; set; }
 
-        [DataMember(Order = 1, Name = "Path")]
+        [DataMember(Name = "Path")]
         public String PathString { get; set; }
         public DirectoryInfo Path
         {
@@ -29,28 +29,28 @@ namespace Util.Configuration
         }
 
 
-        [DataMember(Order = 2)]
+        [DataMember]
         public Boolean UseObfuscation { get; set; }
 
-        [DataMember(Order = 3)]
+        [DataMember]
         public Boolean CleanName { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember]
         public String PostTag { get; set; }
 
-        [DataMember(Order = 5)]
+        [DataMember]
         public List<String> TargetNewsgroups { get; set; }
 
-        [DataMember(Order = 6)]
+        [DataMember]
         public Boolean StripFileMetadata { get; set; }
 
-        [DataMember(Order = 7)]
+        [DataMember]
         public String FromAddress { get; set; }
 
-        [DataMember(Order = 8)]
+        [DataMember]
         public Boolean ApplyRandomPassword { get; set; }
 
-        [DataMember(Order = 9)]
+        [DataMember]
         public String RarPassword { get; set; }
 
         [OnDeserializing]
