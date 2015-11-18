@@ -163,8 +163,21 @@ namespace nntpPoster
                 password);
 
             var parWrapper = new ParWrapper(configuration.InactiveProcessTimeout, configuration.ParLocation);
-            parWrapper.CreateParFilesInDirectory(
-                processedFolder, nameWithoutExtension, configuration.YEncPartSize, rarSizeRecommendation.Par2Percentage);
+            Boolean makePar = true;
+            Int32 partSize = configuration.YEncPartSize;
+            while (makePar && partSize / configuration.YEncPartSize < 10)   //Max 10 loops.
+            {
+                try
+                {
+                    parWrapper.CreateParFilesInDirectory(
+                        processedFolder, nameWithoutExtension, partSize, rarSizeRecommendation.Par2Percentage);
+                    makePar = false;
+                }
+                catch (Par2BlockSizeTooSmallException)
+                {
+                    partSize += configuration.YEncPartSize;
+                }
+            }
         }
 
         private XDocument GenerateNzbFromPostInfo(String title, List<PostedFileInfo> postedFiles, String rarPassword)

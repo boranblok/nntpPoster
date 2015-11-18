@@ -64,6 +64,7 @@
     <Compile Include="ExternalProcessWrapperBase.cs" />
     <Compile Include="FFmpegWrapper.cs" />
     <Compile Include="MkvPropEditWrapper.cs" />
+    <Compile Include="Par2BlockSizeTooSmallException.cs" />
     <Compile Include="ParWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RarWrapper.cs" />

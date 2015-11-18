@@ -49,5 +49,12 @@ namespace ExternalProcessWrappers
 
             return fileList.ToString();
         }
+
+        protected override void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            base.Process_ErrorDataReceived(sender, e);
+            if (e.Data != null && e.Data.Contains("Block size is too small."))
+                throw (new Par2BlockSizeTooSmallException());
+        }
     }
 }
