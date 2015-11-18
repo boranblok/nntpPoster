@@ -34,6 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Releases", "Releases", "{41
 		Releases\0.6.3.zip = Releases\0.6.3.zip
 		Releases\0.6.4.zip = Releases\0.6.4.zip
 		Releases\0.6.5.zip = Releases\0.6.5.zip
+		Releases\0.6.6.zip = Releases\0.6.6.zip
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nntpAutoPosterWindowsService", "nntpAutoPosterWindowsService\nntpAutoPosterWindowsService.csproj", "{523CACA4-A579-45D1-84F9-A3A9695D21BD}"

@@ -1,1 +1,1 @@
-7z a ..\..\..\Releases\0.6.5.zip *
+7z a ..\..\..\Releases\0.6.6.zip *
