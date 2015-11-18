@@ -10,6 +10,7 @@ namespace ExternalProcessWrappers
 {
     public class ParWrapper : ExternalProcessWrapperBase
     {
+        private Boolean blockSizeTooSmall;
         protected override string ProcessPathLocation
         {
             get { return "par2"; }
@@ -26,6 +27,8 @@ namespace ExternalProcessWrappers
 
         public void CreateParFilesInDirectory(DirectoryInfo workingFolder, String nameWithoutExtension, Int32 blockSize, Int32 redundancyPercentage)
         {
+            blockSizeTooSmall = false;
+
             String parParameters = String.Format("c -s{0} -r{1} -- \"{2}\"{3}",
                blockSize,
                redundancyPercentage,
@@ -33,7 +36,16 @@ namespace ExternalProcessWrappers
                GetFileList(workingFolder)
             );
 
-            this.ExecuteProcess(parParameters);
+            try
+            {
+                this.ExecuteProcess(parParameters);
+            }
+            catch(Exception ex)
+            {
+                if (blockSizeTooSmall)
+                    throw new Par2BlockSizeTooSmallException("Block size too small", ex);
+                throw;
+            }
         }
 
         private String GetFileList(DirectoryInfo workingFolder)
@@ -54,7 +66,7 @@ namespace ExternalProcessWrappers
         {
             base.Process_ErrorDataReceived(sender, e);
             if (e.Data != null && e.Data.Contains("Block size is too small."))
-                throw (new Par2BlockSizeTooSmallException());
+                blockSizeTooSmall = true;
         }
     }
 }
