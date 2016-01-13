@@ -56,6 +56,9 @@ namespace Util.Configuration
         [DataMember(Order = 9)]
         public String RarPassword { get; set; }
 
+        [DataMember(Order = 10)]
+        public Int32 Priority { get; set; }
+
         [OnDeserializing]
         private void OnDeserializing(StreamingContext context)
         {

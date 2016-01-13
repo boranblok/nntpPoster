@@ -104,6 +104,7 @@ namespace nntpAutoposter
             newUploadentry.RemoveAfterVerify = configuration.RemoveAfterVerify;
             newUploadentry.Cancelled = false;
             newUploadentry.Size = toPost.Size();
+            newUploadentry.PriorityNum = folderConfiguration.Priority;
             if (newUploadentry.Size == 0)
             {
                 log.ErrorFormat("File added with a size of 0 bytes, This cannot be uploaded! File name: [{0}]",

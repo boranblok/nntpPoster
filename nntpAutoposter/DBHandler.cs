@@ -141,7 +141,7 @@ namespace nntpAutoposter
                     cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
                                         WHERE UploadedAt IS NULL 
                                           AND Cancelled = 0
-                                        ORDER BY CreatedAt ASC
+                                        ORDER BY PriorityNum DESC, CreatedAt ASC
                                         LIMIT 1";
                     using (SqliteDataReader reader = cmd.ExecuteReader())
                     {
@@ -218,7 +218,9 @@ namespace nntpAutoposter
                 conn.Open();
                 using (SqliteCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT ROWID, * from UploadEntries WHERE Name = @name AND Cancelled = 0";
+                    cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
+                                        WHERE Name = @name 
+                                            AND Cancelled = 0";
                     cmd.Parameters.Add(new SqliteParameter("@name", name));
                     using(SqliteDataReader reader = cmd.ExecuteReader())
                     {
@@ -264,7 +266,8 @@ namespace nntpAutoposter
                                                             Cancelled,
                                                             WatchFolderShortName,
                                                             UploadAttempts,
-                                                            RarPassword)
+                                                            RarPassword,
+                                                            PriorityNum)
                                                     VALUES(
                                                             @name,
                                                             @size,
@@ -278,7 +281,8 @@ namespace nntpAutoposter
                                                             @cancelled,
                                                             @watchFolderShortName,
                                                             @uploadAttempts,
-                                                            @rarPassword)";
+                                                            @rarPassword,
+                                                            @priorityNum)";
                         cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                         cmd.Parameters.Add(new SqliteParameter("@size", uploadEntry.Size));
                         cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
@@ -292,6 +296,7 @@ namespace nntpAutoposter
                         cmd.Parameters.Add(new SqliteParameter("@watchFolderShortName", uploadEntry.WatchFolderShortName));
                         cmd.Parameters.Add(new SqliteParameter("@uploadAttempts", uploadEntry.UploadAttempts));
                         cmd.Parameters.Add(new SqliteParameter("@rarPassword", uploadEntry.RarPassword));
+                        cmd.Parameters.Add(new SqliteParameter("@priorityNum", uploadEntry.PriorityNum));
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = "select last_insert_rowid()";
@@ -321,7 +326,8 @@ namespace nntpAutoposter
                                             Cancelled = @cancelled,
                                             WatchFolderShortName = @watchFolderShortName,
                                             UploadAttempts = @uploadAttempts,
-                                            RarPassword = @rarPassword
+                                            RarPassword = @rarPassword,
+                                            PriorityNum = @priorityNum
                                         WHERE ROWID = @rowId";
                     cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                     cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
@@ -334,6 +340,7 @@ namespace nntpAutoposter
                     cmd.Parameters.Add(new SqliteParameter("@watchFolderShortName", uploadEntry.WatchFolderShortName));
                     cmd.Parameters.Add(new SqliteParameter("@uploadAttempts", uploadEntry.UploadAttempts));
                     cmd.Parameters.Add(new SqliteParameter("@rarPassword", uploadEntry.RarPassword));
+                    cmd.Parameters.Add(new SqliteParameter("@priorityNum", uploadEntry.PriorityNum));
                     cmd.Parameters.Add(new SqliteParameter("@rowId", uploadEntry.ID));
                     
                     cmd.ExecuteNonQuery();                   
@@ -359,6 +366,7 @@ namespace nntpAutoposter
             uploadEntry.WatchFolderShortName = reader["WatchFolderShortName"] as String;
             uploadEntry.UploadAttempts = (Int64) reader["UploadAttempts"];
             uploadEntry.RarPassword = reader["RarPassword"] as String;
+            uploadEntry.PriorityNum = (Int64)reader["PriorityNum"];
 
             return uploadEntry;
         }
