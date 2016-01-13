@@ -121,45 +121,45 @@ namespace Util.Configuration
 
         //Settings the user must change
 
-        [DataMember]
+        [DataMember(Order = 0)]
         public String NewsGroupAddress { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 1)]
         public Int32 NewsGroupPort { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 2)]
         public String NewsGroupUsername { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 3)]
         public String NewsGroupPassword { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 4)]
         public Boolean NewsGroupUseSsl { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 5)]
         public String ObfuscatedNotificationUrl { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 6)]
         public String SearchUrl { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 7)]
         public String IndexerRenameMapSource { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 8)]
         public String IndexerRenameMapTarget { get; set; }
 
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = true, Order = 9)]
         public List<WatchFolderSettings> WatchFolderSettings { get; set; }
 
 
 
         //Settings that the user might want to change
 
-        [DataMember]
+        [DataMember(Order = 10)]
         public Int32 MaxConnectionCount { get; set; }
 
         
-        [DataMember(Name = "WorkingFolder")]
+        [DataMember(Order = 11, Name = "WorkingFolder")]
         public String WorkingFolderString { get; set; }
         public DirectoryInfo WorkingFolder
         {
@@ -167,7 +167,7 @@ namespace Util.Configuration
             set { WorkingFolderString = value.FullName; }
         }
 
-        [DataMember(Name = "NzbOutputFolder")]
+        [DataMember(Order = 12, Name = "NzbOutputFolder")]
         public String NzbOutputFolderString { get; set; }
         public DirectoryInfo NzbOutputFolder
         {
@@ -175,7 +175,7 @@ namespace Util.Configuration
             set { NzbOutputFolderString = value.FullName; }
         }
 
-        [DataMember(Name = "BackupFolder")]
+        [DataMember(Order = 13, Name = "BackupFolder")]
         public String BackupFolderString { get; set; }
         public DirectoryInfo BackupFolder
         {
@@ -183,10 +183,10 @@ namespace Util.Configuration
             set { BackupFolderString = value.FullName; }
         }
 
-        [DataMember]
+        [DataMember(Order = 14)]
         public Int32 MaxRepostCount { get; set; }
 
-        [DataMember(Name = "PostFailedFolder")]
+        [DataMember(Order = 15, Name = "PostFailedFolder")]
         public String PostFailedFolderString { get; set; }
         public DirectoryInfo PostFailedFolder
         {
@@ -194,62 +194,62 @@ namespace Util.Configuration
             set { PostFailedFolderString = value.FullName; }
         }
 
-        [DataMember]
+        [DataMember(Order = 16)]
         public String RarLocation { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 17)]
         public String ParLocation { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 18)]
         public String MkvPropEditLocation { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 19)]
         public String FFmpegLocation { get; set; }
 
 
         // Settings the user probably shouldnt change.
 
 
-        [DataMember]
+        [DataMember(Order = 20)]
         public Boolean RemoveAfterVerify { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 21)]
         public Int32 FilesystemCheckIntervalMillis { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 22)]
         public Int32 FilesystemCheckTesholdMinutes { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 23)]
         public Int32 AutoposterIntervalMillis { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 24)]
         public Int32 NotifierIntervalMinutes { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 25)]
         public Int32 VerifierIntervalMinutes { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 26)]
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 27)]
         public Int32 RepostAfterMinutes { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 28)]
         public Int32 MaxRetryCount { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 29)]
         public Int32 InactiveProcessTimeout { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 30)]
         public Int32 YEncLineSize { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 31)]
         public Int32 YEncLinesPerMessage { get; set; }
 
-        [DataMember]
+        [DataMember(Order = 32)]
         public String DatabaseFile { get; set; }
 
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = true, Order = 33)]
         public List<RarNParSetting> RarNParSettings { get; set; }
 
         [OnDeserializing]
