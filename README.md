@@ -26,7 +26,7 @@ To install extract the Release zipfile to a folder.
 
 The folder needs to be readable and writable by the user under which you execute the service.
 
-Modify the `nntpAutoPosterWindowsService.exe.config` file to match your upload parameters.
+Modify the `settings.config` file to match your upload parameters.
 
 Optionally modify the folder settings as well if you want the application to use a different location to watch/process etc.  
 The folders are written in the native OS format so /mnt/folder etc on linux derivates and C:\folder on windows systems.  
