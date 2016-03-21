@@ -53,6 +53,8 @@ namespace ExternalProcessWrappers
 
                 log.DebugFormat("Executing process: [{0} {1}]", ProcessLocation, parameters);
 
+                LastOutputReceivedAt = DateTime.Now;
+
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
