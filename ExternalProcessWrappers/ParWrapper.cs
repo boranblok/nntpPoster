@@ -25,7 +25,7 @@ namespace ExternalProcessWrappers
         {
         }
 
-        public void CreateParFilesInDirectory(DirectoryInfo workingFolder, String nameWithoutExtension, Int32 blockSize, Int32 redundancyPercentage)
+        public void CreateParFilesInDirectory(DirectoryInfo workingFolder, String nameWithoutExtension, Int32 blockSize, Int32 redundancyPercentage, String extraParams)
         {
             blockSizeTooSmall = false;
 

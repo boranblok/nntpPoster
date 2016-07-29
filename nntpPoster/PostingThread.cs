@@ -21,7 +21,6 @@ namespace nntpPoster
         private Task MyTask;
 
         private SimpleNntpPostingClient _client;
-        private Boolean _continuePosting;
 
         private Settings _configuration;
         private WatchFolderSettings _folderConfiguration;

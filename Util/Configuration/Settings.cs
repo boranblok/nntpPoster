@@ -198,58 +198,64 @@ namespace Util.Configuration
         public String RarLocation { get; set; }
 
         [DataMember(Order = 17)]
-        public String ParLocation { get; set; }
+        public String RarExtraParameters { get; set; }
 
         [DataMember(Order = 18)]
-        public String MkvPropEditLocation { get; set; }
+        public String ParLocation { get; set; }
 
         [DataMember(Order = 19)]
+        public String ParExtraParameters { get; set; }
+
+        [DataMember(Order = 20)]
+        public String MkvPropEditLocation { get; set; }
+
+        [DataMember(Order = 21)]
         public String FFmpegLocation { get; set; }
 
 
         // Settings the user probably shouldnt change.
 
 
-        [DataMember(Order = 20)]
+        [DataMember(Order = 22)]
         public Boolean RemoveAfterVerify { get; set; }
 
-        [DataMember(Order = 21)]
+        [DataMember(Order = 23)]
         public Int32 FilesystemCheckIntervalMillis { get; set; }
 
-        [DataMember(Order = 22)]
+        [DataMember(Order = 24)]
         public Int32 FilesystemCheckTesholdMinutes { get; set; }
 
-        [DataMember(Order = 23)]
+        [DataMember(Order = 25)]
         public Int32 AutoposterIntervalMillis { get; set; }
 
-        [DataMember(Order = 24)]
+        [DataMember(Order = 26)]
         public Int32 NotifierIntervalMinutes { get; set; }
 
-        [DataMember(Order = 25)]
+        [DataMember(Order = 27)]
         public Int32 VerifierIntervalMinutes { get; set; }
 
-        [DataMember(Order = 26)]
+        [DataMember(Order = 28)]
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
 
-        [DataMember(Order = 27)]
+        [DataMember(Order = 29)]
         public Int32 RepostAfterMinutes { get; set; }
 
-        [DataMember(Order = 28)]
+        [DataMember(Order = 30)]
         public Int32 MaxRetryCount { get; set; }
 
-        [DataMember(Order = 29)]
+        [DataMember(Order = 31)]
         public Int32 InactiveProcessTimeout { get; set; }
 
-        [DataMember(Order = 30)]
+        [DataMember(Order = 32)]
         public Int32 YEncLineSize { get; set; }
 
-        [DataMember(Order = 31)]
+        [DataMember(Order = 33)]
         public Int32 YEncLinesPerMessage { get; set; }
 
-        [DataMember(Order = 32)]
+        [DataMember(Order = 34)]
         public String DatabaseFile { get; set; }
 
-        [DataMember(IsRequired = true, Order = 33)]
+        [DataMember(IsRequired = true, Order = 35)]
         public List<RarNParSetting> RarNParSettings { get; set; }
 
         [OnDeserializing]

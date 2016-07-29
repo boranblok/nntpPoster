@@ -160,7 +160,8 @@ namespace nntpPoster
                 nameWithoutExtension, 
                 Settings.DetermineOptimalRarSize(rarSizeRecommendation.RarSize, 
                     configuration.YEncLineSize, configuration.YEncLinesPerMessage),
-                password);
+                password,
+                configuration.RarExtraParameters);
 
             var parWrapper = new ParWrapper(configuration.InactiveProcessTimeout, configuration.ParLocation);
             Boolean makePar = true;
@@ -170,7 +171,7 @@ namespace nntpPoster
                 try
                 {
                     parWrapper.CreateParFilesInDirectory(
-                        processedFolder, nameWithoutExtension, partSize, rarSizeRecommendation.Par2Percentage);
+                        processedFolder, nameWithoutExtension, partSize, rarSizeRecommendation.Par2Percentage, configuration.ParExtraParameters);
                     makePar = false;
                 }
                 catch (Par2BlockSizeTooSmallException)
