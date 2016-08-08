@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -40,6 +41,8 @@ namespace nntpAutoposter
 
         public void Start()
         {
+            AssemblyInfo myAssembly =
+            log.InfoFormat("Starting nntpPoster version {0}", Assembly.GetExecutingAssembly().GetName().Version);
             InitializeEnvironment();
             MyTask.Start();
         }

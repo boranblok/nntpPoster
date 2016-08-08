@@ -29,11 +29,12 @@ namespace ExternalProcessWrappers
         {
             blockSizeTooSmall = false;
 
-            String parParameters = String.Format("c -s{0} -r{1} -- \"{2}\"{3}",
+            String parParameters = String.Format("c -s{0} -r{1} {4} -- \"{2}\"{3}",
                blockSize,
                redundancyPercentage,
                Path.Combine(workingFolder.FullName, nameWithoutExtension + ".par2"),
-               GetFileList(workingFolder)
+               GetFileList(workingFolder),
+               extraParams
             );
 
             try
