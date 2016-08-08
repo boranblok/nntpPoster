@@ -1,0 +1,21 @@
+#Modify the paths in this file as required before installing the systemd service.
+
+[Unit]
+Description=NntpPoster Daemon
+After=syslog.target network.target
+
+[Service]
+User=nntp
+Group=users
+Type=forking
+UMask=0007
+ExecStart=/usr/bin/mono-service -d:/opt/nntpPoster -l:/opt/nntpPoster/nntpAutoPosterWindowsService.pid -m:nntpAutoPoster /opt/nntpPoster/nntpAutoPosterWindowsService.exe
+PIDFile=/opt/nntpPoster/nntpAutoPosterWindowsService.pid
+TimeoutStopSec=20
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+#copy or symlink to /lib/systemd/system/nntpPoster.service
