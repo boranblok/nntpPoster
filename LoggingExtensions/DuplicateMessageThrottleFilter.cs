@@ -41,12 +41,14 @@ namespace LoggingExtensions
                     Int32 lastMessagePercentageIndex = lastMessage.LastIndexOf('%');
                     if (lastMessagePercentageIndex > 0)
                     {
-                        Int32 newMessagePercentageIndex = lastMessage.LastIndexOf('%');
-                        Int32 newMessageSpaceIndex = lastMessage.LastIndexOf(' ', newMessagePercentageIndex);
-                        if (newMessagePercentageIndex > 0 && newMessageSpaceIndex > 0)
+                        Int32 newMessagePercentageIndex = newMessage.LastIndexOf('%');
+                        if (newMessagePercentageIndex > 0)
                         {
+                            Int32 newMessageSpaceIndex = newMessage.LastIndexOf(' ', newMessagePercentageIndex);
+                            if (newMessageSpaceIndex < 0)
+                                newMessageSpaceIndex = 0;
                             Decimal percentage;
-                            if (Decimal.TryParse(newMessage.Substring(newMessageSpaceIndex, lastMessagePercentageIndex - 2 - newMessageSpaceIndex), out percentage))
+                            if (Decimal.TryParse(newMessage.Substring(newMessageSpaceIndex, newMessagePercentageIndex - (newMessageSpaceIndex + 1)), out percentage))
                             {
                                 if (percentage < PercentageCutoff)
                                     decision = FilterDecision.Deny;
