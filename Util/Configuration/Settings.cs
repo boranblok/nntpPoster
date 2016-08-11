@@ -238,24 +238,27 @@ namespace Util.Configuration
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
 
         [DataMember(Order = 29)]
-        public Int32 RepostAfterMinutes { get; set; }
+        public Int32 VerifyAfterMinutes { get; set; }
 
         [DataMember(Order = 30)]
-        public Int32 MaxRetryCount { get; set; }
+        public Int32 RepostAfterMinutes { get; set; }
 
         [DataMember(Order = 31)]
-        public Int32 InactiveProcessTimeout { get; set; }
+        public Int32 MaxRetryCount { get; set; }
 
         [DataMember(Order = 32)]
-        public Int32 YEncLineSize { get; set; }
+        public Int32 InactiveProcessTimeout { get; set; }
 
         [DataMember(Order = 33)]
-        public Int32 YEncLinesPerMessage { get; set; }
+        public Int32 YEncLineSize { get; set; }
 
         [DataMember(Order = 34)]
+        public Int32 YEncLinesPerMessage { get; set; }
+
+        [DataMember(Order = 35)]
         public String DatabaseFile { get; set; }
 
-        [DataMember(IsRequired = true, Order = 35)]
+        [DataMember(IsRequired = true, Order = 36)]
         public List<RarNParSetting> RarNParSettings { get; set; }
 
         [OnDeserializing]
@@ -268,6 +271,7 @@ namespace Util.Configuration
         {
             MaxRepostCount = 3;
             PostFailedFolderString = "uploadfailed";
+            VerifyAfterMinutes = 30;
         }
     }
 }

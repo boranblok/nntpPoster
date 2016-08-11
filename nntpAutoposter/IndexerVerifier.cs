@@ -87,10 +87,10 @@ namespace nntpAutoposter
                         continue;
                     }
 
-                    if ((DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes < configuration.RepostAfterMinutes)
+                    if ((DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes < configuration.VerifyAfterMinutes)
                     {
                         log.DebugFormat("The upload [{0}] is younger than {1} minutes. Skipping check.", 
-                            upload.CleanedName, configuration.RepostAfterMinutes);
+                            upload.CleanedName, configuration.VerifyAfterMinutes);
                         continue;
                     }
 
@@ -208,14 +208,18 @@ namespace nntpAutoposter
         {
             var ageInMinutes = (DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes;
 
-            if (!(ageInMinutes > configuration.RepostAfterMinutes)) return;
-            
-            log.WarnFormat("Could not find [{0}] after {1} minutes, reposting, attempt {2}",
-                upload.Name, configuration.RepostAfterMinutes, upload.UploadAttempts);
-            upload.UploadedAt = null;
+            if (ageInMinutes > configuration.RepostAfterMinutes)
+            {
+                log.WarnFormat("Could not find [{0}] after {1} minutes, reposting, attempt {2}", upload.CleanedName, configuration.RepostAfterMinutes, upload.UploadAttempts);
+                upload.UploadedAt = null;
 
-            DBHandler.Instance.UpdateUploadEntry(upload);
-           
+                DBHandler.Instance.UpdateUploadEntry(upload);
+
+            }
+            else
+            {
+                log.InfoFormat("A repost of [{0}] is not required as {1} minutes have not passed since upload.", upload.CleanedName, configuration.RepostAfterMinutes);
+            }           
         }
     }
 }
