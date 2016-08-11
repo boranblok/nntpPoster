@@ -10,28 +10,54 @@ namespace LoggingExtensions
 {
     class DuplicateMessageThrottleFilter : FilterSkeleton
     {
-        private String lastMessage;
+        public Boolean FilterPercentages { get; set; }
+        public Int32 PercentageCutoff { get; set; }
 
-        public override void ActivateOptions()
-        {
-            base.ActivateOptions();
-        }
+        private String lastMessage;
 
         public override FilterDecision Decide(LoggingEvent loggingEvent)
         {
+            if (PercentageCutoff <= 0 || PercentageCutoff > 100)
+                PercentageCutoff = 85;
+
+            FilterDecision decision = FilterDecision.Accept;
+
             String newMessage = null;
             if (loggingEvent.MessageObject != null)
             {
                 newMessage = loggingEvent.MessageObject.ToString();
             }
 
-            if (newMessage == lastMessage)
+            if (!String.IsNullOrWhiteSpace(lastMessage) && !String.IsNullOrWhiteSpace(newMessage))
             {
-                return FilterDecision.Deny;
+
+                if (newMessage == lastMessage)
+                {
+                    decision = FilterDecision.Deny;
+                }
+
+                if (FilterPercentages)
+                {
+                    Int32 lastMessagePercentageIndex = lastMessage.LastIndexOf('%');
+                    if (lastMessagePercentageIndex > 0)
+                    {
+                        Int32 newMessagePercentageIndex = lastMessage.LastIndexOf('%');
+                        Int32 newMessageSpaceIndex = lastMessage.LastIndexOf(' ', newMessagePercentageIndex);
+                        if (newMessagePercentageIndex > 0 && newMessageSpaceIndex > 0)
+                        {
+                            Decimal percentage;
+                            if (Decimal.TryParse(newMessage.Substring(newMessageSpaceIndex, lastMessagePercentageIndex - 2 - newMessageSpaceIndex), out percentage))
+                            {
+                                if (percentage < PercentageCutoff)
+                                    decision = FilterDecision.Deny;
+                            }
+                        }
+                    }
+                }
             }
 
             lastMessage = newMessage;
-            return FilterDecision.Accept;
+            return decision;
         }
     }
 }
