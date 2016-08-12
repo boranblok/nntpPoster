@@ -106,6 +106,7 @@
     <None Include="..\nntpAutoposter\settings.config">
       <Link>settings.config</Link>
       <TransformOnBuild>true</TransformOnBuild>
+      <SubType>Designer</SubType>
     </None>
     <None Include="..\nntpAutoposter\settings.Debug.config">
       <Link>settings.Debug.config</Link>
@@ -131,7 +132,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
-    <None Include="systemd.service" />
+    <None Include="systemd.service">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="UninstallService.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

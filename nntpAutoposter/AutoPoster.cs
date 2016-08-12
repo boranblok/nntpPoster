@@ -125,7 +125,7 @@ namespace nntpAutoposter
                         nextUpload.UploadAttempts);
                     nextUpload.Cancelled = true;
                     DirectoryInfo failedPostFolder = new DirectoryInfo(
-                        Path.Combine(configuration.PostFailedFolderString, folderConfiguration.ShortName));
+                        Path.Combine(configuration.PostFailedFolder.FullName, folderConfiguration.ShortName));
                     toUpload.Move(failedPostFolder);
                     DBHandler.Instance.UpdateUploadEntry(nextUpload);
                     return;

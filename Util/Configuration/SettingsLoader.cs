@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Util.Configuration
         public static Settings LoadSettings()
         {
             var settings = GetSettingsFromIniFiles();
-            settings.ValidateSettings();
+            ValidateSettings(settings);
             return settings;
         }
 
@@ -24,7 +25,7 @@ namespace Util.Configuration
             if (settings.WatchFolderSettings.GroupBy(s => s.ShortName).Any(g => g.Count() > 1))
                 throw new Exception("The watchfolder short name has to be unique.");
 
-            if (settings.WatchFolderSettings.GroupBy(s => s.PathString).Any(g => g.Count() > 1))
+            if (settings.WatchFolderSettings.GroupBy(s => s.Path.FullName).Any(g => g.Count() > 1))
                 throw new Exception("The watchfolder path has to be unique.");
 
             if (settings.IndexerRenameMapSource != null && settings.IndexerRenameMapTarget != null)
@@ -45,7 +46,7 @@ namespace Util.Configuration
                     throw new Exception("IndexerRenameMapSource and IndexerRenameMap target need to be of same length.");
             }
 
-            if (settings.WatchFolderSettings.Any(s => s.ApplyRandomPassword) && String.IsNullOrWhiteSpace(NzbOutputFolderString))
+            if (settings.WatchFolderSettings.Any(s => s.ApplyRandomPassword) && settings.NzbOutputFolder == null)
             {
                 log.Warn("ApplyRandomPassword is set to true for a watchfolder but NZB output folder is not set.");
                 log.Warn("You will have to check the SQLite3 database to know what password was used for a release.");
@@ -67,7 +68,7 @@ namespace Util.Configuration
             return folder;
         }
 
-        private static object GetSettingsFromIniFiles()
+        private static Settings GetSettingsFromIniFiles()
         {
             throw new NotImplementedException();
         }
