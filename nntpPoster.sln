@@ -43,8 +43,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Releases", "Releases", "{41
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nntpAutoPosterWindowsService", "nntpAutoPosterWindowsService\nntpAutoPosterWindowsService.csproj", "{523CACA4-A579-45D1-84F9-A3A9695D21BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateDefaultConfig", "GenerateDefaultConfig\GenerateDefaultConfig.csproj", "{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLoggingExtensions", "TestLoggingExtensions\TestLoggingExtensions.csproj", "{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggingExtensions", "LoggingExtensions\LoggingExtensions.csproj", "{B1310D73-74CE-419C-BF35-3E0CFE80A91B}"
@@ -134,14 +132,6 @@ Global
 		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Package|Any CPU.Build.0 = Package|Any CPU
 		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{523CACA4-A579-45D1-84F9-A3A9695D21BD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Mono|Any CPU.ActiveCfg = Release|Any CPU
-		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Mono|Any CPU.Build.0 = Release|Any CPU
-		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Package|Any CPU.ActiveCfg = Release|Any CPU
-		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Package|Any CPU.Build.0 = Release|Any CPU
-		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2A4A6941-0AAC-4FB0-8B8D-E3F482D5972D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BEB5E52-2174-44CE-85DD-E6B6ED2D93D7}.Mono|Any CPU.ActiveCfg = Release|Any CPU
