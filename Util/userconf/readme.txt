@@ -1,9 +1,8 @@
 ﻿#
-#   !!! DO NOT MODIFY THIS FILE !!!
+# Place setting files in this folder and they will be loaded in alphabetical order.
+# A later file will overrule any previous settings it contains.
 #
-# It will be overwritten every version update. Place confing files in the userconf folder instead.
-#
-
+# copy this file and change extension to .ini to have a basic config file to start with.
 
 
 [NewsHost]
@@ -17,8 +16,8 @@ Port=443
 Username=username
 Password=password
 
-# Use ssl or not. Take into account that forcing ssl on non SSL connections wont work, and vice versa
-NewsGroupUseSsl=true
+# Use SSL or not. Take into account that forcing SLL on non SSL connections wont work, and vice versa
+UseSsl=true
 
 # How many connections to open simultaneously. Your newshost. More is not always better. 
 # Experiment with this to find the lowest value that saturates your connection for best performance.
@@ -42,18 +41,6 @@ ObfuscatedNotificationUrl=https://api.apiserver.com/api?hash={0}&name={1}&apikey
 #   optionally ${ApiKey} will be replaced by the value entered above
 SearchUrl=https://api.apiserver.com/api?t=search&q={0}&maxage={1}&apikey=${ApiKey}
 
-# The indexer rename maps defines rules how the indexer itself renames uploaded items. Use this if verification fails because of too much difference between what was uploaded and what was found.-->
-# This map works as follows. Each character in Source is replaced by the corresponding character in target. If the character in target is identical it is removed entirely -->
-# because whitespace is often used here place the value between quotes
-IndexerRenameMapSource="_@"
-IndexerRenameMapTarget=" @"
-
-# Some indexers still rename some things.
-# This parameters determines how similar the uploaded name has to be using the Levenshtein distance.
-# The default value of 95 is a good compromise in most cases.
-VerifySimilarityPercentageTreshold=95
-
-
 [Folders]
 # Folder used to prepare the files for posting. Any data in this folder is removed at startup!
 Working=working
@@ -71,10 +58,6 @@ PostFailed=uploadfailed
 [Posting]
 # The maximum number of attempts a file will be reposted if it has an error. After this it goes to the postFailed folder
 MaxRepostCount=3
-
-# When a release has been found on the indexer, remove it from the backup location or not.
-# It is best to leave this on unless you have a manual cleaning process.
-RemoveAfterVerify=true
 
 # How many times to retry posting a message. Take into account this is a usenet message, not a file.
 MaxRetryCount=3
@@ -107,43 +90,3 @@ MkvPropEditLocation=
 
 # Where to find ffmpeg on the system, leave empty if ffmpeg is accesible trough the path
 FFmpegLocation=
-
-
-[Subjob timings]
-# How often to check for new files in the watch folder.
-FilesystemCheckIntervalSeconds=5
-
-# Minimum age in minutes that files/folders need to have before they get picked up.
-FilesystemCheckTesholdMinutes=5
-
-# How often to trigger the posting thread.
-AutoposterIntervalSeconds=5
-
-# How often to notify the index of new obfuscated content.
-NotifierIntervalMinutes=5
-
-# How often to verify content has been indexed.
-VerifierIntervalMinutes=15
-
-# After how many minutes should we verify the upload. 
-# Set this to the typical index time of the indexer to limit search API spam. 
-# But low enough to speed backup cleaning
-VerifyAfterMinutes=20
-
-# After how many minutes should we trigger a reupload.
-# Make this higher if you are seeing duplicate uploads.
-RepostAfterMinutes=240
-
-
-[Application]
-# The database file path, leave blank to use the default location
-DatabaseFile=
-
-
-[Nntp]
-# How long the yEnc lines should be. ONLY CHANGE IF YOU KNOW WHAT YOU'RE DOING!
-YEncLineSize=128
-
-# How many yEnc lines to put in a post. ONLY CHANGE IF YOU KNOW WHAT YOU'RE DOING!
-YEncLinesPerMessage=6000
-

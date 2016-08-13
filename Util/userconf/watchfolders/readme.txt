@@ -1,8 +1,10 @@
 ﻿#
-#   !!! DO NOT MODIFY THIS FILE !!!
-#
-# It will be overwritten every version update. Place confing files in the userconf/watchfolders folder instead.
-#
+# Place watchfolder files in this folder. Each file will define a new watch folder.
+# Settings from the default watchfolder will be taken as base.
+# If a file named default is placed in this folder it will overrule the default watch folder.
+
+# copy this file and change extension to .ini to have a basic config file to start with.
+
 
 [Watchfolder]
 # The short identifying name for this watch folder. 
