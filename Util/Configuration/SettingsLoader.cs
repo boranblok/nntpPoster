@@ -1,4 +1,6 @@
 ﻿using log4net;
+using Nini.Config;
+using Nini.Ini;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,6 +71,28 @@ namespace Util.Configuration
         }
 
         private static Settings GetSettingsFromIniFiles()
+        {
+            FileInfo defaultConfigFile = new FileInfo("conf/default.ini");
+            if(!defaultConfigFile.Exists)
+            {
+                log.Fatal("The default config file at conf/default.ini does not exist");
+                throw new Exception("The default config file at conf/default.ini does not exist");
+            }
+
+            IConfigSource baseConfig = new IniConfigSource(new IniDocument("conf/default.ini", IniFileType.MysqlStyle));
+
+            List<String> userConfigFiles = new List<String>(Directory.GetFiles("userconf", "*.ini"));
+            userConfigFiles.Sort();
+            userConfigFiles.ForEach(f => baseConfig.Merge(new IniConfigSource(new IniDocument(f, IniFileType.MysqlStyle))));
+
+            Settings settings = GetSettingsFromMergedIni(baseConfig);
+
+            //TODO: FolderConfigs.
+
+            return settings;
+        }
+
+        private static Settings GetSettingsFromMergedIni(IConfigSource baseConfig)
         {
             throw new NotImplementedException();
         }
