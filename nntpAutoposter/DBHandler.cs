@@ -47,7 +47,7 @@ namespace nntpAutoposter
         private void DetermineConnectionString()
         {
             String dbFilePath;
-            if (String.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["DatabaseFile"]))
+            if (String.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["DatabaseFile"])) //TODO: This does not use the settings yet!
             {
                 String codeBase = Assembly.GetExecutingAssembly().CodeBase;
                 UriBuilder uri = new UriBuilder(codeBase);

@@ -17,7 +17,7 @@ Username=username
 Password=password
 
 # Use SSL or not. Take into account that forcing SLL on non SSL connections wont work, and vice versa
-UseSsl=true
+UseSSL=yes
 
 # How many connections to open simultaneously. Your newshost. More is not always better. 
 # Experiment with this to find the lowest value that saturates your connection for best performance.
