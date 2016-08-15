@@ -12,6 +12,7 @@ namespace Util.Configuration
 {
     class SettingsLoader
     {
+        private const string WatchfolderSection = "Watchfolder";
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -29,6 +30,7 @@ namespace Util.Configuration
 
             if (settings.WatchFolderSettings.GroupBy(s => s.Path.FullName).Any(g => g.Count() > 1))
                 throw new Exception("The watchfolder path has to be unique.");
+            //TODO : Validate a watchfolder is not inside another watchfolder.
 
             if (settings.IndexerRenameMapSource != null && settings.IndexerRenameMapTarget != null)
             {
@@ -88,19 +90,9 @@ namespace Util.Configuration
 
             Settings settings = GetSettingsFromMergedIni(baseConfig);
 
-            //TODO: FolderConfigs.
+            LoadFolderConfigs(settings);
 
             return settings;
-        }
-
-        private static void AddConfigAliasses(IConfigSource config)
-        {
-            config.Alias.AddAlias("true", true);
-            config.Alias.AddAlias("false", false);
-            config.Alias.AddAlias("yes", true);
-            config.Alias.AddAlias("no", false);
-            config.Alias.AddAlias("1", true);
-            config.Alias.AddAlias("0", false);
         }
 
         private static Settings GetSettingsFromMergedIni(IConfigSource baseConfig)
@@ -186,6 +178,85 @@ namespace Util.Configuration
                 throw;
             }
             return rarNParSettings;
+        }
+
+        private static void LoadFolderConfigs(Settings settings)
+        {
+            Dictionary<String, IConfigSource> watchfolderConfigurations = new Dictionary<String, IConfigSource>();
+            LoadIniFiles(watchfolderConfigurations);
+
+            foreach(String watchfolderConfig in watchfolderConfigurations.Keys)
+            {
+                settings.WatchFolderSettings.Add(LoadWatchFolderSettingsFromIniFile(watchfolderConfigurations[watchfolderConfig]));
+            }
+        }
+
+        private static void LoadIniFiles(Dictionary<string, IConfigSource> watchfolderConfigurations)
+        {
+            IConfigSource baseConfig = new IniConfigSource(new IniDocument("conf/watchfolders/default.ini", IniFileType.MysqlStyle));
+            AddConfigAliasses(baseConfig);
+            try
+            {
+                watchfolderConfigurations.Add(GetSettingString(baseConfig, WatchfolderSection, "ShortName"), baseConfig);
+            }
+            catch (Exception ex)
+            {
+                log.Fatal(String.Format("Could not load base watchfolder ini file. {0}", "conf/watchfolders/default.ini"), ex);
+                throw;
+            }
+
+            List<String> userConfigFiles = new List<String>(Directory.GetFiles("userconf/watchfolders", "*.ini"));
+            userConfigFiles.Sort();
+            foreach (String filename in userConfigFiles)
+            {
+                try
+                {
+                    IConfigSource userConfig = new IniConfigSource(new IniDocument(filename, IniFileType.MysqlStyle));
+                    AddConfigAliasses(userConfig);
+                    String shortName = GetSettingString(userConfig, WatchfolderSection, "ShortName");
+                    if (!watchfolderConfigurations.ContainsKey(shortName))
+                    {
+                        IConfigSource defaultConfig = new IniConfigSource(new IniDocument("conf/watchfolders/default.ini", IniFileType.MysqlStyle));
+                        AddConfigAliasses(defaultConfig);
+                        watchfolderConfigurations.Add(shortName, defaultConfig);
+                    }
+                    watchfolderConfigurations[shortName].Merge(userConfig);
+                }
+                catch (Exception ex)
+                {
+                    log.Fatal(String.Format("Could not load user watchfolder ini file. {0}", filename), ex);
+                    throw;
+                }
+            }
+        }
+
+        private static WatchFolderSettings LoadWatchFolderSettingsFromIniFile(IConfigSource config)
+        {
+            WatchFolderSettings settings = new WatchFolderSettings();
+            settings.ShortName = GetSettingString(config, WatchfolderSection, "ShortName");
+            settings.Path = GetSettingDirectoryInfo(config, WatchfolderSection, "Path");
+            settings.UseObfuscation = GetSettingBoolean(config, WatchfolderSection, "UseObfuscation");
+            settings.CleanName = GetSettingBoolean(config, WatchfolderSection, "CleanName");
+            settings.PreTag = GetSettingString(config, WatchfolderSection, "PreTag", true);
+            settings.PostTag = GetSettingString(config, WatchfolderSection, "PostTag", true);
+            settings.TargetNewsgroups = new List<String>(GetSettingString(config, WatchfolderSection, "TargetNewsgroups").Split('|'));
+            settings.StripFileMetadata = GetSettingBoolean(config, WatchfolderSection, "StripFileMetadata");
+            settings.FromAddress = GetSettingString(config, WatchfolderSection, "FromAddress");
+            settings.ApplyRandomPassword = GetSettingBoolean(config, WatchfolderSection, "ApplyRandomPassword");
+            settings.RarPassword = GetSettingString(config, WatchfolderSection, "RarPassword", true);
+            settings.Priority = GetSettingInt(config, WatchfolderSection, "Priority");
+
+            return settings;
+        }
+        
+        private static void AddConfigAliasses(IConfigSource config)
+        {
+            config.Alias.AddAlias("true", true);
+            config.Alias.AddAlias("false", false);
+            config.Alias.AddAlias("yes", true);
+            config.Alias.AddAlias("no", false);
+            config.Alias.AddAlias("1", true);
+            config.Alias.AddAlias("0", false);
         }
 
         private static DirectoryInfo GetSettingDirectoryInfo(IConfigSource config, String section, String key, Boolean allowEmpty = false)
