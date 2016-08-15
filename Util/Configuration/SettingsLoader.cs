@@ -135,16 +135,13 @@ namespace Util.Configuration
             settings.FFmpegLocation = GetSettingString(baseConfig, ExternalProgramsSection, "FFmpegLocation", true, "ffmpeg");
 
             const string SubjobTimingSection = "Subjob Timings";
-            settings.FilesystemCheckIntervalMillis = GetSettingInt(baseConfig, SubjobTimingSection, "FilesystemCheckIntervalSeconds") * 1000; //TODO change to seconds in code as well.
+            settings.FilesystemCheckIntervalSeconds = GetSettingInt(baseConfig, SubjobTimingSection, "FilesystemCheckIntervalSeconds");
             settings.FilesystemCheckTesholdMinutes = GetSettingInt(baseConfig, SubjobTimingSection, "FilesystemCheckTesholdMinutes");
-            settings.AutoposterIntervalMillis = GetSettingInt(baseConfig, SubjobTimingSection, "AutoposterIntervalSeconds") * 1000; //TODO change to seconds in code as well.
+            settings.AutoposterIntervalSeconds = GetSettingInt(baseConfig, SubjobTimingSection, "AutoposterIntervalSeconds");
             settings.NotifierIntervalMinutes = GetSettingInt(baseConfig, SubjobTimingSection, "NotifierIntervalMinutes");
             settings.VerifierIntervalMinutes = GetSettingInt(baseConfig, SubjobTimingSection, "VerifierIntervalMinutes");
             settings.VerifyAfterMinutes = GetSettingInt(baseConfig, SubjobTimingSection, "VerifyAfterMinutes");
             settings.RepostAfterMinutes = GetSettingInt(baseConfig, SubjobTimingSection, "RepostAfterMinutes");
-
-            const string ApplicationSection = "Application";
-            settings.DatabaseFile = GetSettingString(baseConfig, ApplicationSection, "DatabaseFile", true);
 
             const string NntpSection = "Nntp";
             settings.MaxRetryCount = GetSettingInt(baseConfig, NntpSection, "MaxRetryCount");
@@ -280,7 +277,7 @@ namespace Util.Configuration
 
         private static String GetSettingString(IConfigSource config, String section, String key, Boolean allowEmpty = false, String defaultValue = "")
         {
-            if(!config.Configs.Contains(section))
+            if(config.Configs[section] == null)
             {
                 log.FatalFormat("Config is missing [{0}] section.", section);
                 throw new Exception(String.Format("Config is missing [{0}] section.", section));
@@ -314,7 +311,7 @@ namespace Util.Configuration
 
         private static Int32 GetSettingInt(IConfigSource config, String section, String key)
         {
-            if (!config.Configs.Contains(section))
+            if (config.Configs[section] == null)
             {
                 log.WarnFormat("Config is missing [{0}] section.", section);
                 throw new Exception(String.Format("Config is missing [{0}] section.", section));
@@ -342,7 +339,7 @@ namespace Util.Configuration
 
         private static Boolean GetSettingBoolean(IConfigSource config, String section, String key)
         {
-            if (!config.Configs.Contains(section))
+            if (config.Configs[section] == null)
             {
                 log.WarnFormat("Config is missing [{0}] section.", section);
                 throw new Exception(String.Format("Config is missing [{0}] section.", section));

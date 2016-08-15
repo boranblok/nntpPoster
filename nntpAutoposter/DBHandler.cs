@@ -46,20 +46,12 @@ namespace nntpAutoposter
 
         private void DetermineConnectionString()
         {
-            String dbFilePath;
-            if (String.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["DatabaseFile"])) //TODO: This does not use the settings yet!
-            {
-                String codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                UriBuilder uri = new UriBuilder(codeBase);
-                String path = Uri.UnescapeDataString(uri.Path);
-                String assemblyDirectory = Path.GetDirectoryName(path);
+            String codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            UriBuilder uri = new UriBuilder(codeBase);
+            String path = Uri.UnescapeDataString(uri.Path);
+            String assemblyDirectory = Path.GetDirectoryName(path);
 
-                dbFilePath = Path.Combine(assemblyDirectory, "nntpAutoPoster.Sqlite3.db");
-            }
-            else
-            {
-                dbFilePath = ConfigurationManager.AppSettings["DatabaseFile"];
-            }
+            String dbFilePath = Path.Combine(assemblyDirectory, "nntpAutoPoster.Sqlite3.db");
             _connectionString = String.Format("URI=file:{0},version=3", dbFilePath);
         }
 
@@ -251,7 +243,8 @@ namespace nntpAutoposter
                         cmd.Transaction = trans;
                         cmd.CommandText = @"UPDATE UploadEntries SET Cancelled = 1 WHERE Name = @name";
                         cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
-                        cmd.ExecuteNonQuery(); //TODO: log here how many other entries were cancelled.
+                        Int32 cancelledEntries = cmd.ExecuteNonQuery();
+                        log.InfoFormat("{0} upload entries were cancelled by a re-add of an existing upload.", cancelledEntries);
 
                         cmd.CommandText = @"INSERT INTO UploadEntries(
                                                             Name, 
