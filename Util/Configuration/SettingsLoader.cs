@@ -30,7 +30,23 @@ namespace Util.Configuration
 
             if (settings.WatchFolderSettings.GroupBy(s => s.Path.FullName).Any(g => g.Count() > 1))
                 throw new Exception("The watchfolder path has to be unique.");
-            //TODO : Validate a watchfolder is not inside another watchfolder.
+
+            for(int i = 0; i < settings.WatchFolderSettings.Count; i++)
+            {
+                for(int j = 0; j < settings.WatchFolderSettings.Count; j++)
+                {
+                    if (i == j)
+                        continue;
+
+                    var folder1 = settings.WatchFolderSettings[i].Path.FullName;
+                    var folder2 = settings.WatchFolderSettings[j].Path.FullName;
+
+                    if(folder1.IsSubPathOf(folder2))
+                        throw new Exception(String.Format("Watchfolder {0} is a subfolder of {1} this would cause loops.", folder1, folder2));
+                    if (folder2.IsSubPathOf(folder1))
+                        throw new Exception(String.Format("Watchfolder {0} is a subfolder of {1} this would cause loops.", folder2, folder1));
+                }
+            }
 
             if (settings.IndexerRenameMapSource != null && settings.IndexerRenameMapTarget != null)
             {
