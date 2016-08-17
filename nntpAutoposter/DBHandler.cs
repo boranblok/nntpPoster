@@ -244,7 +244,8 @@ namespace nntpAutoposter
                         cmd.CommandText = @"UPDATE UploadEntries SET Cancelled = 1 WHERE Name = @name";
                         cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                         Int32 cancelledEntries = cmd.ExecuteNonQuery();
-                        log.InfoFormat("{0} upload entries were cancelled by a re-add of an existing upload.", cancelledEntries);
+                        if(cancelledEntries > 0)
+                            log.InfoFormat("{0} upload entries were cancelled by a re-add of an existing upload.", cancelledEntries);
 
                         cmd.CommandText = @"INSERT INTO UploadEntries(
                                                             Name, 
