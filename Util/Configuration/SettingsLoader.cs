@@ -20,7 +20,40 @@ namespace Util.Configuration
         {
             var settings = GetSettingsFromIniFiles();
             ValidateSettings(settings);
+            CreateFolders(settings);
             return settings;
+        }
+
+        private static void CreateFolders(Settings settings)
+        {
+            if (!settings.BackupFolder.Exists)
+            {
+                settings.BackupFolder.Create();
+                settings.BackupFolder.Refresh();
+            }
+            if(settings.NzbOutputFolder != null && !settings.NzbOutputFolder.Exists)
+            {
+                settings.NzbOutputFolder.Create();
+                settings.NzbOutputFolder.Refresh();
+            }
+            if(!settings.PostFailedFolder.Exists)
+            {
+                settings.PostFailedFolder.Create();
+                settings.PostFailedFolder.Refresh();
+            }
+            if(!settings.WorkingFolder.Exists)
+            {
+                settings.WorkingFolder.Create();
+                settings.WorkingFolder.Refresh();
+            }
+            foreach(var watchfolder in settings.WatchFolderSettings)
+            {
+                if (!watchfolder.Path.Exists)
+                {
+                    watchfolder.Path.Create();
+                    watchfolder.Path.Refresh();
+                }
+            }
         }
 
         private static void ValidateSettings(Settings settings)
