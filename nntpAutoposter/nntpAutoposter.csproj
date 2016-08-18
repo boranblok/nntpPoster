@@ -127,24 +127,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
-    <None Include="settings.Debug.config">
-      <DependentUpon>settings.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="settings.Mono.config">
-      <DependentUpon>settings.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="settings.Package.config">
-      <DependentUpon>settings.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-    </None>
-    <None Include="settings.Release.config">
-      <DependentUpon>settings.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-    </None>
     <None Include="start.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -170,9 +152,6 @@
   <ItemGroup>
     <None Include="log4netConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="settings.config">
-      <TransformOnBuild>true</TransformOnBuild>
     </None>
     <Content Include="dbScripts\3.1.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

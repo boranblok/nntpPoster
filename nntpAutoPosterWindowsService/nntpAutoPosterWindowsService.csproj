@@ -103,31 +103,6 @@
       <Link>App.Release.config</Link>
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <None Include="..\nntpAutoposter\settings.config">
-      <Link>settings.config</Link>
-      <TransformOnBuild>true</TransformOnBuild>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="..\nntpAutoposter\settings.Debug.config">
-      <Link>settings.Debug.config</Link>
-      <DependentUpon>settings.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-    </None>
-    <None Include="..\nntpAutoposter\settings.Mono.config">
-      <Link>settings.Mono.config</Link>
-      <DependentUpon>settings.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-    </None>
-    <None Include="..\nntpAutoposter\settings.Package.config">
-      <Link>settings.Package.config</Link>
-      <DependentUpon>settings.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-    </None>
-    <None Include="..\nntpAutoposter\settings.Release.config">
-      <Link>settings.Release.config</Link>
-      <DependentUpon>settings.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-    </None>
     <None Include="init.d.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
