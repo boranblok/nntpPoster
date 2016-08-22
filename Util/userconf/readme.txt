@@ -81,9 +81,3 @@ ParLocation=
 
 # Extra parameters to add to the end of the par command, careful with this as it can break stuff.
 ParExtraParameters=
-
-# Where to find mkvpropedit on the system, leave empty if mkvpropedit is accesible trough the path
-MkvPropEditLocation=
-
-# Where to find ffmpeg on the system, leave empty if ffmpeg is accesible trough the path
-FFmpegLocation=

@@ -35,10 +35,6 @@ PostTag=
 # Like a.b.multimedia|a.b.test|a.b.videos
 TargetNewsgroups=alt.binaries.multimedia
 
-# Wether to modify the video file to strip metadata.
-# If this is enabled MkvPropEditLocation and FFmpegLocation settings have to be filled in.
-StripFileMetadata=no
-
 # The newsgroup address that is added in the from header.
 # This has no functional impact, but might be handy for debugging purposes.
 FromAddress=bob@bobbers.bob
