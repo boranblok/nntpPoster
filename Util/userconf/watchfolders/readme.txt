@@ -18,11 +18,11 @@ Path=watch
 # Wether or not to obfuscate the filename.
 # If set to true the uploaded filename will be a GUID instead of the original filename.
 # When set the ObfuscatedNotificationUrl parameter has to be filled in.
-UseObfuscation=false
+UseObfuscation=no
 
 # wether to clean the name when uploading, this ensures a better name for usenet. 
 # But might interfere with anime names.
-CleanName=true
+CleanName=yes
 
 # A prefix to add to every release name, leave blank to omit
 PreTag=
@@ -35,16 +35,12 @@ PostTag=
 # Like a.b.multimedia|a.b.test|a.b.videos
 TargetNewsgroups=alt.binaries.multimedia
 
-# Wether to modify the video file to strip metadata.
-# If this is enabled MkvPropEditLocation and FFmpegLocation settings have to be filled in.
-StripFileMetadata=false
-
 # The newsgroup address that is added in the from header.
 # This has no functional impact, but might be handy for debugging purposes.
 FromAddress=bob@bobbers.bob
 
 # Wether to apply a random password to the uploaded archive
-ApplyRandomPassword=false
+ApplyRandomPassword=no
 
 # Apply this fixed rar password to the uploaded archive
 # If ApplyRandomPassword is set to true this takes precedence and this setting is ignored.

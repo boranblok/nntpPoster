@@ -83,9 +83,9 @@ namespace Util.Configuration
         // Settings the user probably shouldnt change.
 
         public Boolean RemoveAfterVerify { get; set; }
-        public Int32 FilesystemCheckIntervalMillis { get; set; }
+        public Int32 FilesystemCheckIntervalSeconds { get; set; }
         public Int32 FilesystemCheckTesholdMinutes { get; set; }
-        public Int32 AutoposterIntervalMillis { get; set; }
+        public Int32 AutoposterIntervalSeconds { get; set; }
         public Int32 NotifierIntervalMinutes { get; set; }
         public Int32 VerifierIntervalMinutes { get; set; }
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
@@ -95,7 +95,6 @@ namespace Util.Configuration
         public Int32 InactiveProcessTimeout { get; set; }
         public Int32 YEncLineSize { get; set; }
         public Int32 YEncLinesPerMessage { get; set; }
-        public String DatabaseFile { get; set; }
         public List<RarNParSetting> RarNParSettings { get; set; }
     }
 }

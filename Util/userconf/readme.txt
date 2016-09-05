@@ -17,7 +17,7 @@ Username=username
 Password=password
 
 # Use SSL or not. Take into account that forcing SLL on non SSL connections wont work, and vice versa
-UseSsl=true
+UseSSL=yes
 
 # How many connections to open simultaneously. Your newshost. More is not always better. 
 # Experiment with this to find the lowest value that saturates your connection for best performance.
@@ -59,9 +59,6 @@ PostFailed=uploadfailed
 # The maximum number of attempts a file will be reposted if it has an error. After this it goes to the postFailed folder
 MaxRepostCount=3
 
-# How many times to retry posting a message. Take into account this is a usenet message, not a file.
-MaxRetryCount=3
-
 # This list contains the rar and par2 settings depending on filesize add more entries for finer control
 # Each entry contains the following 3 fields: "From size in megabytes,Rar size in megabyte,Par percentage" Separate each series by a |
 # so "0,15,10" would mean: for files from 0 megabyes use a 15 megabyte par size and 10 percent par2.
@@ -84,9 +81,3 @@ ParLocation=
 
 # Extra parameters to add to the end of the par command, careful with this as it can break stuff.
 ParExtraParameters=
-
-# Where to find mkvpropedit on the system, leave empty if mkvpropedit is accesible trough the path
-MkvPropEditLocation=
-
-# Where to find ffmpeg on the system, leave empty if ffmpeg is accesible trough the path
-FFmpegLocation=
