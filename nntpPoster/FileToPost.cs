@@ -60,7 +60,7 @@ namespace nntpPoster
             PostedFileInfo postedFileInfo = new PostedFileInfo();
             String subjectNameBase = ConstructSubjectNameBase(prefix, suffix);
             postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
-            postedFileInfo.PostedGroups.AddRange(folderConfiguration.TargetNewsgroups);
+            postedFileInfo.PostedGroups.AddRange(folderConfiguration.GetTargetNewsGroups());
             postedFileInfo.PostedDateTime = DateTime.Now;
 
             var yEncoder = new YEncEncoder();

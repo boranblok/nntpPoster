@@ -104,6 +104,14 @@ namespace Util.Configuration
                 log.Warn("ApplyRandomPassword is set to true for a watchfolder but NZB output folder is not set.");
                 log.Warn("You will have to check the SQLite3 database to know what password was used for a release.");
             }
+
+            foreach(WatchFolderSettings watchfolderSetting in settings.WatchFolderSettings)
+            {
+                if(watchfolderSetting.SpreadFilesOverTargetNewsgroups && watchfolderSetting.TargetNewsgroups.Count < 2)
+                {
+                    log.WarnFormat("Spreading files over newsgroups is enabled but only one newsgroup has been entered for watch folder configuration {0}", watchfolderSetting.ShortName);
+                }
+            }
         }
 
         internal static DirectoryInfo GetOrCreateFolder(String folderString)
@@ -286,6 +294,7 @@ namespace Util.Configuration
             settings.PreTag = GetSettingString(config, WatchfolderSection, "PreTag", true);
             settings.PostTag = GetSettingString(config, WatchfolderSection, "PostTag", true);
             settings.TargetNewsgroups = new List<String>(GetSettingString(config, WatchfolderSection, "TargetNewsgroups").Split('|'));
+            settings.SpreadFilesOverTargetNewsgroups = GetSettingBoolean(config, WatchfolderSection, "SpreadFilesOverTargetNewsgroups");
             settings.StripFileMetadata = GetSettingBoolean(config, WatchfolderSection, "StripFileMetadata");
             settings.FromAddress = GetSettingString(config, WatchfolderSection, "FromAddress");
             settings.ApplyRandomPassword = GetSettingBoolean(config, WatchfolderSection, "ApplyRandomPassword");
