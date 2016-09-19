@@ -21,7 +21,7 @@ namespace nntpAutoPosterWindowsService
 
         Watcher watcher;
         AutoPoster poster;
-        IndexerNotifier notifier;
+        IndexerNotifierNewznabHash notifier;
         IndexerVerifier verifier;
 
         public Service()
@@ -46,7 +46,7 @@ namespace nntpAutoPosterWindowsService
                 poster.Start();
                 log.Info("Autoposter started");
 
-                notifier = new IndexerNotifier(configuration);
+                notifier = new IndexerNotifierNewznabHash(configuration);
                 notifier.Start();
                 log.Info("Notifier started");
 

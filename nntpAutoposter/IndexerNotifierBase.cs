@@ -14,19 +14,20 @@ using Util.Configuration;
 
 namespace nntpAutoposter
 {
-    public class IndexerNotifier
+    public abstract class IndexerNotifierBase
     {
-        private static readonly ILog log = LogManager.GetLogger(
+        protected static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private Object monitor = new Object();
-        private Settings configuration;
+        private Object monitor = new Object();        
         private Task MyTask;
         private Boolean StopRequested;
 
-        public IndexerNotifier(Settings configuration)
+        protected Settings Configuration { get; set; }
+
+        public IndexerNotifierBase(Settings configuration)
         {
-            this.configuration = configuration;
+            Configuration = configuration;
             StopRequested = false;
             MyTask = new Task(IndexerNotifierTask, TaskCreationOptions.LongRunning);
         }
@@ -59,7 +60,7 @@ namespace nntpAutoposter
                         {
                             break;
                         }
-                        Monitor.Wait(monitor, configuration.NotifierIntervalMinutes * 60 * 1000);
+                        Monitor.Wait(monitor, Configuration.NotifierIntervalMinutes * 60 * 1000);
                     }
                 }
             }
@@ -88,36 +89,6 @@ namespace nntpAutoposter
             }
         }
 
-        private void NotifyIndexerOfObfuscatedUpload(UploadEntry upload)
-        {
-            String notificationGetUrl = String.Format(
-                configuration.ObfuscatedNotificationUrl, 
-                Uri.EscapeDataString(upload.ObscuredName), 
-                Uri.EscapeDataString(upload.CleanedName));
-
-            ServicePointManager.ServerCertificateValidationCallback = ServerCertificateValidationCallback;
-
-            HttpWebRequest request = WebRequest.Create(notificationGetUrl) as HttpWebRequest;       //Mono does not support CreateHttp
-            //request.ServerCertificateValidationCallback = ServerCertificateValidationCallback;    //Not implemented in mono
-            request.Method = "GET";
-            request.Timeout = 60 * 1000;
-            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-
-            if (response.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Error when notifying indexer: "
-                    + response.StatusCode + " " + response.StatusDescription);
-
-            using(var reader = new StreamReader(response.GetResponseStream()))
-            {
-                var responseBody = reader.ReadToEnd();
-                if(responseBody.IndexOf("<error code=") >= 0)
-                    throw new Exception("Error when notifying indexer: " + responseBody);
-            }           
-        }
-
-        private bool ServerCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-        {
-            return true;    //HACK: this should be worked out better, right now we accept all SSL Certs.
-        }
+        protected abstract void NotifyIndexerOfObfuscatedUpload(UploadEntry upload);
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace nntpAutoposter
 {
-    class UploadEntry
+    public class UploadEntry
     {
         public Int64 ID { get; set; }
         public String Name { get; set; }

@@ -92,7 +92,8 @@
     <Compile Include="AutoPoster.cs" />
     <Compile Include="DBHandler.cs" />
     <Compile Include="DBScript.cs" />
-    <Compile Include="IndexerNotifier.cs" />
+    <Compile Include="IndexerNotifierBase.cs" />
+    <Compile Include="IndexerNotifierNewznabHash.cs" />
     <Compile Include="IndexerVerifier.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
