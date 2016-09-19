@@ -93,6 +93,7 @@
     <Compile Include="DBHandler.cs" />
     <Compile Include="DBScript.cs" />
     <Compile Include="IndexerNotifierBase.cs" />
+    <Compile Include="IndexerNotifierNzbPost.cs" />
     <Compile Include="IndexerNotifierNewznabHash.cs" />
     <Compile Include="IndexerVerifier.cs" />
     <Compile Include="Program.cs" />

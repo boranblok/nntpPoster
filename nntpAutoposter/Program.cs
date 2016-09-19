@@ -34,10 +34,18 @@ namespace nntpAutoposter
                 log.Info("Autoposter started");
                 Console.WriteLine("Autoposter started");
 
-                IndexerNotifierBase notifier = new IndexerNotifierNewznabHash(configuration);
-                notifier.Start();
-                log.Info("Notifier started");
-                Console.WriteLine("Notifier started");
+                IndexerNotifierBase notifier = IndexerNotifierBase.GetActiveNotifier(configuration);
+                if (notifier != null)
+                {
+                    notifier.Start();
+                    log.Info("Notifier started");
+                    Console.WriteLine("Notifier started");
+                }
+                else
+                {
+                    log.Info("No notifier");
+                    Console.WriteLine("No notifier");
+                }
 
                 IndexerVerifier verifier = new IndexerVerifier(configuration);
                 verifier.Start();

@@ -25,7 +25,27 @@ namespace nntpAutoposter
 
         protected Settings Configuration { get; set; }
 
-        public IndexerNotifierBase(Settings configuration)
+        public static IndexerNotifierBase GetActiveNotifier(Settings configuration)
+        {
+            if("NewznabHash".Equals(configuration.NotificationType, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return new IndexerNotifierNewznabHash(configuration);
+            }
+
+            if("NzbPost".Equals(configuration.NotificationType, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return new IndexerNotifierNzbPost(configuration);
+            }
+
+            if (!String.IsNullOrEmpty(configuration.NotificationType))
+                log.WarnFormat("{0} is an unknown notification type. Valid values are 'NewznabHash' and 'NzbPost'");
+            else
+                log.InfoFormat("No notification type defined in configuration.");
+
+            return null;
+        }
+
+        protected IndexerNotifierBase(Settings configuration)
         {
             Configuration = configuration;
             StopRequested = false;

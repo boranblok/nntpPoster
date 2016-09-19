@@ -78,6 +78,7 @@ namespace Util.Configuration
         public String ParExtraParameters { get; set; }
         public String MkvPropEditLocation { get; set; }
         public String FFmpegLocation { get; set; }
+        public String NotificationType { get; set; }
 
 
         // Settings the user probably shouldnt change.
