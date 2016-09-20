@@ -22,7 +22,7 @@ namespace nntpAutoPosterWindowsService
         Watcher watcher;
         AutoPoster poster;
         IndexerNotifierBase notifier;
-        IndexerVerifier verifier;
+        IndexerVerifierBase verifier;
 
         public Service()
         {
@@ -57,10 +57,17 @@ namespace nntpAutoPosterWindowsService
                     log.Info("No notifier");
                 }
 
-                verifier = new IndexerVerifier(configuration);
-                verifier.Start();
-                log.Info("Verifier started");
-            
+                verifier = IndexerVerifierBase.GetActiveVerifier(configuration);
+                if (verifier != null)
+                {
+                    verifier.Start();
+                    log.Info("Verifier started");
+                }
+                else
+                {
+                    log.Info("No verifier");
+                }
+
             }
             catch (Exception ex)
             {
@@ -79,11 +86,17 @@ namespace nntpAutoPosterWindowsService
                 poster.Stop();  //This call will block until the current item is done posting.
                 log.Info("Autoposter stopped");
 
-                verifier.Stop(2000);
-                log.Info("Verifier stopped");
+                if (verifier != null)
+                {
+                    verifier.Stop(2000);
+                    log.Info("Verifier stopped");
+                }
 
-                notifier.Stop(2000);
-                log.Info("Notifier stopped");
+                if (notifier != null)
+                {
+                    notifier.Stop(2000);
+                    log.Info("Notifier stopped");
+                }
             }
             catch (Exception ex)
             {
@@ -106,11 +119,17 @@ namespace nntpAutoPosterWindowsService
                 watcher.Stop(2000);
                 log.Info("FileSystemWatcher stopped");
 
-                verifier.Stop(2000);
-                log.Info("Verifier stopped");
+                if (verifier != null)
+                {
+                    verifier.Stop(2000);
+                    log.Info("Verifier stopped");
+                }
 
-                notifier.Stop(2000);
-                log.Info("Notifier stopped");
+                if (notifier != null)
+                {
+                    notifier.Stop(2000);
+                    log.Info("Notifier stopped");
+                }                
 
                 poster.Stop(20000);
                 log.Info("Autoposter stopped");

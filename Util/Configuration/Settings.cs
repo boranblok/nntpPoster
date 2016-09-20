@@ -79,6 +79,7 @@ namespace Util.Configuration
         public String MkvPropEditLocation { get; set; }
         public String FFmpegLocation { get; set; }
         public String NotificationType { get; set; }
+        public String VerificationType { get; set; }
 
 
         // Settings the user probably shouldnt change.

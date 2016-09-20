@@ -47,10 +47,18 @@ namespace nntpAutoposter
                     Console.WriteLine("No notifier");
                 }
 
-                IndexerVerifier verifier = new IndexerVerifier(configuration);
-                verifier.Start();
-                log.Info("Verifier started");
-                Console.WriteLine("Verifier started");
+                IndexerVerifierBase verifier = IndexerVerifierBase.GetActiveVerifier(configuration);
+                if (verifier != null)
+                {
+                    verifier.Start();
+                    log.Info("Verifier started");
+                    Console.WriteLine("Verifier started");
+                }
+                else
+                {
+                    log.Info("No verifier");
+                    Console.WriteLine("No verifier");
+                }
 
                 Console.WriteLine("Press the \"s\" key to stop after the current operations have finished.");
 
@@ -65,13 +73,19 @@ namespace nntpAutoposter
                 log.Info("FileSystemWatcher stopped");
                 Console.WriteLine("FileSystemWatcher stopped");
 
-                verifier.Stop();
-                log.Info("Verifier stopped");
-                Console.WriteLine("Verifier stopped");
+                if (verifier != null)
+                {
+                    verifier.Stop();
+                    log.Info("Verifier stopped");
+                    Console.WriteLine("Verifier stopped");
+                }
 
-                notifier.Stop();
-                log.Info("Notifier stopped");
-                Console.WriteLine("Notifier stopped");
+                if (notifier != null)
+                {
+                    notifier.Stop();
+                    log.Info("Notifier stopped");
+                    Console.WriteLine("Notifier stopped");
+                }
 
                 poster.Stop();
                 log.Info("Autoposter stopped");
