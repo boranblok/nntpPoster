@@ -29,13 +29,13 @@ namespace nntpAutoposter
 
         public static IndexerVerifierBase GetActiveVerifier(Settings configuration)
         {
-            if ("NewznabSearch".Equals(configuration.NotificationType, StringComparison.InvariantCultureIgnoreCase))
+            if ("NewznabSearch".Equals(configuration.VerificationType, StringComparison.InvariantCultureIgnoreCase))
             {
                 return new IndexerVerifierNewznabSearch(configuration);
             }            
 
-            if (!String.IsNullOrEmpty(configuration.NotificationType))
-                log.WarnFormat("{0} is an unknown notification type. Valid values are 'NewznabSearch' and 'postVerify'");
+            if (!String.IsNullOrEmpty(configuration.VerificationType))
+                log.WarnFormat("{0} is an unknown verification type. Valid values are 'NewznabSearch' and 'PostVerify'");
             else
                 log.InfoFormat("No verification type defined in configuration.");
             

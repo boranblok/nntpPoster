@@ -27,12 +27,23 @@ MaxConnectionCount=10
 [Indexer]
 # enter your API key that is used for the indexer here. Then you can use ${ApiKey} in the urls below
 ApiKey=APIKEY
+
+# Method used to notify the index of the new upload.
+# Supported values are 'NewznabHash' which uses the newznab Method (default)
+# or 'NzbPost' which sends the nzb file to the notification url.
+NotificationType=NewznabHash
+
 # API url that is used to notify the indexer of an obfuscated release.
 # The following two parameters will be replaced:
 #   {0} by the obfuscated name of the file/folder
 #   {1} by the original name of the file/folder
 #   optionally ${ApiKey} will be replaced by the value entered above
 ObfuscatedNotificationUrl=https://api.apiserver.com/api?hash={0}&name={1}&apikey=${ApiKey}
+
+# Method used to verify that the upload was placed on the index.
+# Supported values are 'NewznabSearch' which uses the newznab method (default)
+# or 'PostVerify' which uses a custom post verification method.
+VerificationType=NewznabSearch
 
 # API url that is used to search the indexer.
 # The following two parameters will be replaced:

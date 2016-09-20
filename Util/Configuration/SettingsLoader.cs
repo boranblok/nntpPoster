@@ -165,7 +165,9 @@ namespace Util.Configuration
             settings.MaxConnectionCount = GetSettingInt(baseConfig, NewsHostSection, "MaxConnectionCount");
 
             const string IndexerSection = "Indexer";
+            settings.NotificationType = GetSettingString(baseConfig, IndexerSection, "NotificationType");
             settings.ObfuscatedNotificationUrl = GetSettingString(baseConfig, IndexerSection, "ObfuscatedNotificationUrl");
+            settings.VerificationType = GetSettingString(baseConfig, IndexerSection, "VerificationType");
             settings.SearchUrl = GetSettingString(baseConfig, IndexerSection, "SearchUrl");
             settings.IndexerRenameMapSource = GetSettingString(baseConfig, IndexerSection, "IndexerRenameMapSource");
             settings.IndexerRenameMapTarget = GetSettingString(baseConfig, IndexerSection, "IndexerRenameMapTarget");
