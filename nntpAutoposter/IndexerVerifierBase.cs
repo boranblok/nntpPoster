@@ -34,8 +34,18 @@ namespace nntpAutoposter
                 return new IndexerVerifierNewznabSearch(configuration);
             }            
 
+            if("PostVerify".Equals(configuration.VerificationType, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return new IndexerVerifierPostVerify(configuration);
+            }
+
+            if("Dummy".Equals(configuration.VerificationType, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return new IndexerVerifierDummy(configuration);
+            }
+
             if (!String.IsNullOrEmpty(configuration.VerificationType))
-                log.WarnFormat("{0} is an unknown verification type. Valid values are 'NewznabSearch' and 'PostVerify'");
+                log.WarnFormat("{0} is an unknown verification type. Valid values are 'NewznabSearch', 'PostVerify' and 'Dummy'");
             else
                 log.InfoFormat("No verification type defined in configuration.");
             

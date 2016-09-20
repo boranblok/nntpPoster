@@ -42,7 +42,8 @@ ObfuscatedNotificationUrl=https://api.apiserver.com/api?hash={0}&name={1}&apikey
 
 # Method used to verify that the upload was placed on the index.
 # Supported values are 'NewznabSearch' which uses the newznab method (default)
-# or 'PostVerify' which uses a custom post verification method.
+# 'PostVerify' which uses a custom post verification method.
+# or 'Dummy' which always considers an upload as successful and therefore cleans up the backup folder after VerifierIntervalMinutes
 VerificationType=NewznabSearch
 
 # API url that is used to search the indexer.

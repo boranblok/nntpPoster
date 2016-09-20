@@ -96,6 +96,8 @@
     <Compile Include="IndexerNotifierNzbPost.cs" />
     <Compile Include="IndexerNotifierNewznabHash.cs" />
     <Compile Include="IndexerVerifierBase.cs" />
+    <Compile Include="IndexerVerifierDummy.cs" />
+    <Compile Include="IndexerVerifierPostVerify.cs" />
     <Compile Include="IndexerVerifierNewznabSearch.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
