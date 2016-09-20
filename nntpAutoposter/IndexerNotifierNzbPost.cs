@@ -28,14 +28,10 @@ namespace nntpAutoposter
 
             MultipartFormDataContent form = new MultipartFormDataContent();
             form.Add(new ByteArrayContent(nzbFileArray), "file", upload.CleanedName + ".nzb");
-            Task<HttpResponseMessage> responseTask = httpClient.PostAsync(notificationUrl, form);
-            responseTask.Wait();
-            HttpResponseMessage response = responseTask.Result;
+            HttpResponseMessage response = httpClient.PostAsync(notificationUrl, form).Result;
 
             HttpContent content = response.Content;
-            Task<String> contentStringTask = content.ReadAsStringAsync();
-            contentStringTask.Wait();
-            String contentString = contentStringTask.Result;
+            String contentString = content.ReadAsStringAsync().Result;
 
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new Exception("Error when notifying indexer: "
