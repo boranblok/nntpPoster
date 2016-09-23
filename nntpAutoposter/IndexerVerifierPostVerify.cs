@@ -50,9 +50,10 @@ namespace nntpAutoposter
                 switch(response.StatusCode)
                 {
                     case HttpStatusCode.OK:
+                        log.InfoFormat("The release {0} was found on indexer. Response: {1}", upload.CleanedName, responseBody);
                         return true;
                     case HttpStatusCode.NotFound:
-                        log.InfoFormat("The release {0} was not found on indexer. Response: {1}", upload.CleanedName, responseBody);
+                        log.InfoFormat("The release {0} was NOT found on indexer. Response: {1}", upload.CleanedName, responseBody);
                         return false;
                     default:
                         throw new Exception("Error when verifying on indexer: " + response.StatusCode + " " + response.StatusDescription + " " + responseBody);
