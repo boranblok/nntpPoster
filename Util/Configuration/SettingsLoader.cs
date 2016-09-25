@@ -204,6 +204,7 @@ namespace Util.Configuration
 
             const string NntpSection = "Nntp";
             settings.MaxRetryCount = GetSettingInt(baseConfig, NntpSection, "MaxRetryCount");
+            settings.RetryDelaySeconds = GetSettingInt(baseConfig, NntpSection, "RetryDelaySeconds");
             settings.YEncLineSize = GetSettingInt(baseConfig, NntpSection, "YEncLineSize");
             settings.YEncLinesPerMessage = GetSettingInt(baseConfig, NntpSection, "YEncLinesPerMessage");
 

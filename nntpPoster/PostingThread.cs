@@ -162,9 +162,14 @@ namespace nntpPoster
                     log.Warn("Posting yEnc message failed", ex);
 
                     if (retryCount++ < _configuration.MaxRetryCount)
+                    {
+                        Thread.Sleep(_configuration.RetryDelaySeconds * 1000);
                         log.InfoFormat("Retrying to post message, attempt {0}", retryCount);
+                    }
                     else
+                    {
                         log.Error("Maximum retry attempts reached. Posting is probably corrupt.");
+                    }
                 }
             }
         }
