@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using log4net;
+using System.Xml.Linq;
+using System.Text;
 
 namespace Util
 {
@@ -197,6 +199,20 @@ namespace Util
             }
 
             return (length < value.Length) ? value.Substring(value.Length - length) : value;
+        }
+
+        public static string ToStringWithDeclaration(this XDocument doc)
+        {
+            if (doc == null)
+            {
+                throw new ArgumentNullException("doc");
+            }
+            StringBuilder builder = new StringBuilder();
+            using (TextWriter writer = new Utf8StringWriter(builder))
+            {
+                doc.Save(writer);
+            }
+            return builder.ToString();
         }
     }
 }

@@ -181,7 +181,7 @@ namespace nntpAutoposter
                 if (configuration.NzbOutputFolder != null)
                     nzbFile.Save(Path.Combine(configuration.NzbOutputFolder.FullName, nextUpload.CleanedName + ".nzb"));
 
-                nextUpload.NzbContents = nzbFile.ToString();
+                nextUpload.NzbContents = nzbFile.ToStringWithDeclaration();
                 nextUpload.RarPassword = password;
                 nextUpload.UploadedAt = DateTime.UtcNow;
                 DBHandler.Instance.UpdateUploadEntry(nextUpload);
