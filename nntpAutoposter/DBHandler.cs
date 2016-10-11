@@ -262,7 +262,8 @@ namespace nntpAutoposter
                                                             UploadAttempts,
                                                             RarPassword,
                                                             PriorityNum,
-                                                            NzbContents)
+                                                            NzbContents,
+                                                            IsRepost)
                                                     VALUES(
                                                             @name,
                                                             @size,
@@ -278,7 +279,8 @@ namespace nntpAutoposter
                                                             @uploadAttempts,
                                                             @rarPassword,
                                                             @priorityNum,
-                                                            @nzbContents)";
+                                                            @nzbContents,
+                                                            @isRepost)";
                         cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                         cmd.Parameters.Add(new SqliteParameter("@size", uploadEntry.Size));
                         cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
@@ -294,6 +296,7 @@ namespace nntpAutoposter
                         cmd.Parameters.Add(new SqliteParameter("@rarPassword", uploadEntry.RarPassword));
                         cmd.Parameters.Add(new SqliteParameter("@priorityNum", uploadEntry.PriorityNum));
                         cmd.Parameters.Add(new SqliteParameter("@nzbContents", uploadEntry.NzbContents));
+                        cmd.Parameters.Add(new SqliteParameter("@isRepost", GetDbValue(uploadEntry.IsRepost)));
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = "select last_insert_rowid()";
@@ -325,7 +328,8 @@ namespace nntpAutoposter
                                             UploadAttempts = @uploadAttempts,
                                             RarPassword = @rarPassword,
                                             PriorityNum = @priorityNum,
-                                            NzbContents = @nzbContents
+                                            NzbContents = @nzbContents,
+                                            IsRepost = @isRepost
                                         WHERE ROWID = @rowId";
                     cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                     cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
@@ -340,6 +344,7 @@ namespace nntpAutoposter
                     cmd.Parameters.Add(new SqliteParameter("@rarPassword", uploadEntry.RarPassword));
                     cmd.Parameters.Add(new SqliteParameter("@priorityNum", uploadEntry.PriorityNum));
                     cmd.Parameters.Add(new SqliteParameter("@nzbContents", uploadEntry.NzbContents));
+                    cmd.Parameters.Add(new SqliteParameter("@isRepost", GetDbValue(uploadEntry.IsRepost)));
                     cmd.Parameters.Add(new SqliteParameter("@rowId", uploadEntry.ID));
                     
                     cmd.ExecuteNonQuery();                   
@@ -367,6 +372,7 @@ namespace nntpAutoposter
             uploadEntry.RarPassword = reader["RarPassword"] as String;
             uploadEntry.PriorityNum = (Int64)reader["PriorityNum"];
             uploadEntry.NzbContents = reader["NzbContents"] as String;
+            uploadEntry.IsRepost = GetBoolean(reader["IsRepost"]);
 
             return uploadEntry;
         }

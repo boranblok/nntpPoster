@@ -24,5 +24,6 @@ namespace nntpAutoposter
         public String RarPassword { get; set; }
         public Int64 PriorityNum { get; set; }
         public String NzbContents { get; set; }
+        public Boolean IsRepost { get; set; }
     }
 }
