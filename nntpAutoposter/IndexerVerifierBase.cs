@@ -101,15 +101,15 @@ namespace nntpAutoposter
                 {
                     String fullPath = Path.Combine(Configuration.BackupFolder.FullName,
                         upload.WatchFolderShortName, upload.Name);
-                    
+
                     Boolean backupExists = false;
                     backupExists = Directory.Exists(fullPath);
-                    if(!backupExists)
+                    if (!backupExists)
                         backupExists = File.Exists(fullPath);
 
                     if (!backupExists)
                     {
-                        log.WarnFormat("The upload [{0}] was removed from the backup folder, cancelling verification.", 
+                        log.WarnFormat("The upload [{0}] was removed from the backup folder, cancelling verification.",
                             upload.Name);
                         upload.Cancelled = true;
                         DBHandler.Instance.UpdateUploadEntry(upload);
@@ -118,33 +118,12 @@ namespace nntpAutoposter
 
                     if ((DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes < Configuration.VerifyAfterMinutes)
                     {
-                        log.DebugFormat("The upload [{0}] is younger than {1} minutes. Skipping check.", 
+                        log.DebugFormat("The upload [{0}] is younger than {1} minutes. Skipping check.",
                             upload.CleanedName, Configuration.VerifyAfterMinutes);
                         continue;
                     }
 
-                    if (UploadIsOnIndexer(upload))
-                    {
-                        upload.SeenOnIndexAt = DateTime.UtcNow;
-                        DBHandler.Instance.UpdateUploadEntry(upload);
-                        log.InfoFormat("Release [{0}] has been found on the indexer.", upload.CleanedName);
-
-                        if (upload.RemoveAfterVerify)
-                        {
-                            FileAttributes attributes = File.GetAttributes(fullPath);
-                            if (attributes.HasFlag(FileAttributes.Directory))
-                                Directory.Delete(fullPath, true);
-                            else
-                                File.Delete(fullPath);
-                        }
-                    }
-                    else
-                    {
-                        log.WarnFormat(
-                            "Release [{0}] has NOT been found on the indexer. Checking if a repost is required.", 
-                            upload.CleanedName);
-                        RepostIfRequired(upload);
-                    }
+                    VerifyEntryOnIndexer(upload, fullPath);
                 }
                 catch (Exception ex)
                 {
@@ -153,7 +132,38 @@ namespace nntpAutoposter
             }
         }
 
-        private void RepostIfRequired(UploadEntry upload)
+        protected virtual void VerifyEntryOnIndexer(UploadEntry upload, String fullPath)
+        {
+            if (UploadIsOnIndexer(upload))
+            {
+                upload.SeenOnIndexAt = DateTime.UtcNow;
+                DBHandler.Instance.UpdateUploadEntry(upload);
+                log.InfoFormat("Release [{0}] has been found on the indexer.", upload.CleanedName);
+
+                if (upload.RemoveAfterVerify)
+                {
+                    DeleteFileOrFolder(fullPath);
+                }
+            }
+            else
+            {
+                log.WarnFormat(
+                    "Release [{0}] has NOT been found on the indexer. Checking if a repost is required.",
+                    upload.CleanedName);
+                RepostIfRequired(upload);
+            }
+        }
+
+        protected static void DeleteFileOrFolder(string fullPath)
+        {
+            FileAttributes attributes = File.GetAttributes(fullPath);
+            if (attributes.HasFlag(FileAttributes.Directory))
+                Directory.Delete(fullPath, true);
+            else
+                File.Delete(fullPath);
+        }
+
+        protected virtual void RepostIfRequired(UploadEntry upload)
         {
             var ageInMinutes = (DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes;
 
@@ -163,7 +173,6 @@ namespace nntpAutoposter
                 upload.UploadedAt = null;
 
                 DBHandler.Instance.UpdateUploadEntry(upload);
-
             }
             else
             {

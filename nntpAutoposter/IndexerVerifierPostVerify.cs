@@ -22,6 +22,21 @@ namespace nntpAutoposter
         {
         }
 
+        protected override void VerifyEntryOnIndexer(UploadEntry upload, string fullPath)
+        {
+            if (UploadIsOnIndexer(upload))
+            {
+                upload.SeenOnIndexAt = DateTime.UtcNow;
+                DBHandler.Instance.UpdateUploadEntry(upload);
+                log.InfoFormat("Release [{0}] has been found on the indexer.", upload.CleanedName);
+
+                if (upload.RemoveAfterVerify)
+                {
+                    DeleteFileOrFolder(fullPath);
+                }
+            }
+        }
+
         protected override Boolean UploadIsOnIndexer(UploadEntry upload)
         {
             String verificationGetUrl = String.Format(Configuration.SearchUrl, upload.ObscuredName);
@@ -55,10 +70,43 @@ namespace nntpAutoposter
                     case HttpStatusCode.NotFound:
                         log.InfoFormat("The release {0} was NOT found on indexer. Response: {1}", upload.CleanedName, responseBody);
                         return false;
+                    case HttpStatusCode.InternalServerError:
+                        HandleServerError(upload, responseBody);
+                        return false;
                     default:
                         throw new Exception("Error when verifying on indexer: " + response.StatusCode + " " + response.StatusDescription + " " + responseBody);
                 }
             }
+        }
+
+        private void HandleServerError(UploadEntry upload, String responseBody)
+        {
+            if(responseBody.IndexOf("ALREADY EXISTS") >= 0)
+            {
+                log.InfoFormat("The release {0} already exists.", upload.CleanedName);
+                if (upload.IsRepost)
+                {
+                    log.WarnFormat("This release was already a repost. Cancelling.");
+                    upload.Cancelled = true;
+                    //TODO: UploadEntry.MoveToFailedLocation (make all move operations on that entry, as there the knowledge is centralized)
+                }
+                else
+                {
+                    WatchFolderSettings wfConfig = Configuration.GetWatchFolderSettings(upload.WatchFolderShortName);
+                    upload.CleanedName = upload.CleanedName.Remove(upload.CleanedName.Length - wfConfig.PostTag.Length - 1) + "-REPOST" + wfConfig.PostTag;
+                    upload.IsRepost = true;
+                    log.InfoFormat("Reuploading as {0}", upload.CleanedName);
+                    upload.UploadedAt = null;
+                }
+            }
+            else
+            {
+                log.WarnFormat("Fatal exception on the server side: {0}", responseBody);
+                log.InfoFormat("Reposting {0}", upload.CleanedName);
+                upload.UploadedAt = null;
+            }           
+
+            DBHandler.Instance.UpdateUploadEntry(upload);
         }
 
         private bool ServerCertificateValidationCallback(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
