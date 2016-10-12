@@ -131,11 +131,7 @@ namespace nntpAutoposter
 
                         if (upload.RemoveAfterVerify)
                         {
-                            FileAttributes attributes = File.GetAttributes(fullPath);
-                            if (attributes.HasFlag(FileAttributes.Directory))
-                                Directory.Delete(fullPath, true);
-                            else
-                                File.Delete(fullPath);
+                            upload.DeleteBackup(Configuration);
                         }
                     }
                     else
