@@ -101,7 +101,7 @@ namespace nntpAutoposter
                 {
                     String fullPath = Path.Combine(Configuration.BackupFolder.FullName,
                         upload.WatchFolderShortName, upload.Name);
-
+                    
                     Boolean backupExists = false;
                     backupExists = Directory.Exists(fullPath);
                     if (!backupExists)
@@ -109,7 +109,7 @@ namespace nntpAutoposter
 
                     if (!backupExists)
                     {
-                        log.WarnFormat("The upload [{0}] was removed from the backup folder, cancelling verification.",
+                        log.WarnFormat("The upload [{0}] was removed from the backup folder, cancelling verification.", 
                             upload.Name);
                         upload.Cancelled = true;
                         DBHandler.Instance.UpdateUploadEntry(upload);
@@ -118,12 +118,12 @@ namespace nntpAutoposter
 
                     if ((DateTime.UtcNow - upload.UploadedAt.Value).TotalMinutes < Configuration.VerifyAfterMinutes)
                     {
-                        log.DebugFormat("The upload [{0}] is younger than {1} minutes. Skipping check.",
+                        log.DebugFormat("The upload [{0}] is younger than {1} minutes. Skipping check.", 
                             upload.CleanedName, Configuration.VerifyAfterMinutes);
                         continue;
                     }
 
-                    VerifyEntryOnIndexer(upload, fullPath);
+                    VerifyEntryOnIndexer(upload);
                 }
                 catch (Exception ex)
                 {
@@ -132,7 +132,7 @@ namespace nntpAutoposter
             }
         }
 
-        protected virtual void VerifyEntryOnIndexer(UploadEntry upload, String fullPath)
+        protected virtual void VerifyEntryOnIndexer(UploadEntry upload)
         {
             if (UploadIsOnIndexer(upload))
             {
@@ -142,7 +142,7 @@ namespace nntpAutoposter
 
                 if (upload.RemoveAfterVerify)
                 {
-                    DeleteFileOrFolder(fullPath);
+                    upload.DeleteBackup(Configuration);
                 }
             }
             else
@@ -154,14 +154,6 @@ namespace nntpAutoposter
             }
         }
 
-        protected static void DeleteFileOrFolder(string fullPath)
-        {
-            FileAttributes attributes = File.GetAttributes(fullPath);
-            if (attributes.HasFlag(FileAttributes.Directory))
-                Directory.Delete(fullPath, true);
-            else
-                File.Delete(fullPath);
-        }
 
         protected virtual void RepostIfRequired(UploadEntry upload)
         {

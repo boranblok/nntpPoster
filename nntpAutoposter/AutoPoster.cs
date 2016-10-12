@@ -125,10 +125,8 @@ namespace nntpAutoposter
                     log.WarnFormat("Cancelling the upload after {0} retry attempts.",
                         nextUpload.UploadAttempts);
                     nextUpload.Cancelled = true;
-                    DirectoryInfo failedPostFolder = new DirectoryInfo(
-                        Path.Combine(configuration.PostFailedFolder.FullName, folderConfiguration.ShortName));
-                    toUpload.Move(failedPostFolder);
                     DBHandler.Instance.UpdateUploadEntry(nextUpload);
+                    nextUpload.MoveToFailedFolder(configuration);
                     return;
                 }
                 PostRelease(folderConfiguration, nextUpload, toUpload, isDirectory);

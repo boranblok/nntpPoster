@@ -22,7 +22,7 @@ namespace nntpAutoposter
         {
         }
 
-        protected override void VerifyEntryOnIndexer(UploadEntry upload, string fullPath)
+        protected override void VerifyEntryOnIndexer(UploadEntry upload)
         {
             if (UploadIsOnIndexer(upload))
             {
@@ -32,7 +32,7 @@ namespace nntpAutoposter
 
                 if (upload.RemoveAfterVerify)
                 {
-                    DeleteFileOrFolder(fullPath);
+                    upload.DeleteBackup(Configuration);
                 }
             }
         }
@@ -88,7 +88,7 @@ namespace nntpAutoposter
                 {
                     log.WarnFormat("This release was already a repost. Cancelling.");
                     upload.Cancelled = true;
-                    //TODO: UploadEntry.MoveToFailedLocation (make all move operations on that entry, as there the knowledge is centralized)
+                    upload.MoveToFailedFolder(Configuration);
                 }
                 else
                 {
