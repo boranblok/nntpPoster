@@ -94,6 +94,7 @@ namespace Util.Configuration
         public Int32 VerifyAfterMinutes { get; set; }
         public Int32 RepostAfterMinutes { get; set; }
         public Int32 MaxRetryCount { get; set; }
+        public Int32 RetryDelaySeconds { get; set; }
         public Int32 InactiveProcessTimeout { get; set; }
         public Int32 YEncLineSize { get; set; }
         public Int32 YEncLinesPerMessage { get; set; }

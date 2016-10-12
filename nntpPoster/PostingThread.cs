@@ -73,20 +73,29 @@ namespace nntpPoster
         {
             try
             {
+                DateTime lastMessage = DateTime.Now;
                 while (!Finished)
                 {
                     var message = GetNextMessageToPost();
                     if (message != null)
                     {
                         PostMessage(message);
+                        lastMessage = DateTime.Now;
                     }
                     else
                     {
                         if (_client != null)         //If the queue runs dry we close the connection
                         {
-                            log.Debug("Disposing client because of empty queue.");
-                            _client.Dispose();
-                            _client = null;
+                            if ((DateTime.Now - lastMessage).TotalMilliseconds > 5000) //TODO: parametrize.
+                            {
+                                log.Debug("Disposing client because of empty queue.");
+                                _client.Dispose();
+                                _client = null;
+                            }
+                            else
+                            {
+                                Thread.Sleep(100);
+                            }
                         }
                         if (StopRequested)
                         {
@@ -162,9 +171,15 @@ namespace nntpPoster
                     log.Warn("Posting yEnc message failed", ex);
 
                     if (retryCount++ < _configuration.MaxRetryCount)
+                    {
+                        log.DebugFormat("Waiting {0} second(s) before retry.", _configuration.RetryDelaySeconds);
+                        Thread.Sleep(_configuration.RetryDelaySeconds * 1000);
                         log.InfoFormat("Retrying to post message, attempt {0}", retryCount);
+                    }
                     else
+                    {
                         log.Error("Maximum retry attempts reached. Posting is probably corrupt.");
+                    }
                 }
             }
         }

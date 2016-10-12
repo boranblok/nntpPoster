@@ -32,16 +32,32 @@ namespace nntpAutoposter
             //request.ServerCertificateValidationCallback = ServerCertificateValidationCallback;    //Not implemented in mono
             request.Method = "GET";
             request.Timeout = 60*1000;
-            HttpWebResponse response = request.GetResponse() as HttpWebResponse;            
+            HttpWebResponse response;
+
+            try
+            {
+                response = request.GetResponse() as HttpWebResponse;
+            }
+            catch(WebException ex)
+            {
+                response = ex.Response as HttpWebResponse;
+            }
 
             using(var reader = new StreamReader(response.GetResponseStream()))
             {
                 var responseBody = reader.ReadToEnd();
 
-                if (response.StatusCode == HttpStatusCode.OK)
-                    return true;
-                else
-                    throw new Exception("Error when verifying on indexer: " + response.StatusCode + " " + response.StatusDescription + " " + responseBody);               
+                switch(response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        log.InfoFormat("The release {0} was found on indexer. Response: {1}", upload.CleanedName, responseBody);
+                        return true;
+                    case HttpStatusCode.NotFound:
+                        log.InfoFormat("The release {0} was NOT found on indexer. Response: {1}", upload.CleanedName, responseBody);
+                        return false;
+                    default:
+                        throw new Exception("Error when verifying on indexer: " + response.StatusCode + " " + response.StatusDescription + " " + responseBody);
+                }
             }
         }
 

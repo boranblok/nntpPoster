@@ -18,7 +18,7 @@ namespace nntpAutoposter
 {
     public abstract class IndexerVerifierBase
     {
-        private static readonly ILog log = LogManager.GetLogger(
+        protected static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private Object monitor = new Object();

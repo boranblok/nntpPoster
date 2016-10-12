@@ -150,7 +150,7 @@ namespace nntpPoster
         {
             Int64 size = toPost.Size();
             var rarSizeRecommendation = configuration.RarNParSettings
-                .Where(rr => rr.FromSize < size)
+                .Where(rr => rr.FromSizeBytes < size)
                 .OrderByDescending(rr => rr.FromSize)
                 .First();
             var rarWrapper = new RarWrapper(configuration.InactiveProcessTimeout, configuration.RarLocation);

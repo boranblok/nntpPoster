@@ -18,24 +18,27 @@ namespace nntpAutoposter
 
         protected override void NotifyIndexerOfObfuscatedUpload(UploadEntry upload)
         {
-            String notificationUrl = String.Format(Configuration.ObfuscatedNotificationUrl);
+            if (upload.UploadedAt != null)
+            {
+                String notificationUrl = String.Format(Configuration.ObfuscatedNotificationUrl);
 
-            ServicePointManager.ServerCertificateValidationCallback = ServerCertificateValidationCallback;
+                ServicePointManager.ServerCertificateValidationCallback = ServerCertificateValidationCallback;
 
-            Byte[] nzbFileArray = UTF8Encoding.Default.GetBytes(upload.NzbContents);
+                Byte[] nzbFileArray = UTF8Encoding.Default.GetBytes(upload.NzbContents);
 
-            HttpClient httpClient = new HttpClient();
+                HttpClient httpClient = new HttpClient();
 
-            MultipartFormDataContent form = new MultipartFormDataContent();
-            form.Add(new ByteArrayContent(nzbFileArray), "file", upload.CleanedName + ".nzb");
-            HttpResponseMessage response = httpClient.PostAsync(notificationUrl, form).Result;
+                MultipartFormDataContent form = new MultipartFormDataContent();
+                form.Add(new ByteArrayContent(nzbFileArray), "file", upload.CleanedName + ".nzb");
+                HttpResponseMessage response = httpClient.PostAsync(notificationUrl, form).Result;
 
-            HttpContent content = response.Content;
-            String contentString = content.ReadAsStringAsync().Result;
+                HttpContent content = response.Content;
+                String contentString = content.ReadAsStringAsync().Result;
 
-            if (response.StatusCode != HttpStatusCode.OK)
-                throw new Exception("Error when notifying indexer: "
-                    + response.StatusCode + " " + response.ReasonPhrase + " " + contentString);     
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception("Error when notifying indexer: "
+                        + response.StatusCode + " " + response.ReasonPhrase + " " + contentString);
+            }
         }
 
         private bool ServerCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
