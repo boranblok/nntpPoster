@@ -72,7 +72,6 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="LevenshteinDistance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utf8StringWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="conf\default.ini">
