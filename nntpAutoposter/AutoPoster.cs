@@ -176,7 +176,7 @@ namespace nntpAutoposter
                     password = Guid.NewGuid().ToString("N");
 
                 var nzbFile = poster.PostToUsenet(toPost, password, false);
-                ○
+                
                 nextUpload.NzbContents = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Environment.NewLine + nzbFile.ToString();
 
                 if (configuration.NzbOutputFolder != null)
