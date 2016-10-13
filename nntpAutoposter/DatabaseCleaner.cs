@@ -46,7 +46,7 @@ namespace nntpAutoposter
                     {
                         break;
                     }
-                    Monitor.Wait(monitor, configuration.DatabaseCleanupHours * 1000 * 60 * 60);
+                    Monitor.Wait(monitor, new TimeSpan(configuration.DatabaseCleanupHours, 0, 0));
                 }
             }
         }

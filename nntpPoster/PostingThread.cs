@@ -173,7 +173,7 @@ namespace nntpPoster
                     if (retryCount++ < _configuration.MaxRetryCount)
                     {
                         log.DebugFormat("Waiting {0} second(s) before retry.", _configuration.RetryDelaySeconds);
-                        Thread.Sleep(_configuration.RetryDelaySeconds * 1000);
+                        Thread.Sleep(new TimeSpan( 0, 0, _configuration.RetryDelaySeconds));
                         log.InfoFormat("Retrying to post message, attempt {0}", retryCount);
                     }
                     else

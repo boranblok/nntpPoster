@@ -80,7 +80,7 @@ namespace nntpAutoposter
                         {
                             break;
                         }
-                        Monitor.Wait(monitor, Configuration.NotifierIntervalMinutes * 60 * 1000);
+                        Monitor.Wait(monitor, new TimeSpan(0, Configuration.NotifierIntervalMinutes, 0));
                     }
                 }
             }

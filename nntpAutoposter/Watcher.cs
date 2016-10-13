@@ -51,7 +51,7 @@ namespace nntpAutoposter
                     {
                         break;
                     }
-                    Monitor.Wait(monitor, configuration.FilesystemCheckIntervalSeconds * 1000);
+                    Monitor.Wait(monitor, new TimeSpan(0, 0, configuration.FilesystemCheckIntervalSeconds));
                 }
             }
         }
