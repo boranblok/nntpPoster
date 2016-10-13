@@ -201,6 +201,8 @@ namespace Util.Configuration
             settings.VerifierIntervalMinutes = GetSettingInt(baseConfig, SubjobTimingSection, "VerifierIntervalMinutes");
             settings.VerifyAfterMinutes = GetSettingInt(baseConfig, SubjobTimingSection, "VerifyAfterMinutes");
             settings.RepostAfterMinutes = GetSettingInt(baseConfig, SubjobTimingSection, "RepostAfterMinutes");
+            settings.DatabaseCleanupHours = GetSettingInt(baseConfig, SubjobTimingSection, "DatabaseCleanupHours");
+            settings.DatabaseCleanupKeepdays = GetSettingInt(baseConfig, SubjobTimingSection, "DatabaseCleanupKeepdays");
 
             const string NntpSection = "Nntp";
             settings.MaxRetryCount = GetSettingInt(baseConfig, NntpSection, "MaxRetryCount");

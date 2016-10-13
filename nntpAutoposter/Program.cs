@@ -60,6 +60,11 @@ namespace nntpAutoposter
                     Console.WriteLine("No verifier");
                 }
 
+                DatabaseCleaner cleaner = new DatabaseCleaner(configuration);
+                cleaner.Start();
+                log.Info("DB Cleaner started");
+                Console.WriteLine("DB Cleaner started");
+
                 Console.WriteLine("Press the \"s\" key to stop after the current operations have finished.");
 
                 Boolean stop = false;
@@ -68,6 +73,10 @@ namespace nntpAutoposter
                     var keyInfo = Console.ReadKey();
                     stop = keyInfo.KeyChar == 's' || keyInfo.KeyChar == 'S';
                 }
+
+                cleaner.Stop();
+                log.Info("DB Cleaner stopped");
+                Console.WriteLine("DB Cleaner stopped");
 
                 watcher.Stop();
                 log.Info("FileSystemWatcher stopped");

@@ -23,6 +23,7 @@ namespace nntpAutoPosterWindowsService
         AutoPoster poster;
         IndexerNotifierBase notifier;
         IndexerVerifierBase verifier;
+        DatabaseCleaner cleaner;
 
         public Service()
         {
@@ -68,6 +69,9 @@ namespace nntpAutoPosterWindowsService
                     log.Info("No verifier");
                 }
 
+                cleaner = new DatabaseCleaner(configuration);
+                cleaner.Start();
+                log.Info("DB Cleaner started");
             }
             catch (Exception ex)
             {
@@ -80,6 +84,9 @@ namespace nntpAutoPosterWindowsService
         {
             try
             {
+                cleaner.Stop(2000);
+                log.Info("DB Cleaner stopped");
+
                 watcher.Stop(2000);
                 log.Info("FileSystemWatcher stopped");
 
@@ -116,6 +123,9 @@ namespace nntpAutoPosterWindowsService
         {
             try
             {
+                cleaner.Stop(2000);
+                log.Info("DB Cleaner stopped");
+
                 watcher.Stop(2000);
                 log.Info("FileSystemWatcher stopped");
 

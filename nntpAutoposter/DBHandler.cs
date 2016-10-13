@@ -123,6 +123,24 @@ namespace nntpAutoposter
             return scripts;
         }
 
+        public void CleanUploadEntries(Int32 keepDays)
+        {
+            DateTime cutOffDateTime = DateTime.Now.AddDays(keepDays * -1);
+
+            using (SqliteConnection conn = new SqliteConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqliteCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE from UploadEntries 
+                                        WHERE CreatedAt <= @cutOffDateTime";
+                    cmd.Parameters.Add(new SqliteParameter("@cutOffDateTime", GetDbValue(cutOffDateTime)));
+                    Int32 linesDeleted = cmd.ExecuteNonQuery();
+                    log.InfoFormat("Cleaned {0} old entries from the database.", linesDeleted);
+                }
+            }
+        }
+
         public UploadEntry GetNextUploadEntryToUpload()
         {
             using (SqliteConnection conn = new SqliteConnection(_connectionString))

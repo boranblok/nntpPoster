@@ -22,11 +22,6 @@ namespace Util.Configuration
             return SettingsLoader.LoadSettings();
         }
 
-        public void SaveSettings()
-        {
-            throw new NotImplementedException();
-        }
-
         public WatchFolderSettings GetWatchFolderSettings(String shortName)
         {
             if(WatchFolderSettings.Any(s => s.ShortName == shortName))
@@ -90,6 +85,8 @@ namespace Util.Configuration
         public Int32 AutoposterIntervalSeconds { get; set; }
         public Int32 NotifierIntervalMinutes { get; set; }
         public Int32 VerifierIntervalMinutes { get; set; }
+        public Int32 DatabaseCleanupHours { get; set; }
+        public Int32 DatabaseCleanupKeepdays { get; set; }
         public Int32 VerifySimilarityPercentageTreshold { get; set; }
         public Int32 VerifyAfterMinutes { get; set; }
         public Int32 RepostAfterMinutes { get; set; }
