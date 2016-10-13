@@ -183,20 +183,18 @@ namespace nntpAutoposter
                     using (StreamReader sr = new StreamReader(ms))
                     {
                         nextUpload.NzbContents = sr.ReadToEnd();
-                    }
-                        
-                    if (configuration.NzbOutputFolder != null)
-                    {
-                        FileInfo file = new FileInfo(Path.Combine(configuration.NzbOutputFolder.FullName, nextUpload.CleanedName + ".nzb"));
-                        using (FileStream fs = file.OpenWrite())
-                        {
-                            ms.Position = 0;
-                            ms.CopyTo(fs);
-                        }
-                    }
-                    
+                    }                    
                 }
-                
+
+                if (configuration.NzbOutputFolder != null)
+                {
+                    FileInfo file = new FileInfo(Path.Combine(configuration.NzbOutputFolder.FullName, nextUpload.CleanedName + ".nzb"));
+                    using (TextWriter tw = new StreamWriter(file.OpenWrite()))
+                    {
+                        tw.Write(nextUpload.NzbContents);
+                    }
+                }
+
                 nextUpload.RarPassword = password;
                 nextUpload.UploadedAt = DateTime.UtcNow;
                 DBHandler.Instance.UpdateUploadEntry(nextUpload);
