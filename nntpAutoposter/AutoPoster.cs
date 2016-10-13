@@ -312,6 +312,7 @@ namespace nntpAutoposter
 
             cleanName = Regex.Replace(cleanName, "\\.{2,}", String.Empty);
 
+            log.InfoFormat("Cleaned the name [{0}] to [{1}]", nameToClean, cleanName);
             return cleanName;
         }
     }
