@@ -176,27 +176,18 @@ namespace nntpAutoposter
                     password = Guid.NewGuid().ToString("N");
 
                 var nzbFile = poster.PostToUsenet(toPost, password, false);
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    nzbFile.Save(ms);
-                    ms.Position = 0;
-                    using (StreamReader sr = new StreamReader(ms))
-                    {
-                        nextUpload.NzbContents = sr.ReadToEnd();
-                    }
-                        
-                    if (configuration.NzbOutputFolder != null)
-                    {
-                        FileInfo file = new FileInfo(Path.Combine(configuration.NzbOutputFolder.FullName, nextUpload.CleanedName + ".nzb"));
-                        using (FileStream fs = file.OpenWrite())
-                        {
-                            ms.Position = 0;
-                            ms.CopyTo(fs);
-                        }
-                    }
-                    
-                }
                 
+                nextUpload.NzbContents = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Environment.NewLine + nzbFile.ToString();
+
+                if (configuration.NzbOutputFolder != null)
+                {
+                    FileInfo file = new FileInfo(Path.Combine(configuration.NzbOutputFolder.FullName, nextUpload.CleanedName + ".nzb"));
+                    using (TextWriter tw = new StreamWriter(file.OpenWrite()))
+                    {
+                        tw.Write(nextUpload.NzbContents);
+                    }
+                }
+
                 nextUpload.RarPassword = password;
                 nextUpload.UploadedAt = DateTime.UtcNow;
                 DBHandler.Instance.UpdateUploadEntry(nextUpload);

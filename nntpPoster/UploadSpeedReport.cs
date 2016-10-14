@@ -17,7 +17,7 @@ namespace nntpPoster
         {
             var tpl = TotalParts.ToString().Length;
 
-            return String.Format("file: {0} : {1," + tpl + "} of {2} parts uploaded at {3}", CurrentlyPostingName, UploadedParts, TotalParts,
+            return String.Format("{0," + tpl + "} of {1} parts uploaded at {2}", UploadedParts, TotalParts,
                 GetHumanReadableSpeed(BytesPerSecond));
 
         }
