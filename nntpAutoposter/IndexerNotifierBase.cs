@@ -104,7 +104,7 @@ namespace nntpAutoposter
                 }
                 catch(Exception ex)
                 {
-                    log.Error("Could not notify indexer of obfuscated release.", ex);
+                    log.Error(String.Format("Could not notify indexer of obfuscated release: [{0}]", upload.CleanedName), ex);
                 }
             }
         }
