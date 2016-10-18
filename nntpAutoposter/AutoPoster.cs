@@ -144,12 +144,12 @@ namespace nntpAutoposter
             if (folderConfiguration.CleanName)
             {
                 nextUpload.CleanedName = 
-                    folderConfiguration.PreTag + CleanName(toUpload.NameWithoutExtension()) + folderConfiguration.PostTag;
+                    folderConfiguration.PreTag + CleanName(StripNonAscii(toUpload.NameWithoutExtension())) + folderConfiguration.PostTag;
             }
             else
             {
                 nextUpload.CleanedName = 
-                    folderConfiguration.PreTag + toUpload.NameWithoutExtension() + folderConfiguration.PostTag;
+                    folderConfiguration.PreTag + StripNonAscii(toUpload.NameWithoutExtension()) + folderConfiguration.PostTag;
             }
             if (folderConfiguration.UseObfuscation)
             {
@@ -292,8 +292,7 @@ namespace nntpAutoposter
 
         private String CleanName(String nameToClean)
         {
-            String cleanName = Regex.Replace(nameToClean, "^[:ascii:]", String.Empty);
-            cleanName = cleanName.Replace(' ', '.');
+            String cleanName = cleanName.Replace(' ', '.');
             cleanName = cleanName.Replace("+", ".");
             cleanName = cleanName.Replace("&", "and");
             foreach(var charToRemove in CharsToRemove)
@@ -305,6 +304,18 @@ namespace nntpAutoposter
 
             log.InfoFormat("Cleaned the name [{0}] to [{1}]", nameToClean, cleanName);
             return cleanName;
+        }
+
+        static string StripNonAscii(String toStrip)
+        {
+            StringBuilder buffer = new StringBuilder(toStrip.Length); //Max length
+            foreach (char ch in toStrip)
+            {
+                UInt16 charNum = Convert.ToUInt16(ch);//In .NET, chars are UTF-16
+                //The basic characters have the same code points as ASCII, and the extended characters are bigger
+                if ((charNum >= 32u) && (charNum <= 126u)) buffer.Append(ch);
+            }
+            return buffer.ToString();
         }
     }
 }
