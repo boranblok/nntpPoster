@@ -292,7 +292,7 @@ namespace nntpAutoposter
 
         private String CleanName(String nameToClean)
         {
-            String cleanName = cleanName.Replace(' ', '.');
+            String cleanName = nameToClean.Replace(' ', '.');
             cleanName = cleanName.Replace("+", ".");
             cleanName = cleanName.Replace("&", "and");
             foreach(var charToRemove in CharsToRemove)
