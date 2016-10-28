@@ -143,13 +143,11 @@ namespace nntpAutoposter
             nextUpload.UploadAttempts++;
             if (folderConfiguration.CleanName)
             {
-                nextUpload.CleanedName = 
-                    folderConfiguration.PreTag + CleanName(StripNonAscii(toUpload.NameWithoutExtension())) + folderConfiguration.PostTag;
+                nextUpload.CleanedName = ApplyTags(CleanName(StripNonAscii(toUpload.NameWithoutExtension())), folderConfiguration);
             }
             else
             {
-                nextUpload.CleanedName = 
-                    folderConfiguration.PreTag + StripNonAscii(toUpload.NameWithoutExtension()) + folderConfiguration.PostTag;
+                nextUpload.CleanedName = ApplyTags(StripNonAscii(toUpload.NameWithoutExtension()), folderConfiguration);
             }
             if (folderConfiguration.UseObfuscation)
             {
@@ -215,6 +213,16 @@ namespace nntpAutoposter
             }
         }
 
+        private String ApplyTags(String cleanedName, WatchFolderSettings folderConfiguration)
+        {
+            if (!cleanedName.StartsWith(folderConfiguration.PreTag))
+                cleanedName = folderConfiguration.PreTag + cleanedName;
+
+            if (!cleanedName.EndsWith(folderConfiguration.PostTag))
+                cleanedName = cleanedName + folderConfiguration.PostTag;
+
+            return cleanedName;
+        }
 
         private DirectoryInfo PrepareDirectoryForPosting(WatchFolderSettings folderConfiguration, 
             UploadEntry nextUpload, DirectoryInfo toUpload)
