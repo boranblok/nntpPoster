@@ -51,8 +51,7 @@ namespace nntpAutoposter
                     fso = new FileInfo(fullPath);
                 }
 
-                DirectoryInfo failedPostFolder = new DirectoryInfo(
-                Path.Combine(config.PostFailedFolder.FullName, WatchFolderShortName));
+                DirectoryInfo failedPostFolder = new DirectoryInfo(Path.Combine(config.PostFailedFolder.FullName, WatchFolderShortName));
                 fso.Move(failedPostFolder);
             }
             catch (FileNotFoundException)
