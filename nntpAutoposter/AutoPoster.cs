@@ -289,7 +289,7 @@ namespace nntpAutoposter
         private void StripMkvMetaDataFromFile(FileInfo preparedFile)
         {
             var mkvPropEdit = new MkvPropEditWrapper(configuration.InactiveProcessTimeout, configuration.MkvPropEditLocation);
-            mkvPropEdit.SetTitle(preparedFile, "g33k");
+            mkvPropEdit.SetTitle(preparedFile, String.Empty);
         }
 
         private void StripMetaDataWithFFmpeg(FileInfo preparedFile)
