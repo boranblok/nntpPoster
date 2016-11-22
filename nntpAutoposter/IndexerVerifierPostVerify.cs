@@ -69,6 +69,7 @@ namespace nntpAutoposter
                         return true;
                     case HttpStatusCode.NotFound:
                         log.InfoFormat("The release {0} was NOT found on indexer. Response: {1}", upload.CleanedName, responseBody);
+                        RepostIfRequired(upload);
                         return false;
                     case HttpStatusCode.InternalServerError:
                         HandleServerError(upload, responseBody);
