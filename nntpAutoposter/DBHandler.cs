@@ -259,7 +259,7 @@ namespace nntpAutoposter
                     using (SqliteCommand cmd = conn.CreateCommand())
                     {
                         cmd.Transaction = trans;
-                        cmd.CommandText = @"UPDATE UploadEntries SET Cancelled = 1 WHERE Name = @name";
+                        cmd.CommandText = @"UPDATE UploadEntries SET Cancelled = 1 WHERE Name = @name AND Cancelled = 0";
                         cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                         Int32 cancelledEntries = cmd.ExecuteNonQuery();
                         if(cancelledEntries > 0)
