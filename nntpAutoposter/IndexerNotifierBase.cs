@@ -110,8 +110,8 @@ namespace nntpAutoposter
                     {
                         log.WarnFormat("The release [{0}] has tried more than {1} times to notify the indexer and failed. There is probably something wrong with the name or with the indexer.",
                             upload.CleanedName, Configuration.MaxNotificationAttempts);
-                        upload.Cancelled = true;                        
-                        upload.MoveToFailedFolder(Configuration);
+                        upload.Cancelled = true;
+                        upload.Move(Configuration, Location.Failed);
                     }
                     DBHandler.Instance.UpdateUploadEntry(upload);
                 }

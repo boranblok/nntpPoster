@@ -99,8 +99,7 @@ namespace nntpAutoposter
             {
                 try
                 {
-                    String fullPath = Path.Combine(Configuration.BackupFolder.FullName,
-                        upload.WatchFolderShortName, upload.Name);
+                    String fullPath = upload.GetCurrentPath(Configuration);
                     
                     Boolean backupExists = false;
                     backupExists = Directory.Exists(fullPath);
@@ -142,7 +141,7 @@ namespace nntpAutoposter
 
                 if (upload.RemoveAfterVerify)
                 {
-                    upload.DeleteBackup(Configuration);
+                    upload.Delete(Configuration);
                 }
             }
             else
@@ -163,6 +162,7 @@ namespace nntpAutoposter
             {
                 log.WarnFormat("Could not find [{0}] after {1} minutes, reposting, attempt {2}", upload.CleanedName, Configuration.RepostAfterMinutes, upload.UploadAttempts);
                 upload.UploadedAt = null;
+                upload.Move(Configuration, Location.Queue);
 
                 DBHandler.Instance.UpdateUploadEntry(upload);
             }

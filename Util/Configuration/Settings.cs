@@ -65,6 +65,7 @@ namespace Util.Configuration
         public DirectoryInfo WorkingFolder { get; set; }
         public DirectoryInfo NzbOutputFolder { get; set; }        
         public DirectoryInfo BackupFolder { get; set; }
+        public DirectoryInfo QueueFolder { get; set; }
         public Int32 MaxRepostCount { get; set; }
         public DirectoryInfo PostFailedFolder { get; set; }
         public String RarLocation { get; set; }

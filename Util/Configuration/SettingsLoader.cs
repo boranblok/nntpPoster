@@ -177,6 +177,7 @@ namespace Util.Configuration
             const string FoldersSection = "Folders";
             settings.WorkingFolder = GetSettingDirectoryInfo(baseConfig, FoldersSection, "Working");
             settings.BackupFolder = GetSettingDirectoryInfo(baseConfig, FoldersSection, "Backup");
+            settings.QueueFolder = GetSettingDirectoryInfo(baseConfig, FoldersSection, "Queue");
             settings.PostFailedFolder = GetSettingDirectoryInfo(baseConfig, FoldersSection, "UploadFailed");
             settings.NzbOutputFolder = GetSettingDirectoryInfo(baseConfig, FoldersSection, "NzbOutput", true);
 

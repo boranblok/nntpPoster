@@ -33,38 +33,69 @@ namespace nntpAutoposter
         public String NzbContents { get; set; }
         public Boolean IsRepost { get; set; }
         public Int64 NotificationCount { get; set; }
+        public Location CurrentLocation { get; set; }
 
-        public void MoveToFailedFolder(Settings config)
+        public void Move(Settings configuration, Location newLocation)
         {
-            String fullPath = Path.Combine(config.BackupFolder.FullName, WatchFolderShortName, Name);
-
+            String sourceFullPath = GetCurrentPath(configuration);
+            DirectoryInfo targetFolder = DetermineTargetLocation(configuration, newLocation);
             FileSystemInfo fso;
 
             try
             {
-                FileAttributes attributes = File.GetAttributes(fullPath);
+                FileAttributes attributes = File.GetAttributes(sourceFullPath);
                 if (attributes.HasFlag(FileAttributes.Directory))
                 {
-                    fso = new DirectoryInfo(fullPath);
+                    fso = new DirectoryInfo(sourceFullPath);
                 }
                 else
                 {
-                    fso = new FileInfo(fullPath);
+                    fso = new FileInfo(sourceFullPath);
                 }
 
-                DirectoryInfo failedPostFolder = new DirectoryInfo(
-                Path.Combine(config.PostFailedFolder.FullName, WatchFolderShortName));
-                fso.Move(failedPostFolder);
+                fso.Move(targetFolder);
             }
             catch (FileNotFoundException)
             {
-                log.WarnFormat("Can no longer find {0} in the backup folder, cancelling move.", Name);
+                log.WarnFormat("Can no longer find '{0}', cancelling move.", sourceFullPath);
+                CurrentLocation = Location.None;
             }
+            CurrentLocation = newLocation;            
         }
 
-        public void DeleteBackup(Settings config)
+        private DirectoryInfo DetermineTargetLocation(Settings configuration, Location newLocation)
         {
-            String fullPath = Path.Combine(config.BackupFolder.FullName, WatchFolderShortName, Name);
+            switch(newLocation)
+            {
+                case Location.Queue:
+                    return new DirectoryInfo(Path.Combine(configuration.QueueFolder.FullName, WatchFolderShortName));
+                case Location.Backup:
+                    return new DirectoryInfo(Path.Combine(configuration.BackupFolder.FullName, WatchFolderShortName));
+                case Location.Failed:
+                    return new DirectoryInfo(Path.Combine(configuration.PostFailedFolder.FullName, WatchFolderShortName));
+            }
+            throw new Exception("Target path can only be Queue, Backup or Failed");
+        }
+
+        public String GetCurrentPath(Settings configuration)
+        {
+            switch(CurrentLocation)
+            {
+                case Location.Watch:
+                    return Path.Combine(configuration.GetWatchFolderSettings(WatchFolderShortName).Path.FullName, Name);
+                case Location.Queue:
+                    return Path.Combine(configuration.QueueFolder.FullName, WatchFolderShortName, Name);
+                case Location.Backup:
+                    return Path.Combine(configuration.BackupFolder.FullName, WatchFolderShortName, Name);
+                case Location.Failed:
+                    return Path.Combine(configuration.PostFailedFolder.FullName, WatchFolderShortName, Name);
+            }
+            throw new Exception(String.Format("Current path of '{0}' cannot be determined.", Name));
+        }
+
+        public void Delete(Settings config)
+        {
+            String fullPath = GetCurrentPath(config);
             
             try
             {
@@ -76,7 +107,11 @@ namespace nntpAutoposter
             }
             catch (FileNotFoundException)
             {
-                log.WarnFormat("Can no longer find {0} in the backup folder, cannot delete.", Name);
+                log.WarnFormat("Can no longer find '{0}', cannot delete.", fullPath);                
+            }
+            finally
+            {
+                CurrentLocation = Location.None;
             }
         }
     }

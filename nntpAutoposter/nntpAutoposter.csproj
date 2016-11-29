@@ -90,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoPoster.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="DatabaseCleaner.cs" />
     <Compile Include="DBHandler.cs" />
     <Compile Include="DBScript.cs" />

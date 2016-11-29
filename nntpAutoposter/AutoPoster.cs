@@ -97,8 +97,7 @@ namespace nntpAutoposter
                     configuration.GetWatchFolderSettings(nextUpload.WatchFolderShortName);
                 FileSystemInfo toUpload;
                 Boolean isDirectory;
-                String fullPath = Path.Combine(
-                    configuration.BackupFolder.FullName, folderConfiguration.ShortName, nextUpload.Name);
+                String fullPath = nextUpload.GetCurrentPath(configuration);
                 try
                 {
                     FileAttributes attributes = File.GetAttributes(fullPath);
@@ -115,7 +114,8 @@ namespace nntpAutoposter
                 }
                 catch (FileNotFoundException)
                 {
-                    log.WarnFormat("Can no longer find {0} in the backup folder, cancelling upload", nextUpload.Name);
+                    log.WarnFormat("Can no longer find '{0}', cancelling upload", fullPath);
+                    nextUpload.CurrentLocation = Location.None;
                     nextUpload.Cancelled = true;
                     DBHandler.Instance.UpdateUploadEntry(nextUpload);
                     return;
@@ -125,8 +125,8 @@ namespace nntpAutoposter
                     log.WarnFormat("Cancelling the upload after {0} retry attempts.",
                         nextUpload.UploadAttempts);
                     nextUpload.Cancelled = true;
-                    DBHandler.Instance.UpdateUploadEntry(nextUpload);
-                    nextUpload.MoveToFailedFolder(configuration);
+                    nextUpload.Move(configuration, Location.Failed);
+                    DBHandler.Instance.UpdateUploadEntry(nextUpload);                    
                     return;
                 }
                 PostRelease(folderConfiguration, nextUpload, toUpload, isDirectory);
@@ -191,6 +191,7 @@ namespace nntpAutoposter
                 DBHandler.Instance.UpdateUploadEntry(nextUpload);
                 log.InfoFormat("[{0}] was uploaded as obfuscated release [{1}] to usenet."
                     , nextUpload.CleanedName, nextUpload.ObscuredName);
+                nextUpload.Move(configuration, Location.Backup);
             }
             finally
             {

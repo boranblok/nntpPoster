@@ -37,7 +37,7 @@ namespace nntpAutoposter
                     foreach(WatchFolderSettings watchFolderSetting in configuration.WatchFolderSettings)
                         foreach (FileSystemInfo toPost in watchFolderSetting.Path.EnumerateFileSystemInfos())
                     {
-                        MoveToBackupFolderAndPost(toPost, watchFolderSetting);
+                        MoveToQueueFolderAndPost(toPost, watchFolderSetting);
                     }
                 }
                 catch(Exception ex)
@@ -76,14 +76,14 @@ namespace nntpAutoposter
                 log.InfoFormat("Monitoring '{0}' for files and folders stopped.", watchFolderSetting.Path.FullName);
         }
 
-        private void MoveToBackupFolderAndPost(FileSystemInfo toPost, WatchFolderSettings folderConfiguration)
+        private void MoveToQueueFolderAndPost(FileSystemInfo toPost, WatchFolderSettings folderConfiguration)
         {
             try
             {
                 if ((DateTime.Now - toPost.LastAccessTime).TotalMinutes > configuration.FilesystemCheckTesholdMinutes)
                 {
                     DirectoryInfo destination = new DirectoryInfo(
-                        Path.Combine(configuration.BackupFolder.FullName, folderConfiguration.ShortName));
+                        Path.Combine(configuration.QueueFolder.FullName, folderConfiguration.ShortName));
                     FileSystemInfo backup = toPost.Move(destination);
 
                     AddItemToPostingDb(backup, folderConfiguration);
@@ -105,6 +105,7 @@ namespace nntpAutoposter
             newUploadentry.Cancelled = false;
             newUploadentry.Size = toPost.Size();
             newUploadentry.PriorityNum = folderConfiguration.Priority;
+            newUploadentry.CurrentLocation = Location.Queue;
             if (newUploadentry.Size == 0)
             {
                 log.ErrorFormat("File added with a size of 0 bytes, This cannot be uploaded! File name: [{0}]",

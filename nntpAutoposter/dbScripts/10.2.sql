@@ -15,7 +15,8 @@
 	RarPassword,
 	PriorityNum,
 	NzbContents,
-	IsRepost)
+	IsRepost,
+	CurrentLocation)
 
 SELECT
 	Name, 
@@ -33,5 +34,6 @@ SELECT
 	RarPassword,
 	PriorityNum,
 	NzbContents,
-	IsRepost
+	IsRepost,
+	Cancelled + 3
 FROM UploadEntries

@@ -289,7 +289,8 @@ namespace nntpAutoposter
                                                             PriorityNum,
                                                             NzbContents,
                                                             IsRepost,
-                                                            NotificationCount)
+                                                            NotificationCount,
+                                                            CurrentLocation)
                                                     VALUES(
                                                             @name,
                                                             @size,
@@ -307,7 +308,8 @@ namespace nntpAutoposter
                                                             @priorityNum,
                                                             @nzbContents,
                                                             @isRepost,
-                                                            @notificationCount)";
+                                                            @notificationCount,
+                                                            @currentLocation)";
                         cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                         cmd.Parameters.Add(new SqliteParameter("@size", uploadEntry.Size));
                         cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
@@ -325,6 +327,7 @@ namespace nntpAutoposter
                         cmd.Parameters.Add(new SqliteParameter("@nzbContents", uploadEntry.NzbContents));
                         cmd.Parameters.Add(new SqliteParameter("@isRepost", GetDbValue(uploadEntry.IsRepost)));
                         cmd.Parameters.Add(new SqliteParameter("@notificationCount", uploadEntry.NotificationCount));
+                        cmd.Parameters.Add(new SqliteParameter("@currentLocation", GetDbValue(uploadEntry.CurrentLocation)));
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = "select last_insert_rowid()";
@@ -359,7 +362,8 @@ namespace nntpAutoposter
                                             PriorityNum = @priorityNum,
                                             NzbContents = @nzbContents,
                                             IsRepost = @isRepost,
-                                            NotificationCount = @notificationCount
+                                            NotificationCount = @notificationCount,
+                                            CurrentLocation = @currentLocation
                                         WHERE ROWID = @rowId";
                     cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                     cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
@@ -376,6 +380,7 @@ namespace nntpAutoposter
                     cmd.Parameters.Add(new SqliteParameter("@nzbContents", uploadEntry.NzbContents));
                     cmd.Parameters.Add(new SqliteParameter("@isRepost", GetDbValue(uploadEntry.IsRepost)));
                     cmd.Parameters.Add(new SqliteParameter("@notificationCount", uploadEntry.NotificationCount));
+                    cmd.Parameters.Add(new SqliteParameter("@currentLocation", GetDbValue(uploadEntry.CurrentLocation)));
                     cmd.Parameters.Add(new SqliteParameter("@rowId", uploadEntry.ID));
                     
                     cmd.ExecuteNonQuery();                   
@@ -405,6 +410,7 @@ namespace nntpAutoposter
             uploadEntry.NzbContents = reader["NzbContents"] as String;
             uploadEntry.IsRepost = GetBoolean(reader["IsRepost"]);
             uploadEntry.NotificationCount = (Int64)reader[".NotificationCount"];
+            uploadEntry.CurrentLocation = GetLocation(reader["CurrentLocation"]);
 
             return uploadEntry;
         }
@@ -419,6 +425,11 @@ namespace nntpAutoposter
             if (!dateTime.HasValue)
                 return DBNull.Value;
             return dateTime.Value.ToString("o");
+        }
+
+        private static Object GetDbValue(Location currentLocation)
+        {
+            return (Int64)currentLocation;
         }
 
         private static Boolean GetBoolean(Object dbValue)
@@ -441,6 +452,11 @@ namespace nntpAutoposter
                 return result;
 
             return null;
+        }
+
+        private static Location GetLocation(Object dbValue)
+        {
+            return (Location)dbValue;
         }
     }
 }

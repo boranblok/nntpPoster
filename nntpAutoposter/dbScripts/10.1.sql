@@ -16,4 +16,5 @@
 	PriorityNum INTEGER DEFAULT 0,
 	NzbContents TEXT,
 	IsRepost INTEGER DEFAULT 0,
-	NotificationCount INTEGER DEFAULT 0)
+	NotificationCount INTEGER DEFAULT 0,
+	CurrentLocation INTEGER DEFAULT 0)

@@ -32,7 +32,7 @@ namespace nntpAutoposter
 
                 if (upload.RemoveAfterVerify)
                 {
-                    upload.DeleteBackup(Configuration);
+                    upload.Delete(Configuration);
                 }
             }
         }
@@ -89,7 +89,7 @@ namespace nntpAutoposter
                 {
                     log.WarnFormat("This release was already a repost. Cancelling.");
                     upload.Cancelled = true;
-                    upload.MoveToFailedFolder(Configuration);
+                    upload.Move(Configuration, Location.Failed);
                 }
                 else
                 {
