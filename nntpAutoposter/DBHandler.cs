@@ -61,6 +61,7 @@ namespace nntpAutoposter
             Int64 highestScriptVersion = (Int64)Math.Floor(
                 dbScripts.OrderByDescending(s => s.ScriptNumber).First().ScriptNumber);
 
+            lock(lockObject)
             using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
@@ -127,6 +128,7 @@ namespace nntpAutoposter
         {
             DateTime cutOffDateTime = DateTime.Now.AddDays(keepDays * -1);
 
+            lock (lockObject)
             using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
@@ -143,6 +145,7 @@ namespace nntpAutoposter
 
         public UploadEntry GetNextUploadEntryToUpload()
         {
+            lock (lockObject)
             using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
@@ -169,6 +172,7 @@ namespace nntpAutoposter
         public List<UploadEntry> GetUploadEntriesToNotifyIndexer()
         {
             List<UploadEntry> uploadEntries = new List<UploadEntry>();
+            lock (lockObject)
             using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
@@ -194,6 +198,7 @@ namespace nntpAutoposter
         public List<UploadEntry> GetUploadEntriesToVerify()
         {
             List<UploadEntry> uploadEntries = new List<UploadEntry>();
+            lock (lockObject)
             using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
@@ -223,6 +228,7 @@ namespace nntpAutoposter
 
         public UploadEntry GetActiveUploadEntry(String name)
         {
+            lock (lockObject)
             using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
@@ -251,6 +257,7 @@ namespace nntpAutoposter
 
         public void AddNewUploadEntry(UploadEntry uploadEntry)
         {
+            lock (lockObject)
             using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
@@ -328,6 +335,7 @@ namespace nntpAutoposter
 
         public void UpdateUploadEntry(UploadEntry uploadEntry)
         {
+            lock (lockObject)
             using (SqliteConnection conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
