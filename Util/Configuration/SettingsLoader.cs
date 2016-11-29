@@ -166,6 +166,7 @@ namespace Util.Configuration
 
             const string IndexerSection = "Indexer";
             settings.NotificationType = GetSettingString(baseConfig, IndexerSection, "NotificationType");
+            settings.MaxNotificationAttempts = GetSettingInt(baseConfig, IndexerSection, "MaxNotificationAttempts");
             settings.ObfuscatedNotificationUrl = GetSettingString(baseConfig, IndexerSection, "ObfuscatedNotificationUrl");
             settings.VerificationType = GetSettingString(baseConfig, IndexerSection, "VerificationType");
             settings.SearchUrl = GetSettingString(baseConfig, IndexerSection, "SearchUrl");

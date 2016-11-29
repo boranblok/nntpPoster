@@ -75,6 +75,7 @@ namespace Util.Configuration
         public String FFmpegLocation { get; set; }
         public String NotificationType { get; set; }
         public String VerificationType { get; set; }
+        public Int32 MaxNotificationAttempts { get; set; }
 
 
         // Settings the user probably shouldnt change.

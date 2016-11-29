@@ -32,6 +32,7 @@ namespace nntpAutoposter
         public Int64 PriorityNum { get; set; }
         public String NzbContents { get; set; }
         public Boolean IsRepost { get; set; }
+        public Int64 NotificationCount { get; set; }
 
         public void MoveToFailedFolder(Settings config)
         {
