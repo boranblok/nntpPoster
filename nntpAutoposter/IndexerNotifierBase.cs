@@ -105,6 +105,15 @@ namespace nntpAutoposter
                 catch(Exception ex)
                 {
                     log.Error(String.Format("Could not notify indexer of obfuscated release: [{0}]", upload.CleanedName), ex);
+                    upload.NotificationCount += 1;
+                    if(upload.NotificationCount > Configuration.MaxNotificationAttempts)
+                    {
+                        log.WarnFormat("The release [{0}] has tried more than {1} times to notify the indexer and failed. There is probably something wrong with the name or with the indexer.",
+                            upload.CleanedName, Configuration.MaxNotificationAttempts);
+                        upload.Cancelled = true;                        
+                        upload.MoveToFailedFolder(Configuration);
+                    }
+                    DBHandler.Instance.UpdateUploadEntry(upload);
                 }
             }
         }
