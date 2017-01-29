@@ -188,10 +188,10 @@ namespace nntpAutoposter
 
                 nextUpload.RarPassword = password;
                 nextUpload.UploadedAt = DateTime.UtcNow;
+                nextUpload.Move(configuration, Location.Backup);
                 DBHandler.Instance.UpdateUploadEntry(nextUpload);
                 log.InfoFormat("[{0}] was uploaded as obfuscated release [{1}] to usenet."
                     , nextUpload.CleanedName, nextUpload.ObscuredName);
-                nextUpload.Move(configuration, Location.Backup);
             }
             finally
             {
