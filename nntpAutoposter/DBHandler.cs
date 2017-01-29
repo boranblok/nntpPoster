@@ -409,7 +409,7 @@ namespace nntpAutoposter
             uploadEntry.PriorityNum = (Int64)reader["PriorityNum"];
             uploadEntry.NzbContents = reader["NzbContents"] as String;
             uploadEntry.IsRepost = GetBoolean(reader["IsRepost"]);
-            uploadEntry.NotificationCount = (Int64)reader[".NotificationCount"];
+            uploadEntry.NotificationCount = (Int64)reader["NotificationCount"];
             uploadEntry.CurrentLocation = GetLocation(reader["CurrentLocation"]);
 
             return uploadEntry;
@@ -456,7 +456,7 @@ namespace nntpAutoposter
 
         private static Location GetLocation(Object dbValue)
         {
-            return (Location)dbValue;
+            return (Location)(Int64)dbValue;
         }
     }
 }

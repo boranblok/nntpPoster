@@ -31,7 +31,12 @@ namespace Util.Configuration
                 settings.BackupFolder.Create();
                 settings.BackupFolder.Refresh();
             }
-            if(settings.NzbOutputFolder != null && !settings.NzbOutputFolder.Exists)
+            if (!settings.QueueFolder.Exists)
+            {
+                settings.QueueFolder.Create();
+                settings.QueueFolder.Refresh();
+            }
+            if (settings.NzbOutputFolder != null && !settings.NzbOutputFolder.Exists)
             {
                 settings.NzbOutputFolder.Create();
                 settings.NzbOutputFolder.Refresh();
