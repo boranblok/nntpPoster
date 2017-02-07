@@ -22,7 +22,7 @@ Optionally if also stripping file metadata:
 
 ## Installation
 
-See the wiki for instructions for [Windows](https://github.com/boranblok/nntpPoster/wiki/Installation-on-Windows) and [Linux](/boranblok/nntpPoster/wiki/Installation-on-Linux)
+See the wiki for instructions for [Windows](https://github.com/boranblok/nntpPoster/wiki/Installation-on-Windows) and [Linux](https://github.com/boranblok/nntpPoster/wiki/Installation-on-Linux)
 
 ## Logging
 
