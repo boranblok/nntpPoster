@@ -23,7 +23,6 @@ namespace nntpAutoposter
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static readonly String CharsToRemove = "()=@#$%^,?<>{}|";
         private static readonly String[] ffmpegHandledExtensions = new String[] {"mkv", "avi", "wmv", "mp4", 
                                                                                  "mov", "ogg", "ogm", "wav", 
                                                                                  "mka", "mks", "mpeg", "mpg", 
@@ -143,7 +142,7 @@ namespace nntpAutoposter
             nextUpload.UploadAttempts++;
             if (folderConfiguration.CleanName)
             {
-                nextUpload.CleanedName = ApplyTags(CleanName(StripNonAscii(toUpload.NameWithoutExtension())), folderConfiguration);
+                nextUpload.CleanedName = ApplyTags(CleanName(folderConfiguration, StripNonAscii(toUpload.NameWithoutExtension())), folderConfiguration);
             }
             else
             {
@@ -299,12 +298,12 @@ namespace nntpAutoposter
             ffmpeg.TryStripMetadata(preparedFile);
         }
 
-        private String CleanName(String nameToClean)
+        private String CleanName(WatchFolderSettings folderConfiguration, String nameToClean)
         {
             String cleanName = nameToClean.Replace(' ', '.');
             cleanName = cleanName.Replace("+", ".");
             cleanName = cleanName.Replace("&", "and");
-            foreach(var charToRemove in CharsToRemove)
+            foreach(var charToRemove in folderConfiguration.CharsToRemove)
             {
                 cleanName = cleanName.Replace(charToRemove.ToString(), String.Empty);
             }

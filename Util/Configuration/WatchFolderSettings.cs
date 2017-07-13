@@ -15,6 +15,7 @@ namespace Util.Configuration
         public DirectoryInfo Path{ get; set; }
         public Boolean UseObfuscation { get; set; }
         public Boolean CleanName { get; set; }
+        public String CharsToRemove { get; set; }
         public String PreTag { get; set; }
         public String PostTag { get; set; }
         internal List<String> TargetNewsgroups { get; set; }

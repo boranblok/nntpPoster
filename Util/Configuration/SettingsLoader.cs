@@ -303,6 +303,7 @@ namespace Util.Configuration
             settings.Path = GetSettingDirectoryInfo(config, WatchfolderSection, "Path");
             settings.UseObfuscation = GetSettingBoolean(config, WatchfolderSection, "UseObfuscation");
             settings.CleanName = GetSettingBoolean(config, WatchfolderSection, "CleanName");
+            settings.CharsToRemove = GetSettingString(config, WatchfolderSection, "CharsToRemove");
             settings.PreTag = GetSettingString(config, WatchfolderSection, "PreTag", true);
             settings.PostTag = GetSettingString(config, WatchfolderSection, "PostTag", true);
             settings.TargetNewsgroups = new List<String>(GetSettingString(config, WatchfolderSection, "TargetNewsgroups").Split('|'));

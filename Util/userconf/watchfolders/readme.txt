@@ -24,6 +24,10 @@ UseObfuscation=no
 # But might interfere with anime names.
 CleanName=yes
 
+# Uncomment and modify to change what characters to strip from the uploaded name, default: "()=@#$%^,?<>{}|"
+# This is only relevant if CleanName=yes
+# CharsToRemove="()=@#$%^,?<>{}|"
+
 # A prefix to add to every release name, leave blank to omit
 PreTag=
 
