@@ -163,7 +163,7 @@ namespace nntpPoster
                 password,
                 configuration.RarExtraParameters);
 
-            var parWrapper = new ParWrapper(configuration.InactiveProcessTimeout, configuration.ParLocation);
+            var parWrapper = new ParWrapper(configuration.InactiveProcessTimeout, configuration.ParLocation, configuration.ParCommandFormat);
             Boolean makePar = true;
             Int32 partSize = configuration.YEncPartSize;
             while (makePar && partSize / configuration.YEncPartSize < 10)   //Max 10 loops.

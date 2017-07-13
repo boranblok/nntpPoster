@@ -21,15 +21,18 @@ namespace ExternalProcessWrappers
         {
         }
 
-        public ParWrapper(Int32 inactiveProcessTimeout, String parLocation) :base(inactiveProcessTimeout, parLocation)
+        public String CommandFormat { get; set; }
+
+        public ParWrapper(Int32 inactiveProcessTimeout, String parLocation, String commandFormat) : base(inactiveProcessTimeout, parLocation)
         {
+            CommandFormat = commandFormat;
         }
 
         public void CreateParFilesInDirectory(DirectoryInfo workingFolder, String nameWithoutExtension, Int32 blockSize, Int32 redundancyPercentage, String extraParams)
         {
             blockSizeTooSmall = false;
 
-            String parParameters = String.Format("c -s{0} -r{1} {4} -- \"{2}\"{3}",
+            String parParameters = String.Format("c -s{0} -r{1} {4} -- {2}{3}",
                blockSize,
                redundancyPercentage,
                Path.Combine(workingFolder.FullName, nameWithoutExtension + ".par2"),

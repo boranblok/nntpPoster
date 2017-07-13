@@ -197,6 +197,7 @@ namespace Util.Configuration
             settings.RarExtraParameters = GetSettingString(baseConfig, ExternalProgramsSection, "RarExtraParameters", true);
             settings.ParLocation = GetSettingString(baseConfig, ExternalProgramsSection, "ParLocation", true, "par2");
             settings.ParExtraParameters = GetSettingString(baseConfig, ExternalProgramsSection, "ParExtraParameters", true);
+            settings.ParCommandFormat = GetSettingString(baseConfig, ExternalProgramsSection, "ParCommandFormat", true, "c -s{0} -r{1} {4} -- {2}{3}");
             settings.MkvPropEditLocation = GetSettingString(baseConfig, ExternalProgramsSection, "MkvPropEditLocation", true, "mkvpropedit");
             settings.FFmpegLocation = GetSettingString(baseConfig, ExternalProgramsSection, "FFmpegLocation", true, "ffmpeg");
 
