@@ -22,34 +22,7 @@ Optionally if also stripping file metadata:
 
 ## Installation
 
-To install extract the Release zipfile to a folder.
-
-The folder needs to be readable and writable by the user under which you execute the service.
-
-Modify the `settings.config` file to match your upload parameters.
-
-Optionally modify the folder settings as well if you want the application to use a different location to watch/process etc.  
-The folders are written in the native OS format so /mnt/folder etc on linux derivates and C:\folder on windows systems.  
-By default the configured folder paths are relative to the application and are all subfolders of the application.
-
-## Running the service
-
-#### On Linux
-
-If you want to run the service in a screen session you can use `start.sh` this script will also ensure the service runs in the correct environment (as it switches the current working folder)
-
-Additionally an init.d shell script is included. (`init.d.sh`) you will need to modify the application path and executing user in this file before you can use it.  
-This has been tested on Debian 7 If you have any issues with this on other systems or have a working autostart script for another linux derivate, please let me know I will include it in the package.
-
-#### On Windows
-
-On windows you can start the `nntpAutoposter.exe` as a console application. But it is more likely you will want to run it as a service.
-
-To install the service run the `InstallService.cmd` file. This will install the service as a windows service.
-
-To uninstall the service run `UninstallService.cmd`
-
-If you ever want to move the application to another location please run uninstall first before moving, and run install afterwards. No settings are lost by this.
+See the wiki for instructions for [Windows](https://github.com/boranblok/nntpPoster/wiki/Installation-on-Windows) and [Linux](https://github.com/boranblok/nntpPoster/wiki/Installation-on-Linux)
 
 ## Logging
 
