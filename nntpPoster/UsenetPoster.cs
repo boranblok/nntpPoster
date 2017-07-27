@@ -154,6 +154,7 @@ namespace nntpPoster
                 .OrderByDescending(rr => rr.FromSize)
                 .First();
             var rarWrapper = new RarWrapper(configuration.InactiveProcessTimeout, configuration.RarLocation);
+            DateTime rarStartTime = DateTime.Now;
             rarWrapper.Compress(
                 toPost, 
                 processedFolder, 
@@ -162,8 +163,15 @@ namespace nntpPoster
                     configuration.YEncLineSize, configuration.YEncLinesPerMessage),
                 password,
                 configuration.RarExtraParameters);
+            if (log.IsInfoEnabled)
+            {
+                TimeSpan rarTimeElapsed = DateTime.Now - rarStartTime;
+                Double rarSpeed = (Double)size / rarTimeElapsed.TotalSeconds;
+                log.InfoFormat("Rarred {0} of file(s) with a speed of {1}", UploadSpeedReport.GetHumanReadableSize(size), UploadSpeedReport.GetHumanReadableSpeed(rarSpeed));
+            }
 
             var parWrapper = new ParWrapper(configuration.InactiveProcessTimeout, configuration.ParLocation, configuration.ParCommandFormat);
+            DateTime parStartTime = DateTime.Now;
             Boolean makePar = true;
             Int32 partSize = configuration.YEncPartSize;
             while (makePar && partSize / configuration.YEncPartSize < 10)   //Max 10 loops.
@@ -178,6 +186,12 @@ namespace nntpPoster
                 {
                     partSize += configuration.YEncPartSize;
                 }
+            }
+            if (log.IsInfoEnabled)
+            {
+                TimeSpan parTimeElapsed = DateTime.Now - parStartTime;
+                Double parSpeed = (Double)size / parTimeElapsed.TotalSeconds;
+                log.InfoFormat("Parred {0} of file(s) with a speed of {1}", UploadSpeedReport.GetHumanReadableSize(size), UploadSpeedReport.GetHumanReadableSpeed(parSpeed));
             }
         }
 

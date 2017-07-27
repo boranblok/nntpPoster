@@ -24,25 +24,30 @@ namespace nntpPoster
 
         public static String GetHumanReadableSpeed(Double bytesPerSecond)
         {
+            return GetHumanReadableSize(bytesPerSecond) + "/sec";
+        }
+
+        public static String GetHumanReadableSize(Double bytes)
+        {
             Double roundedValue;
             String unit;
-            if (bytesPerSecond > 1024 * 1024)
+            if (bytes > 1024 * 1024)
             {
-                roundedValue = Math.Round(bytesPerSecond / (1024 * 1024), 2, MidpointRounding.AwayFromZero);
+                roundedValue = Math.Round(bytes / (1024 * 1024), 2, MidpointRounding.AwayFromZero);
                 unit = "MB";
             }
-            else if (bytesPerSecond > 1024)
+            else if (bytes > 1024)
             {
-                roundedValue = Math.Round(bytesPerSecond / 1024, 0, MidpointRounding.AwayFromZero);
+                roundedValue = Math.Round(bytes / 1024, 0, MidpointRounding.AwayFromZero);
                 unit = "KB";
             }
             else
             {
-                roundedValue = Math.Round(bytesPerSecond, 0, MidpointRounding.AwayFromZero);
+                roundedValue = Math.Round(bytes, 0, MidpointRounding.AwayFromZero);
                 unit = "Bytes";
             }
 
-            return roundedValue.ToString("0.00") + " " + unit + "/sec";
+            return roundedValue.ToString("0.00") + " " + unit;
         }
     }
 }
