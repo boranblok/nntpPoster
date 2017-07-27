@@ -44,7 +44,7 @@ namespace PostingNntpClient
 
         public void Connect()
         {
-            log.Debug("Connecting to newshost.");
+            log.DebugFormat("Connecting to newshost: {0}:{1}", ConnectionInfo.Address, ConnectionInfo.Port);
             _tcpClient = new TcpClient(ConnectionInfo.Address, ConnectionInfo.Port);
             var stream = _tcpClient.GetStream();
             if(ConnectionInfo.UseSsl)
