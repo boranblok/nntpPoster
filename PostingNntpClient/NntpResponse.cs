@@ -20,7 +20,7 @@ namespace PostingNntpClient
         private Int32 ExtractResponseCode(String responseMessage)
         {
             Int32 code;
-            if(Int32.TryParse(responseMessage.Substring(0,3), out code))
+            if(!String.IsNullOrWhiteSpace(responseMessage) && Int32.TryParse(responseMessage.Substring(0,3), out code))
             {
                 return code;
             }
