@@ -32,7 +32,7 @@ namespace ExternalProcessWrappers
         {
             blockSizeTooSmall = false;
 
-            String parParameters = String.Format("c -s{0} -r{1} {4} -- {2}{3}",
+            String parParameters = String.Format(CommandFormat,
                blockSize,
                redundancyPercentage,
                Path.Combine(workingFolder.FullName, nameWithoutExtension + ".par2"),
