@@ -72,10 +72,13 @@ namespace nntpAutoposter
                 {
                     versionCmd.CommandText = "PRAGMA user_version";
                     dbVersion = (Int64) versionCmd.ExecuteScalar();
+                    log.DebugFormat("Database version {0}", dbVersion);
                 }
 
                 if (dbVersion >= highestScriptVersion)
                     return;
+
+                log.DebugFormat("Updating database to version {0}", highestScriptVersion);
 
                 var scriptsToApply = dbScripts.Where(s => s.ScriptNumber >= dbVersion + 1).OrderBy(s => s.ScriptNumber);
 
@@ -139,6 +142,21 @@ namespace nntpAutoposter
                     cmd.Parameters.Add(new SqliteParameter("@cutOffDateTime", GetDbValue(cutOffDateTime)));
                     Int32 linesDeleted = cmd.ExecuteNonQuery();
                     log.InfoFormat("Cleaned {0} old entries from the database.", linesDeleted);
+                }
+            }
+        }
+
+        internal void Vacuum()
+        {
+            lock (lockObject)
+            using (SqliteConnection conn = new SqliteConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqliteCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"VACUUM";
+                    Int32 linesDeleted = cmd.ExecuteNonQuery();
+                    log.Info("Vacuumed the database.");
                 }
             }
         }

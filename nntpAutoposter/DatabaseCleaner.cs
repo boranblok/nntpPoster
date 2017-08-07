@@ -34,6 +34,7 @@ namespace nntpAutoposter
                 {
                     log.InfoFormat("Cleaning up database, removing entries older than {0} days", configuration.DatabaseCleanupKeepdays);
                     DBHandler.Instance.CleanUploadEntries(configuration.DatabaseCleanupKeepdays);
+                    DBHandler.Instance.Vacuum();
                 }
                 catch (Exception ex)
                 {
