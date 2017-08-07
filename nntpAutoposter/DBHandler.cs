@@ -151,7 +151,7 @@ namespace nntpAutoposter
                 conn.Open();
                 using (SqliteCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
+                    cmd.CommandText = @"SELECT * from UploadEntries 
                                         WHERE UploadedAt IS NULL 
                                           AND Cancelled = 0
                                         ORDER BY PriorityNum DESC, CreatedAt ASC
@@ -178,7 +178,7 @@ namespace nntpAutoposter
                 conn.Open();
                 using (SqliteCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
+                    cmd.CommandText = @"SELECT * from UploadEntries 
                                         WHERE ObscuredName IS NOT NULL 
                                           AND NotifiedIndexerAt IS NULL
                                           AND Cancelled = 0
@@ -204,7 +204,7 @@ namespace nntpAutoposter
                 conn.Open();
                 using (SqliteCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
+                    cmd.CommandText = @"SELECT * from UploadEntries 
                                         WHERE UploadedAt IS NOT NULL
                                           AND SeenOnIndexerAt IS NULL
                                           AND Cancelled = 0
@@ -234,7 +234,7 @@ namespace nntpAutoposter
                 conn.Open();
                 using (SqliteCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT ROWID, * from UploadEntries 
+                    cmd.CommandText = @"SELECT * from UploadEntries 
                                         WHERE Name = @name 
                                             AND Cancelled = 0";
                     cmd.Parameters.Add(new SqliteParameter("@name", name));
@@ -364,7 +364,7 @@ namespace nntpAutoposter
                                             IsRepost = @isRepost,
                                             NotificationCount = @notificationCount,
                                             CurrentLocation = @currentLocation
-                                        WHERE ROWID = @rowId";
+                                        WHERE RowIDAlias = @rowIDAlias";
                     cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                     cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
                     cmd.Parameters.Add(new SqliteParameter("@ObscuredName", uploadEntry.ObscuredName));                    
@@ -381,7 +381,7 @@ namespace nntpAutoposter
                     cmd.Parameters.Add(new SqliteParameter("@isRepost", GetDbValue(uploadEntry.IsRepost)));
                     cmd.Parameters.Add(new SqliteParameter("@notificationCount", uploadEntry.NotificationCount));
                     cmd.Parameters.Add(new SqliteParameter("@currentLocation", GetDbValue(uploadEntry.CurrentLocation)));
-                    cmd.Parameters.Add(new SqliteParameter("@rowId", uploadEntry.ID));
+                    cmd.Parameters.Add(new SqliteParameter("@rowIDAlias", uploadEntry.ID));
                     
                     cmd.ExecuteNonQuery();                   
                 }
@@ -392,7 +392,7 @@ namespace nntpAutoposter
         {
             UploadEntry uploadEntry = new UploadEntry();
 
-            uploadEntry.ID = (Int64)reader["ROWID"];
+            uploadEntry.ID = (Int64)reader["RowIDAlias"];
             uploadEntry.Name = reader["Name"] as String;
             uploadEntry.Size = (Int64)reader["Size"];
             uploadEntry.CleanedName = reader["CleanedName"] as String;

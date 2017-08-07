@@ -160,6 +160,11 @@
     <None Include="log4netConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="dbScripts\11.0.sql" />
+    <Content Include="dbScripts\11.1.sql" />
+    <Content Include="dbScripts\11.2.sql" />
+    <Content Include="dbScripts\11.3.sql" />
+    <Content Include="dbScripts\11.4.sql" />
     <Content Include="dbScripts\3.1.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
