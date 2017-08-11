@@ -112,23 +112,16 @@ namespace ExternalProcessWrappers
         {
             LastOutputReceivedAt = DateTime.Now;
             outDataTmp.Append(e.Data);
-            //log.DebugFormat("std output contains [{0}]", outDataTmp);
             Int32 indexOfNewLine = outDataTmp.ToString().IndexOf(Environment.NewLine);
-            //log.DebugFormat("newline found at [{0}]", indexOfNewLine);
             while (indexOfNewLine >= 0)
             {
                 String outputLine = outDataTmp.ToString().Substring(0, indexOfNewLine);
-                //log.DebugFormat("std output line [{0}]", outputLine);
 
                 Process_OutputDataReceived(sender, outputLine);
 
-                //log.Debug("removing");
                 outDataTmp.Remove(0, indexOfNewLine + Environment.NewLine.Length);
-                //log.DebugFormat("std output contains [{0}]", outDataTmp);
                 indexOfNewLine = outDataTmp.ToString().IndexOf(Environment.NewLine);
-                //log.DebugFormat("newline found at [{0}]", indexOfNewLine);
             }
-            //log.DebugFormat("std output contains [{0}]", outDataTmp);
         }
 
         private void stderrReeader_DataReceivedEvent(object sender, DataReceived e)
@@ -136,23 +129,16 @@ namespace ExternalProcessWrappers
             LastOutputReceivedAt = DateTime.Now;
             errDataTmp.Append(e.Data);
 
-            //log.DebugFormat("err output contains [{0}]", errDataTmp);
             Int32 indexOfNewLine = errDataTmp.ToString().IndexOf(Environment.NewLine);
-            //log.DebugFormat("newline found at [{0}]", indexOfNewLine);
             while (indexOfNewLine >= 0)
             {
                 String errLine = errDataTmp.ToString().Substring(0, indexOfNewLine);
-                //log.DebugFormat("err output line [{0}]", errLine);
 
                 Process_ErrorDataReceived(sender, errLine);
 
-                //log.Debug("removing");
                 errDataTmp.Remove(0, indexOfNewLine + Environment.NewLine.Length);
-                //log.DebugFormat("err output contains [{0}]", errDataTmp);
                 indexOfNewLine = errDataTmp.ToString().IndexOf(Environment.NewLine);
-                //log.DebugFormat("newline found at [{0}]", indexOfNewLine);
             }
-            //log.DebugFormat("err output contains [{0}]", errDataTmp);
         }
 
         protected virtual void Process_OutputDataReceived(object sender, String outputLine)
