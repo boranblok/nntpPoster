@@ -68,6 +68,7 @@
     <Compile Include="ParWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RarWrapper.cs" />
+    <Compile Include="StdStreamReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

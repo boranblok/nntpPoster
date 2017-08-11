@@ -32,6 +32,11 @@ namespace ExternalProcessWrappers
 
         public Int32 InactiveProcessTimeout { get; set; }
 
+        private StringBuilder outDataTmp;
+        private StringBuilder errDataTmp;
+        private StdStreamReader stdoutReader;
+        private StdStreamReader stderrReader;
+
         protected ExternalProcessWrapperBase(Int32 inactiveProcessTimeout)
         {
             InactiveProcessTimeout = inactiveProcessTimeout;
@@ -46,6 +51,16 @@ namespace ExternalProcessWrappers
 
         protected void ExecuteProcess(String parameters)
         {
+            outDataTmp = new StringBuilder();
+            errDataTmp = new StringBuilder();
+            stdoutReader = new StdStreamReader();
+            stderrReader = new StdStreamReader();
+
+            stdoutReader.DataReceivedEvent +=
+                new EventHandler<DataReceived>(stdoutReader_DataReceivedEvent);
+            stderrReader.DataReceivedEvent +=
+                new EventHandler<DataReceived>(stderrReeader_DataReceivedEvent);
+
             using (var process = new Process())
             {
                 process.StartInfo.Arguments = parameters;
@@ -59,21 +74,28 @@ namespace ExternalProcessWrappers
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.CreateNoWindow = true;
-                process.ErrorDataReceived += Process_ErrorDataReceived;
-                process.OutputDataReceived += Process_OutputDataReceived;
-                process.EnableRaisingEvents = true;
+
                 process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
+
+                stdoutReader.StartReader(process.StandardOutput.BaseStream, process);
+                stderrReader.StartReader(process.StandardError.BaseStream, process);
+
 
                 while (!process.WaitForExit(60*1000))
                 {
                     process.Refresh();
-                    if (process.HasExited) break;
+                    if (process.HasExited)
+                    {
+                        stdoutReader.IsDone();
+                        stderrReader.IsDone();
+                        break;
+                    }
 
                     if ((DateTime.Now - LastOutputReceivedAt).TotalMinutes > InactiveProcessTimeout)
                     {
                         log.WarnFormat("No output received for {0} minutes, killing external process.", InactiveProcessTimeout);
+                        stdoutReader.IsDone();
+                        stderrReader.IsDone();
                         process.Kill();
                         throw new Exception("External process had to be killed due to inactivity.");
                     }
@@ -86,18 +108,63 @@ namespace ExternalProcessWrappers
             }
         }
 
-        protected virtual void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        private void stdoutReader_DataReceivedEvent(object sender, DataReceived e)
         {
             LastOutputReceivedAt = DateTime.Now;
-            if(!String.IsNullOrWhiteSpace(e.Data))
-                log.Debug(e.Data);
+            outDataTmp.Append(e.Data);
+            //log.DebugFormat("std output contains [{0}]", outDataTmp);
+            Int32 indexOfNewLine = outDataTmp.ToString().IndexOf(Environment.NewLine);
+            //log.DebugFormat("newline found at [{0}]", indexOfNewLine);
+            while (indexOfNewLine >= 0)
+            {
+                String outputLine = outDataTmp.ToString().Substring(0, indexOfNewLine);
+                //log.DebugFormat("std output line [{0}]", outputLine);
+
+                Process_OutputDataReceived(sender, outputLine);
+
+                //log.Debug("removing");
+                outDataTmp.Remove(0, indexOfNewLine + Environment.NewLine.Length);
+                //log.DebugFormat("std output contains [{0}]", outDataTmp);
+                indexOfNewLine = outDataTmp.ToString().IndexOf(Environment.NewLine);
+                //log.DebugFormat("newline found at [{0}]", indexOfNewLine);
+            }
+            //log.DebugFormat("std output contains [{0}]", outDataTmp);
         }
 
-        protected virtual void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        private void stderrReeader_DataReceivedEvent(object sender, DataReceived e)
         {
             LastOutputReceivedAt = DateTime.Now;
-            if (!String.IsNullOrWhiteSpace(e.Data))
-                log.Warn(e.Data);
+            errDataTmp.Append(e.Data);
+
+            //log.DebugFormat("err output contains [{0}]", errDataTmp);
+            Int32 indexOfNewLine = errDataTmp.ToString().IndexOf(Environment.NewLine);
+            //log.DebugFormat("newline found at [{0}]", indexOfNewLine);
+            while (indexOfNewLine >= 0)
+            {
+                String errLine = errDataTmp.ToString().Substring(0, indexOfNewLine);
+                //log.DebugFormat("err output line [{0}]", errLine);
+
+                Process_ErrorDataReceived(sender, errLine);
+
+                //log.Debug("removing");
+                errDataTmp.Remove(0, indexOfNewLine + Environment.NewLine.Length);
+                //log.DebugFormat("err output contains [{0}]", errDataTmp);
+                indexOfNewLine = errDataTmp.ToString().IndexOf(Environment.NewLine);
+                //log.DebugFormat("newline found at [{0}]", indexOfNewLine);
+            }
+            //log.DebugFormat("err output contains [{0}]", errDataTmp);
+        }
+
+        protected virtual void Process_OutputDataReceived(object sender, String outputLine)
+        {            
+            if(!String.IsNullOrWhiteSpace(outputLine))
+                log.Debug(outputLine);
+        }
+
+        protected virtual void Process_ErrorDataReceived(object sender, String outputLine)
+        {
+            if (!String.IsNullOrWhiteSpace(outputLine))
+                log.Warn(outputLine);
         }
     }
 }
