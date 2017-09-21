@@ -10,15 +10,17 @@ namespace Util
     public class RandomStringGenerator
     {
         //Source: https://stackoverflow.com/questions/1344221/how-can-i-generate-random-alphanumeric-strings-in-c/1344255#1344255
+
+        //64 characters to have a % chars/length equal to 0 to be balanced.
+        private static readonly char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@-".ToCharArray();
+
         public static string GetRandomString(int size)
-        {
-            char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@-".ToCharArray();    //64 characters to have a % chars/length equal to 0 to be balanced.
-            byte[] data = new byte[1];
+        {            
+            byte[] data;
             using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
             {
-                crypto.GetNonZeroBytes(data);
                 data = new byte[size];
-                crypto.GetNonZeroBytes(data);
+                crypto.GetBytes(data);
             }
             StringBuilder result = new StringBuilder(size);
             foreach (byte b in data)
