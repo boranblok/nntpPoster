@@ -72,6 +72,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="LevenshteinDistance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RandomStringGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="conf\99_nodejsParPar.ini">
