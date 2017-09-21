@@ -18,6 +18,7 @@ namespace Util.Configuration
         public String CharsToRemove { get; set; }
         public String PreTag { get; set; }
         public String PostTag { get; set; }
+        public Boolean GenerateRandomMessageId { get; set; }
         internal List<String> TargetNewsgroups { get; set; }
         public Boolean SpreadFilesOverTargetNewsgroups { get; set; }
         public Boolean StripFileMetadata { get; set; }

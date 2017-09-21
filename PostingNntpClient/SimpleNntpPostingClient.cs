@@ -90,7 +90,7 @@ namespace PostingNntpClient
             }
         }
 
-        public String PostYEncMessage(String from, String subject, IEnumerable<String> newsGroups, 
+        public String PostYEncMessage(String overrideMessageId, String from, String subject, IEnumerable<String> newsGroups, 
             DateTime postedDateTime, IEnumerable<String> yEncHeaders, Byte[] yEncBody, IEnumerable<String> yEncFooters)
         {
             _writer.WriteLine("POST");
@@ -99,7 +99,7 @@ namespace PostingNntpClient
             {
                 throw new Exception("Could not start posting message: " + response.ResponseMessage);
             }
-            var messageId = ExtractMessageID(response.ResponseMessage);
+            var messageId = String.IsNullOrWhiteSpace(overrideMessageId) ? ExtractMessageID(response.ResponseMessage) : overrideMessageId;
             var postedDateTimeString = postedDateTime.ToString("ddd, dd MMM yyyy HH:mm:ss zzz (UTC)", CultureInfo.InvariantCulture);
             postedDateTimeString = postedDateTimeString.Remove(postedDateTimeString.LastIndexOf(':'), 1);
 

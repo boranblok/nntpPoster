@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using log4net;
 using PostingNntpClient;
 using Util.Configuration;
+using Util;
 
 namespace nntpPoster
 {
@@ -140,7 +141,13 @@ namespace nntpPoster
                         _client = new SimpleNntpPostingClient(_connectionInfo);
                         _client.Connect();
                     }
+
+                    String proposedMessageID = null;
+                    if (_folderConfiguration.GenerateRandomMessageId)
+                        proposedMessageID = RandomStringGenerator.GetRandomString(20, 30) + "@" + RandomStringGenerator.GetRandomString(5, 10) + "." + RandomStringGenerator.GetRandomString(3);
+
                     var partMessageId = _client.PostYEncMessage(
+                        proposedMessageID,
                         message.FromAddress,
                         message.Subject,
                         message.PostInfo.PostedGroups,

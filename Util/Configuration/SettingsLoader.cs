@@ -307,6 +307,7 @@ namespace Util.Configuration
             settings.CharsToRemove = GetSettingString(config, WatchfolderSection, "CharsToRemove");
             settings.PreTag = GetSettingString(config, WatchfolderSection, "PreTag", true);
             settings.PostTag = GetSettingString(config, WatchfolderSection, "PostTag", true);
+            settings.GenerateRandomMessageId = GetSettingBoolean(config, WatchfolderSection, "GenerateRandomMessageId");
             settings.TargetNewsgroups = new List<String>(GetSettingString(config, WatchfolderSection, "TargetNewsgroups").Split('|'));
             settings.SpreadFilesOverTargetNewsgroups = GetSettingBoolean(config, WatchfolderSection, "SpreadFilesOverTargetNewsgroups");
             settings.StripFileMetadata = GetSettingBoolean(config, WatchfolderSection, "StripFileMetadata");
