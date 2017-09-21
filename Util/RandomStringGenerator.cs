@@ -12,7 +12,7 @@ namespace Util
         //Source: https://stackoverflow.com/questions/1344221/how-can-i-generate-random-alphanumeric-strings-in-c/1344255#1344255
 
         //64 characters to have a % chars/length equal to 0 to be balanced.
-        private static readonly char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@-".ToCharArray();
+        private static readonly char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-".ToCharArray();
 
         public static string GetRandomString(int size)
         {            

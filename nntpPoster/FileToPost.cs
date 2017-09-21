@@ -53,7 +53,7 @@ namespace nntpPoster
         {
             if("RANDOM".Equals(fromAddress, StringComparison.InvariantCultureIgnoreCase))
             {
-                return RandomStringGenerator.GetRandomString(10, 50);
+                return RandomStringGenerator.GetRandomString(10, 30) + "@" + RandomStringGenerator.GetRandomString(5, 15) + "." + RandomStringGenerator.GetRandomString(3);
             }
             else
             {
