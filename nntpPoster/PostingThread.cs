@@ -141,7 +141,7 @@ namespace nntpPoster
                         _client.Connect();
                     }
                     var partMessageId = _client.PostYEncMessage(
-                        _folderConfiguration.FromAddress,
+                        message.FromAddress,
                         message.Subject,
                         message.PostInfo.PostedGroups,
                         message.PostInfo.PostedDateTime,

@@ -9,6 +9,7 @@ namespace nntpPoster
 {
     public class nntpMessage
     {
+        public String FromAddress { get; set; }
         public String Subject { get; set; }
         public List<String> Prefix { get; set; }
         public YEncFilePart YEncFilePart { get; set; }

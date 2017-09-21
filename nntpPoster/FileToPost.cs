@@ -58,6 +58,7 @@ namespace nntpPoster
         public PostedFileInfo PostYEncFile(InntpMessagePoster poster, String prefix, String suffix)
         {
             PostedFileInfo postedFileInfo = new PostedFileInfo();
+            postedFileInfo.FromAddress = folderConfiguration.FromAddress;
             String subjectNameBase = ConstructSubjectNameBase(prefix, suffix);
             postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
             postedFileInfo.PostedGroups.AddRange(folderConfiguration.GetTargetNewsGroups());
@@ -106,6 +107,7 @@ namespace nntpPoster
             String subjectNameBase)
         {
             var message = new nntpMessage();
+            message.FromAddress = postedFileInfo.FromAddress;
             message.Subject = String.Format(subjectNameBase, part.Number);
 
             message.YEncFilePart = part;

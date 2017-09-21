@@ -216,7 +216,7 @@ namespace nntpPoster
                         ),
                     postedFiles.Select(f =>
                         new XElement(ns + "file",
-                            new XAttribute("poster", folderConfiguration.FromAddress),
+                            new XAttribute("poster", f.FromAddress),
                             new XAttribute("date", f.GetUnixPostedDateTime()),
                             new XAttribute("subject", f.NzbSubjectName),
                             new XElement(ns + "groups",

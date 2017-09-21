@@ -8,6 +8,7 @@ namespace nntpPoster
 {
     public class PostedFileInfo
     {
+        public String FromAddress { get; set; }
         public String NzbSubjectName { get; set; }
         public DateTime PostedDateTime { get; set; }
         public List<String> PostedGroups { get; private set; }
