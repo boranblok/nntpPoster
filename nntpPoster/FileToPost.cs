@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using log4net;
 using nntpPoster.yEncLib;
 using Util.Configuration;
+using Util;
 
 namespace nntpPoster
 {
@@ -48,6 +49,18 @@ namespace nntpPoster
             return subject.ToString();
         }
 
+        private string GetFromAddress(String fromAddress)
+        {
+            if("RANDOM".Equals(fromAddress, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return RandomStringGenerator.GetRandomString(10, 50);
+            }
+            else
+            {
+                return fromAddress;
+            }
+        }
+
         private void DetermineTotalParts()
         {
             TotalParts = (Int32)(File.Length / partSize);
@@ -58,7 +71,7 @@ namespace nntpPoster
         public PostedFileInfo PostYEncFile(InntpMessagePoster poster, String prefix, String suffix)
         {
             PostedFileInfo postedFileInfo = new PostedFileInfo();
-            postedFileInfo.FromAddress = folderConfiguration.FromAddress;
+            postedFileInfo.FromAddress = GetFromAddress(folderConfiguration.FromAddress);
             String subjectNameBase = ConstructSubjectNameBase(prefix, suffix);
             postedFileInfo.NzbSubjectName = String.Format(subjectNameBase, 1);
             postedFileInfo.PostedGroups.AddRange(folderConfiguration.GetTargetNewsGroups());
