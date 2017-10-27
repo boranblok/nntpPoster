@@ -69,7 +69,7 @@ namespace ExternalProcessWrappers
         protected override void Process_ErrorDataReceived(object sender, String outputLine)
         {
             base.Process_ErrorDataReceived(sender, outputLine);
-            if (outputLine != null && outputLine.Contains("Block size is too small."))
+            if (outputLine != null && (outputLine.Contains("Block size is too small.") || outputLine.Contains("Too many input slices")))
                 blockSizeTooSmall = true;
         }
     }
