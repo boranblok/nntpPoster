@@ -144,7 +144,10 @@ namespace nntpPoster
 
                     String proposedMessageID = null;
                     if (_folderConfiguration.GenerateRandomMessageId)
-                        proposedMessageID = RandomStringGenerator.GetRandomString(20, 30) + "@" + RandomStringGenerator.GetRandomString(5, 10) + "." + RandomStringGenerator.GetRandomString(3);
+                    {
+                        proposedMessageID = String.Format("<{0}@{1}.{2}>",
+                            RandomStringGenerator.GetRandomString(20, 30), RandomStringGenerator.GetRandomString(5, 10), RandomStringGenerator.GetRandomString(3));
+                    }
 
                     var partMessageId = _client.PostYEncMessage(
                         proposedMessageID,
