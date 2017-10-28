@@ -16,7 +16,7 @@ namespace Util.Configuration
 
         public Int64 FromSizeBytes
         {
-            get { return FromSize*1024*1024; }
+            get { return (Int64)FromSize*1024*1024; }
         }
 
         [DataMember(Order = 1)]
