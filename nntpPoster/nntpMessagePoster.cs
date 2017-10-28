@@ -65,6 +65,7 @@ namespace nntpPoster
         {
             if (!IsPosting)
             {
+                log.Info("we were not posting yet, starting posting threads.");
                 IsPosting = true;
                 PostingThreads.ForEach(t => t.Start());
             }
@@ -112,9 +113,11 @@ namespace nntpPoster
 
         public void WaitTillCompletion()
         {
+            log.Info("Verifying if we already started posting.");
             //If the amount of blocks to post was not enough to trigger the start of posting, we trigger it here.
             StartPostingThreadsIfNotStarted();
 
+            log.Info("Waiting for the final messages to be posted.");
             Task.WaitAll(PostingThreads.Select(t => t.RequestStop()).ToArray());
         }
 
