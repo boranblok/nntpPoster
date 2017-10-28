@@ -41,7 +41,7 @@ namespace Util.Configuration
         {
             get
             {
-                return YEncLineSize * YEncLinesPerMessage;
+                return (YEncLineSize * YEncLinesPerMessage) - ((YEncLineSize * YEncLinesPerMessage) % 4);   //Always has to be a multiple of 4.
             }
         }
 
