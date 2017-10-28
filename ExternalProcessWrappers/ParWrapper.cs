@@ -10,6 +10,7 @@ namespace ExternalProcessWrappers
 {
     public class ParWrapper : ExternalProcessWrapperBase
     {
+        private static readonly Int32 maxNumberOfBlocks = Int16.MaxValue;
         private Boolean blockSizeTooSmall;
         protected override string ProcessPathLocation
         {
@@ -71,6 +72,13 @@ namespace ExternalProcessWrappers
             base.Process_ErrorDataReceived(sender, outputLine);
             if (outputLine != null && (outputLine.Contains("Block size is too small.") || outputLine.Contains("Too many input slices")))
                 blockSizeTooSmall = true;
+        }
+
+        public Int32 CalculatePartSize(Int64 sizeOfFiles, Int32 yEncPartSize)
+        {
+            Decimal calcPartSize = (Decimal)sizeOfFiles / maxNumberOfBlocks;
+            Decimal partSizeMultiplier = Math.Ceiling(calcPartSize / yEncPartSize);
+            return (Int32)partSizeMultiplier;
         }
     }
 }

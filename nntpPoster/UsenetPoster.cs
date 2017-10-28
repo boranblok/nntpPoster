@@ -171,9 +171,10 @@ namespace nntpPoster
             }
 
             var parWrapper = new ParWrapper(configuration.InactiveProcessTimeout, configuration.ParLocation, configuration.ParCommandFormat);
+            var processedSize = processedFolder.Size();
+            Int32 partSize = parWrapper.CalculatePartSize(processedSize, configuration.YEncPartSize);
             DateTime parStartTime = DateTime.Now;
             Boolean makePar = true;
-            Int32 partSize = configuration.YEncPartSize;
             while (makePar && partSize / configuration.YEncPartSize < 10)   //Max 10 loops.
             {
                 try
