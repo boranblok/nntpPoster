@@ -36,7 +36,7 @@ namespace ExternalProcessWrappers
             String parParameters = String.Format(CommandFormat,
                blockSize,
                redundancyPercentage,
-               Path.Combine(workingFolder.FullName, nameWithoutExtension + ".par2"),
+               '"' + Path.Combine(workingFolder.FullName, nameWithoutExtension + ".par2") + '"',
                GetFileList(workingFolder),
                extraParams
             );
@@ -78,7 +78,7 @@ namespace ExternalProcessWrappers
         {
             Decimal calcPartSize = (Decimal)sizeOfFiles / maxNumberOfBlocks;
             Decimal partSizeMultiplier = Math.Ceiling(calcPartSize / yEncPartSize);
-            return (Int32)partSizeMultiplier;
+            return yEncPartSize * (Int32)partSizeMultiplier;
         }
     }
 }
