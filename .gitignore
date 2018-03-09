@@ -192,3 +192,4 @@ ModelManifest.xml
 App.*.config
 Web.*.config
 settings.*.config
+/.vs
