@@ -88,22 +88,6 @@
     <None Include="..\nntpAutoposter\App.config">
       <Link>App.config</Link>
     </None>
-    <None Include="..\nntpAutoposter\App.Debug.config">
-      <Link>App.Debug.config</Link>
-      <DependentUpon>App.config</DependentUpon>
-    </None>
-    <None Include="..\nntpAutoposter\App.Mono.config">
-      <Link>App.Mono.config</Link>
-      <DependentUpon>App.config</DependentUpon>
-    </None>
-    <None Include="..\nntpAutoposter\App.Package.config">
-      <Link>App.Package.config</Link>
-      <DependentUpon>App.config</DependentUpon>
-    </None>
-    <None Include="..\nntpAutoposter\App.Release.config">
-      <Link>App.Release.config</Link>
-      <DependentUpon>App.config</DependentUpon>
-    </None>
     <None Include="init.d.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -182,11 +166,4 @@ if not exist uploadfailed\ mkdir uploadfailed\
     <SlowCheetahTargets Condition=" '$(SlowCheetah_EnableImportFromNuGet)'=='true' and Exists('$(SlowCheetah_NuGetImportPath)') ">$(SlowCheetah_NuGetImportPath)</SlowCheetahTargets>
   </PropertyGroup>
   <Import Project="$(SlowCheetahTargets)" Condition="Exists('$(SlowCheetahTargets)')" Label="SlowCheetah" />
-  <Import Project="..\packages\SlowCheetah.2.5.48\build\SlowCheetah.targets" Condition="Exists('..\packages\SlowCheetah.2.5.48\build\SlowCheetah.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\SlowCheetah.2.5.48\build\SlowCheetah.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SlowCheetah.2.5.48\build\SlowCheetah.targets'))" />
-  </Target>
 </Project>
