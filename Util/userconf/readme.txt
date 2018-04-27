@@ -57,6 +57,9 @@ SearchUrl=https://api.apiserver.com/api?t=search&q={0}&maxage={1}&apikey=${ApiKe
 # Folder used to prepare the files for posting. Any data in this folder is removed at startup!
 Working=working
 
+# What folder to use as queue for files that have not been uploaded yet.
+Queue=queue
+
 # Folder where to output NZB's leave empty to skip writing NZB's to the filesystem
 NzbOutput=
 
@@ -64,7 +67,7 @@ NzbOutput=
 Backup=backup
 
 # The folder to put failed uploads in
-PostFailed=uploadfailed
+UploadFailed=uploadfailed
 
 
 [Posting]
