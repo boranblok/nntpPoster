@@ -26,16 +26,16 @@ namespace nntpPoster
         private Settings _configuration;
         private WatchFolderSettings _folderConfiguration;
         private NewsHostConnectionInfo _connectionInfo;        
-        private Queue<nntpMessage> _messageQueue;
+        private Queue<NntpMessage> _messageQueue;
 
-        public event EventHandler<nntpMessage> MessagePosted;
-        protected virtual void OnMessagePosted(nntpMessage e)
+        public event EventHandler<NntpMessage> MessagePosted;
+        protected virtual void OnMessagePosted(NntpMessage e)
         {
-            if (MessagePosted != null) MessagePosted(this, e);
+            MessagePosted?.Invoke(this, e);
         }        
 
         public PostingThread(Settings configuration, WatchFolderSettings folderConfiguration, NewsHostConnectionInfo connectionInfo, 
-            Queue<nntpMessage> messageQueue)
+            Queue<NntpMessage> messageQueue)
         {
             _configuration = configuration;
             _folderConfiguration = folderConfiguration;
@@ -78,8 +78,9 @@ namespace nntpPoster
                 while (!Finished)
                 {
                     var message = GetNextMessageToPost();
-                    if (message != null)
+                    if (message != null)                        
                     {
+                        log.DebugFormat("Posting message [{0}]", message.Subject);
                         PostMessage(message);
                         lastMessage = DateTime.Now;
                     }
@@ -100,23 +101,29 @@ namespace nntpPoster
                         }
                         if (StopRequested)
                         {
+                            log.Debug("Empty queue and stop requested, Finished = true.");
                             Finished = true;
                         }
                         else
                         {
                             lock (monitor)
                             {
+                                log.Debug("Locked monitor.");
                                 if (Finished)
                                 {
+                                    log.Debug("Finished = true breaking out of loop.");
                                     break;
                                 }
                                 if (StopRequested)
                                 {
+                                    log.Debug("Empty queue and stop requested, Finished = true.");
                                     Finished = true;
                                     break;
                                 }
-                                Monitor.Wait(monitor, 100);
+                                log.Debug("waiting 100 ms on monitor.");
+                                Monitor.Wait(monitor, 100);     //TODO: BLB Possible cause of locking issue by UNI.
                             }
+                            log.Debug("Unlocked on monitor.");
                         }
                     }
                 }
@@ -127,7 +134,7 @@ namespace nntpPoster
             }
         }
 
-        private void PostMessage(nntpMessage message)
+        private void PostMessage(NntpMessage message)
         {
             var retryCount = 0;
             var retry = true;
@@ -158,8 +165,10 @@ namespace nntpPoster
                         message.Prefix,
                         message.YEncFilePart.EncodedLines,
                         message.Suffix);
+                    log.DebugFormat("Message [{0}] posted. Adding to segments.", message.Subject);
                     lock (message.PostInfo.Segments)
                     {
+                        log.Debug("Locked segments list.");
                         message.PostInfo.Segments.Add(new PostedFileSegment
                         {
                             MessageId = partMessageId,
@@ -167,6 +176,7 @@ namespace nntpPoster
                             SegmentNumber = message.YEncFilePart.Number
                         });
                     }
+                    log.Debug("Unlocked segments list.");
                     retry = false;
                     OnMessagePosted(message);
                 }
@@ -194,16 +204,22 @@ namespace nntpPoster
             }
         }
 
-        private nntpMessage GetNextMessageToPost()
+        private NntpMessage GetNextMessageToPost()
         {
+            NntpMessage message = null;
+            log.Debug("GetNextMessageToPost started.");
             lock (_messageQueue)
             {
-                if (_messageQueue.Count > 0)
-                    return _messageQueue.Dequeue();
+                log.Debug("Locked messageQueue");
+                var count = _messageQueue.Count;
+                log.DebugFormat("The messageQueue has {0} items.", count);
+                if (count > 0)
+                    message = _messageQueue.Dequeue();
             }
-            if (!StopRequested) //If stop is requested it is logical the queue gets empty.
+            log.Debug("Unlocked messageQueue");
+            if (message == null && !StopRequested) //If stop is requested it is logical the queue gets empty.
                 log.Warn("Posting thread is starved, reduce threads to make more optimal use of resources.");
-            return null;
+            return message;
         }
 
         public void Dispose()

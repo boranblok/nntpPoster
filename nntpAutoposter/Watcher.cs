@@ -97,7 +97,9 @@ namespace nntpAutoposter
 
         private void AddItemToPostingDb(FileSystemInfo toPost, WatchFolderSettings folderConfiguration)
         {
+#pragma warning disable IDE0017 // Simplify object initialization
             UploadEntry newUploadentry = new UploadEntry();
+#pragma warning restore IDE0017 // Simplify object initialization
             newUploadentry.WatchFolderShortName = folderConfiguration.ShortName;
             newUploadentry.CreatedAt = DateTime.UtcNow;
             newUploadentry.Name = toPost.Name;

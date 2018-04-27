@@ -7,7 +7,7 @@ using nntpPoster.yEncLib;
 
 namespace nntpPoster
 {
-    public class nntpMessage
+    public class NntpMessage
     {
         public String FromAddress { get; set; }
         public String Subject { get; set; }
@@ -16,7 +16,7 @@ namespace nntpPoster
         public List<String> Suffix { get; set; }
         public PostedFileInfo PostInfo { get; set; }
 
-        public nntpMessage()
+        public NntpMessage()
         {
             Prefix = new List<String>();
             Suffix = new List<String>();

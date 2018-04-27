@@ -19,7 +19,7 @@ namespace nntpAutoposter
         protected static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private Object monitor = new Object();        
+        private Object monitor = new Object();
         private Task MyTask;
         private Boolean StopRequested;
 
@@ -27,12 +27,12 @@ namespace nntpAutoposter
 
         public static IndexerNotifierBase GetActiveNotifier(Settings configuration)
         {
-            if("NewznabHash".Equals(configuration.NotificationType, StringComparison.InvariantCultureIgnoreCase))
+            if ("NewznabHash".Equals(configuration.NotificationType, StringComparison.InvariantCultureIgnoreCase))
             {
                 return new IndexerNotifierNewznabHash(configuration);
             }
 
-            if("NzbPost".Equals(configuration.NotificationType, StringComparison.InvariantCultureIgnoreCase))
+            if ("NzbPost".Equals(configuration.NotificationType, StringComparison.InvariantCultureIgnoreCase))
             {
                 return new IndexerNotifierNzbPost(configuration);
             }
@@ -84,7 +84,7 @@ namespace nntpAutoposter
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 log.Error("Serious error in the notifier thread.", ex);
             }
@@ -92,21 +92,21 @@ namespace nntpAutoposter
 
         private void NotifyIndexerOfNewObfuscatedUploads()
         {
-            foreach(var upload in DBHandler.Instance.GetUploadEntriesToNotifyIndexer())
+            foreach (var upload in DBHandler.Instance.GetUploadEntriesToNotifyIndexer())
             {
                 try
                 {
                     NotifyIndexerOfObfuscatedUpload(upload);
                     upload.NotifiedIndexerAt = DateTime.UtcNow;
                     DBHandler.Instance.UpdateUploadEntry(upload);
-                    log.InfoFormat("Notified indexer that obfuscated release [{0}] is actually [{1}]", 
+                    log.InfoFormat("Notified indexer that obfuscated release [{0}] is actually [{1}]",
                         upload.ObscuredName, upload.CleanedName);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     log.Error(String.Format("Could not notify indexer of obfuscated release: [{0}]", upload.CleanedName), ex);
                     upload.NotificationCount += 1;
-                    if(upload.NotificationCount > Configuration.MaxNotificationAttempts)
+                    if (upload.NotificationCount > Configuration.MaxNotificationAttempts)
                     {
                         log.WarnFormat("The release [{0}] has tried more than {1} times to notify the indexer and failed. There is probably something wrong with the name or with the indexer.",
                             upload.CleanedName, Configuration.MaxNotificationAttempts);

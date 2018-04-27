@@ -18,7 +18,7 @@ namespace nntpPoster
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public event EventHandler<UploadSpeedReport> newUploadSpeedReport;
+        public event EventHandler<UploadSpeedReport> NewUploadSpeedReport;
 
         private Settings configuration;
         private WatchFolderSettings folderConfiguration;
@@ -41,9 +41,9 @@ namespace nntpPoster
 
         public XDocument PostToUsenet(FileSystemInfo toPost, String title, String rarPassword, Boolean saveNzb = true)
         {
-            using (nntpMessagePoster poster = new nntpMessagePoster(configuration, folderConfiguration))
+            using (NntpMessagePoster poster = new NntpMessagePoster(configuration, folderConfiguration))
             {
-                poster.PartPosted += poster_PartPosted;
+                poster.PartPosted += Poster_PartPosted;
                 DirectoryInfo processedFiles = null;
                 try
                 {
@@ -106,7 +106,7 @@ namespace nntpPoster
             }
         }
 
-        void poster_PartPosted(object sender, YEncFilePart e)
+        void Poster_PartPosted(object sender, YEncFilePart e)
         {
             Int32 _uploadedPartCount;
             Int64 _totalUploadedBytes;
@@ -133,8 +133,7 @@ namespace nntpPoster
         {
             Console.Write("\r" + e.ToString() + "   ");
 
-            EventHandler<UploadSpeedReport> handler = newUploadSpeedReport;
-            if (handler != null) handler(this, e);
+            NewUploadSpeedReport?.Invoke(this, e);
         }
 
         private DirectoryInfo MakeProcessingFolder(String nameWithoutExtension)

@@ -6,6 +6,6 @@ namespace nntpPoster
 {
     public interface InntpMessagePoster
     {
-        void PostMessage(nntpMessage message);
+        void PostMessage(NntpMessage message);
     }
 }

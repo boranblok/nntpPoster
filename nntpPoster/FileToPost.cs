@@ -119,7 +119,7 @@ namespace nntpPoster
         private void PostPart(InntpMessagePoster poster, PostedFileInfo postedFileInfo, YEncFilePart part, 
             String subjectNameBase)
         {
-            var message = new nntpMessage();
+            var message = new NntpMessage();
             message.FromAddress = postedFileInfo.FromAddress;
             message.Subject = String.Format(subjectNameBase, part.Number);
 

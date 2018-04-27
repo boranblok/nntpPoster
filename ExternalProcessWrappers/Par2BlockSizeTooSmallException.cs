@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ExternalProcessWrappers
 {
+    [Serializable]
     public class Par2BlockSizeTooSmallException : Exception
     {
         public Par2BlockSizeTooSmallException() : base() { }

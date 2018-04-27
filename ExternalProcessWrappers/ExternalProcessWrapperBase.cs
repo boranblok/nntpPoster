@@ -8,7 +8,7 @@ using log4net;
 
 namespace ExternalProcessWrappers
 {
-    public abstract class ExternalProcessWrapperBase
+    public abstract class ExternalProcessWrapperBase : IDisposable
     {
         protected static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -57,9 +57,9 @@ namespace ExternalProcessWrappers
             stderrReader = new StdStreamReader();
 
             stdoutReader.DataReceivedEvent +=
-                new EventHandler<DataReceived>(stdoutReader_DataReceivedEvent);
+                new EventHandler<DataReceived>(StdoutReader_DataReceivedEvent);
             stderrReader.DataReceivedEvent +=
-                new EventHandler<DataReceived>(stderrReeader_DataReceivedEvent);
+                new EventHandler<DataReceived>(StderrReeader_DataReceivedEvent);
 
             using (var process = new Process())
             {
@@ -108,7 +108,7 @@ namespace ExternalProcessWrappers
             }
         }
 
-        private void stdoutReader_DataReceivedEvent(object sender, DataReceived e)
+        private void StdoutReader_DataReceivedEvent(object sender, DataReceived e)
         {
             LastOutputReceivedAt = DateTime.Now;
             outDataTmp.Append(e.Data);
@@ -124,7 +124,7 @@ namespace ExternalProcessWrappers
             }
         }
 
-        private void stderrReeader_DataReceivedEvent(object sender, DataReceived e)
+        private void StderrReeader_DataReceivedEvent(object sender, DataReceived e)
         {
             LastOutputReceivedAt = DateTime.Now;
             errDataTmp.Append(e.Data);
@@ -151,6 +151,23 @@ namespace ExternalProcessWrappers
         {
             if (!String.IsNullOrWhiteSpace(outputLine))
                 log.Warn(outputLine);
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if(stdoutReader != null)
+                    stdoutReader.Dispose();
+                if(stderrReader != null)
+                    stderrReader.Dispose();
+            }
         }
     }
 }

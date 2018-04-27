@@ -14,7 +14,7 @@ namespace ExternalProcessWrappers
         public Process Process { get; set; }
     }
 
-    public class StdStreamReader
+    public class StdStreamReader : IDisposable
     {
         static int bufferSize = 1024;
         byte[] _buffer = new byte[bufferSize];
@@ -74,6 +74,20 @@ namespace ExternalProcessWrappers
                 {
                     Monitor.Exit(_DataQueue);
                 }
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _DoneEvent.Dispose();
             }
         }
     }

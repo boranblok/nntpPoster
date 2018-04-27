@@ -55,6 +55,7 @@ namespace nntpAutoposter
             _connectionString = String.Format("URI=file:{0},version=3", dbFilePath);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         private void InitializeDatabase()
         {
             List<DBScript> dbScripts = LoadDbScripts();
@@ -109,9 +110,8 @@ namespace nntpAutoposter
 
             foreach (FileInfo scriptFile in scriptFolder.GetFileSystemInfos("*.sql"))
             {
-                Decimal scriptNumber;
                 if (Decimal.TryParse(scriptFile.NameWithoutExtension(), 
-                    NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out scriptNumber))
+                    NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out Decimal scriptNumber))
                 {
                     using(StreamReader reader = scriptFile.OpenText())
                     {
@@ -408,7 +408,9 @@ namespace nntpAutoposter
 
         private static UploadEntry GetUploadEntryFromReader(SqliteDataReader reader)
         {
+#pragma warning disable IDE0017 // Simplify object initialization
             UploadEntry uploadEntry = new UploadEntry();
+#pragma warning restore IDE0017 // Simplify object initialization
 
             uploadEntry.ID = (Int64)reader["RowIDAlias"];
             uploadEntry.Name = reader["Name"] as String;
@@ -464,9 +466,7 @@ namespace nntpAutoposter
 
         private static Nullable<DateTime> GetNullableDateTime(Object dbValue)
         {
-            String dateTimeStr = dbValue as String;
-            DateTime result;
-            if (dateTimeStr != null && DateTime.TryParse(dateTimeStr, null, DateTimeStyles.RoundtripKind, out result))
+            if (dbValue is String dateTimeStr && DateTime.TryParse(dateTimeStr, null, DateTimeStyles.RoundtripKind, out DateTime result))
                 return result;
 
             return null;

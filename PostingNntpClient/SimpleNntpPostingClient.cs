@@ -58,9 +58,11 @@ namespace PostingNntpClient
             {
                 _stream = stream;
             }
-            _writer = new StreamWriter(_stream, iso88591Encoding);
-            _writer.NewLine = "\r\n";  //Added for mono compatibility, nntp requires \r\n as newline char, not just \n as used by mono.
-            _writer.AutoFlush = true;
+            _writer = new StreamWriter(_stream, iso88591Encoding)
+            {
+                NewLine = "\r\n",  //Added for mono compatibility, nntp requires \r\n as newline char, not just \n as used by mono.
+                AutoFlush = true
+            };
             _reader = new StreamReader(_stream, iso88591Encoding);
 
             var connectResponse = ReadResponse();
@@ -157,30 +159,45 @@ namespace PostingNntpClient
             return "<" + Guid.NewGuid().ToString("N") + "@" + ConnectionInfo.Address + ">";
         }
 
-
         public void Dispose()
         {
-            try
-            {
-                if (_reader != null)
-                    _reader.Dispose();
-            }
-            catch
-            { }
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            try
+        protected virtual void Dispose(Boolean disposing)
+        {
+            if (disposing)
             {
-                if (_writer != null)
-                    _writer.Dispose();
-            }
-            catch { }
+                try
+                {
+                    if (_reader != null)
+                        _reader.Dispose();
+                }
+                catch
+                { }
 
-            try
-            {
-                if (_stream != null)
-                    _stream.Dispose();
+                try
+                {
+                    if (_writer != null)
+                        _writer.Dispose();
+                }
+                catch { }
+
+                try
+                {
+                    if (_stream != null)
+                        _stream.Dispose();
+                }
+                catch { }
+
+                try
+                {
+                    if (_tcpClient != null && _tcpClient.Connected)
+                        _tcpClient.Close();
+                }
+                catch { }
             }
-            catch { }
         }
     }
 }

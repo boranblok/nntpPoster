@@ -75,8 +75,8 @@
   <ItemGroup>
     <Compile Include="FileToPost.cs" />
     <Compile Include="InntpMessagePoster.cs" />
-    <Compile Include="nntpMessage.cs" />
-    <Compile Include="nntpMessagePoster.cs" />
+    <Compile Include="NntpMessage.cs" />
+    <Compile Include="NntpMessagePoster.cs" />
     <Compile Include="PostedFileInfo.cs" />
     <Compile Include="PostingThread.cs">
       <SubType>Code</SubType>

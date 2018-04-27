@@ -11,7 +11,7 @@ using Util.Configuration;
 
 namespace nntpPoster
 {
-    public class nntpMessagePoster : InntpMessagePoster, IDisposable
+    public class NntpMessagePoster : InntpMessagePoster, IDisposable
     {
         private static readonly ILog log = LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -21,11 +21,11 @@ namespace nntpPoster
         private WatchFolderSettings folderConfiguration;
         private NewsHostConnectionInfo connectionInfo;
 
-        private Queue<nntpMessage> MessagesToPost;
+        private Queue<NntpMessage> MessagesToPost;
         private List<PostingThread> PostingThreads;
         private Boolean IsPosting;
 
-        public nntpMessagePoster(Settings configuration, WatchFolderSettings folderConfiguration)
+        public NntpMessagePoster(Settings configuration, WatchFolderSettings folderConfiguration)
         {
             this.configuration = configuration;
             this.folderConfiguration = folderConfiguration;
@@ -38,7 +38,7 @@ namespace nntpPoster
                 Password = configuration.NewsGroupPassword
             };
 
-            MessagesToPost = new Queue<nntpMessage>();
+            MessagesToPost = new Queue<NntpMessage>();
             PostingThreads = ConstructPostingThreads();
             IsPosting = false;
         }
@@ -49,14 +49,14 @@ namespace nntpPoster
             for (int i = 0; i < configuration.MaxConnectionCount; i++)
             {
                 var postingThread = new PostingThread(configuration, folderConfiguration, connectionInfo, MessagesToPost);
-                postingThread.MessagePosted += postingThread_MessagePosted;
+                postingThread.MessagePosted += PostingThread_MessagePosted;
                 postingThreads.Add(postingThread);
             }
 
             return postingThreads;
         }
 
-        void postingThread_MessagePosted(object sender, nntpMessage e)  //TODO propagate this further instead of yEnc part? (combine the two ?)
+        void PostingThread_MessagePosted(object sender, NntpMessage e)  //TODO propagate this further instead of yEnc part? (combine the two ?)
         {
             OnFilePartPosted(e.YEncFilePart);
         }
@@ -78,10 +78,10 @@ namespace nntpPoster
             {
                 Monitor.Pulse(monitor);
             }
-            if (PartPosted != null) PartPosted(this, e);
+            PartPosted?.Invoke(this, e);
         }
 
-        public void PostMessage(nntpMessage message)
+        public void PostMessage(NntpMessage message)
         {
             Boolean wait = true;
             while (wait)
@@ -123,8 +123,17 @@ namespace nntpPoster
 
         public void Dispose()
         {
-            log.Debug("Disposing Posting threads.");
-            PostingThreads.ForEach(t => t.Dispose());
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(Boolean disposing)
+        {
+            if (disposing)
+            {
+                log.Debug("Disposing Posting threads.");
+                PostingThreads.ForEach(t => t.Dispose());
+            }
         }
     }
 }

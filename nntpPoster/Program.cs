@@ -46,7 +46,7 @@ namespace nntpPoster
             Settings config = Settings.LoadSettings();
 
             UsenetPoster poster = new UsenetPoster(config, config.GetWatchFolderSettings("Default"));
-            poster.newUploadSpeedReport += poster_newUploadSpeedReport;
+            poster.NewUploadSpeedReport += poster_newUploadSpeedReport;
             poster.PostToUsenet(toUpload, null);
 
             return 0;
