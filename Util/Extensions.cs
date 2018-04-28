@@ -119,8 +119,15 @@ namespace Util
             DirectoryInfo moved = new DirectoryInfo(destinationFolder);
             if (moved.Exists)
             {
-                log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toMove.Name);
-                moved.Delete();
+                if (toMove.FullName == moved.FullName)
+                {
+                    log.WarnFormat("Folder '{0}' was already at destination location.", toMove.Name);
+                }
+                else
+                {
+                    log.WarnFormat("Folder '{0}' already existed. Overwriting!", toMove.Name);
+                    moved.Delete();
+                }
             }
             log.DebugFormat("Moving folder [{0}] to [{1}]", sourceFolder, destinationFolder);
             Directory.Move(sourceFolder, destinationFolder);
@@ -134,8 +141,15 @@ namespace Util
             FileSystemInfo moved = new FileInfo(destinationFile);
             if (moved.Exists)
             {
-                log.WarnFormat("The backup folder for '{0}' already existed. Overwriting!", toMove.Name);
-                moved.Delete();
+                if (toMove.FullName == moved.FullName)
+                {
+                    log.WarnFormat("File '{0}' was already at destination location.", toMove.Name);
+                }
+                else
+                {
+                    log.WarnFormat("File '{0}' already existed. Overwriting!", toMove.Name);
+                    moved.Delete();
+                }
             }
             log.DebugFormat("Moving file [{0}] to [{1}]", sourceFile, destinationFile);
             File.Move(sourceFile, destinationFile);

@@ -84,9 +84,9 @@ namespace nntpAutoposter
                 {
                     DirectoryInfo destination = new DirectoryInfo(
                         Path.Combine(configuration.QueueFolder.FullName, folderConfiguration.ShortName));
-                    FileSystemInfo backup = toPost.Move(destination);
+                    FileSystemInfo queue = toPost.Move(destination);
 
-                    AddItemToPostingDb(backup, folderConfiguration);
+                    AddItemToPostingDb(queue, folderConfiguration);
                 }
             }
             catch(Exception ex)

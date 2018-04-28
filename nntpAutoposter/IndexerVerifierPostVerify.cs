@@ -98,6 +98,7 @@ namespace nntpAutoposter
                     upload.IsRepost = true;
                     log.InfoFormat("Reuploading as {0}", upload.CleanedName);
                     upload.UploadedAt = null;
+                    upload.Move(Configuration, Location.Queue);
                 }
             }
             else
@@ -105,6 +106,7 @@ namespace nntpAutoposter
                 log.WarnFormat("Fatal exception on the server side: {0}", responseBody);
                 log.InfoFormat("Reposting {0}", upload.CleanedName);
                 upload.UploadedAt = null;
+                upload.Move(Configuration, Location.Queue);
             }           
 
             DBHandler.Instance.UpdateUploadEntry(upload);

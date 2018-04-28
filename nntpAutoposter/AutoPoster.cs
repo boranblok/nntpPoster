@@ -152,8 +152,7 @@ namespace nntpAutoposter
             {
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
                 nextUpload.NotifiedIndexerAt = null;
-            }
-            DBHandler.Instance.UpdateUploadEntry(nextUpload);   //This ensures we already notify the indexer of our obfuscated post before we start posting.
+            }            
 
             UsenetPoster poster = new UsenetPoster(configuration, folderConfiguration);
             FileSystemInfo toPost = null;

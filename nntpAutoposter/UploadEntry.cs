@@ -37,6 +37,12 @@ namespace nntpAutoposter
 
         public void Move(Settings configuration, Location newLocation)
         {
+            if(CurrentLocation == newLocation)
+            {
+                log.WarnFormat("Upload is already at the '{0}' location, cancelling move.", CurrentLocation);
+                return;
+            }
+
             String sourceFullPath = GetCurrentPath(configuration);
             DirectoryInfo targetFolder = DetermineTargetLocation(configuration, newLocation);
             FileSystemInfo fso;

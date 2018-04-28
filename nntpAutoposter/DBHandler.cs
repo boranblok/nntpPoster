@@ -199,6 +199,7 @@ namespace nntpAutoposter
                     cmd.CommandText = @"SELECT * from UploadEntries 
                                         WHERE ObscuredName IS NOT NULL 
                                           AND NotifiedIndexerAt IS NULL
+                                          AND UploadedAt IS NOT NULL
                                           AND Cancelled = 0
                                         ORDER BY CreatedAt ASC";
                     using (SqliteDataReader reader = cmd.ExecuteReader())
