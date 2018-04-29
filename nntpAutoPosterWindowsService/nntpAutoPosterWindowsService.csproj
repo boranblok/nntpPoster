@@ -154,6 +154,7 @@
 if not exist watch\ mkdir watch\
 if not exist working\ mkdir working\
 if not exist backup\ mkdir backup\
+if not exist queue\ mkdir queue\
 if not exist uploadfailed\ mkdir uploadfailed\
 "$(SolutionDir)\utilities\dos2unix.exe" "$(TargetDir)\init.d.sh"
 "$(SolutionDir)\utilities\dos2unix.exe" "$(TargetDir)\start.sh"
