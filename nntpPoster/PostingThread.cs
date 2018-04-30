@@ -106,6 +106,7 @@ namespace nntpPoster
                         }
                         else
                         {
+                            log.Debug("Locking monitor.");
                             lock (monitor)
                             {
                                 log.Debug("Locked monitor.");
@@ -123,7 +124,7 @@ namespace nntpPoster
                                 log.Debug("waiting 100 ms on monitor.");
                                 Monitor.Wait(monitor, 100);     //TODO: BLB Possible cause of locking issue by UNI.
                             }
-                            log.Debug("Unlocked on monitor.");
+                            log.Debug("Unlocked monitor.");
                         }
                     }
                 }
