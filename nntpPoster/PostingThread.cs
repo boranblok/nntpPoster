@@ -86,16 +86,19 @@ namespace nntpPoster
                     }
                     else
                     {
+                        log.DebugFormat("No message to post, checking cleanup.");
                         if (_client != null)         //If the queue runs dry we close the connection
                         {
+                            log.DebugFormat("The posting client is not null.");
                             if ((DateTime.Now - lastMessage).TotalMilliseconds > 5000) //TODO: parametrize.
-                            {
+                            {                                
                                 log.Debug("Disposing client because of empty queue.");
                                 _client.Dispose();
                                 _client = null;
                             }
                             else
                             {
+                                log.DebugFormat("Sleeping 100ms before next loop.");
                                 Thread.Sleep(100);
                             }
                         }
@@ -127,6 +130,7 @@ namespace nntpPoster
                             log.Debug("Unlocked monitor.");
                         }
                     }
+                    log.DebugFormat("Finished cleanup.");
                 }
             }
             catch (Exception ex)
