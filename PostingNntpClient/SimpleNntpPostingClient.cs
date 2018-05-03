@@ -46,6 +46,7 @@ namespace PostingNntpClient
         {
             log.DebugFormat("Connecting to newshost: {0}:{1}", ConnectionInfo.Address, ConnectionInfo.Port);
             _tcpClient = new TcpClient(ConnectionInfo.Address, ConnectionInfo.Port);
+            _tcpClient.ReceiveTimeout = _tcpClient.SendTimeout = ConnectionInfo.TcpTimeoutSeconds * 1000;
             var stream = _tcpClient.GetStream();
             if(ConnectionInfo.UseSsl)
             {

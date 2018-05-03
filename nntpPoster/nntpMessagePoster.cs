@@ -35,7 +35,8 @@ namespace nntpPoster
                 Port = configuration.NewsGroupPort,
                 UseSsl = configuration.NewsGroupUseSsl,
                 Username = configuration.NewsGroupUsername,
-                Password = configuration.NewsGroupPassword
+                Password = configuration.NewsGroupPassword,
+                TcpTimeoutSeconds = configuration.NntpConnectionTimeoutSeconds                
             };
 
             MessagesToPost = new Queue<NntpMessage>();

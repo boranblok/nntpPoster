@@ -137,6 +137,7 @@ namespace nntpPoster
             {
                 log.Error("Exception in the posting thread.", ex);
             }
+            log.Debug("Finished posting task, exiting thread.");
         }
 
         private void PostMessage(NntpMessage message)
