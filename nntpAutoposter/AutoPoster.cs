@@ -133,8 +133,7 @@ namespace nntpAutoposter
             catch (Exception ex)
             {
                 log.Error("The upload failed to post. Retrying.", ex);
-            }
-           
+            }           
         }
 
         private void PostRelease(WatchFolderSettings folderConfiguration, UploadEntry nextUpload, FileSystemInfo toUpload, Boolean isDirectory)
@@ -152,7 +151,8 @@ namespace nntpAutoposter
             {
                 nextUpload.ObscuredName = Guid.NewGuid().ToString("N");
                 nextUpload.NotifiedIndexerAt = null;
-            }            
+            }
+            DBHandler.Instance.UpdateUploadEntry(nextUpload);
 
             UsenetPoster poster = new UsenetPoster(configuration, folderConfiguration);
             FileSystemInfo toPost = null;
