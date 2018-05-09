@@ -41,6 +41,11 @@ namespace nntpPoster
 
         public XDocument PostToUsenet(FileSystemInfo toPost, String title, String rarPassword, Boolean saveNzb = true)
         {
+            if(toPost.Size() == 0)
+            {
+                throw new Exception(String.Format("File/Folder [{0}] is 0 bytes in size, aborting post", toPost.FullName));
+            }
+
             using (NntpMessagePoster poster = new NntpMessagePoster(configuration, folderConfiguration))
             {
                 poster.PartPosted += Poster_PartPosted;
