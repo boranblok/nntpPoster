@@ -174,7 +174,7 @@ namespace nntpPoster
                     log.DebugFormat("Message [{0}] posted. Adding to segments.", message.Subject);
                     lock (message.PostInfo.Segments)
                     {
-                        log.Debug("Locked segments list.");
+                        //log.Debug("Locked segments list.");
                         message.PostInfo.Segments.Add(new PostedFileSegment
                         {
                             MessageId = partMessageId,
@@ -182,7 +182,7 @@ namespace nntpPoster
                             SegmentNumber = message.YEncFilePart.Number
                         });
                     }
-                    log.Debug("Unlocked segments list.");
+                    //log.Debug("Unlocked segments list.");
                     retry = false;
                     OnMessagePosted(message);
                 }
@@ -216,13 +216,13 @@ namespace nntpPoster
             log.Debug("GetNextMessageToPost started.");
             lock (_messageQueue)
             {
-                log.Debug("Locked messageQueue");
+                //log.Debug("Locked messageQueue");
                 var count = _messageQueue.Count;
                 log.DebugFormat("The messageQueue has {0} items.", count);
                 if (count > 0)
                     message = _messageQueue.Dequeue();
             }
-            log.Debug("Unlocked messageQueue");
+            //log.Debug("Unlocked messageQueue");
             if (message == null && !StopRequested) //If stop is requested it is logical the queue gets empty.
                 log.Warn("Posting thread is starved, reduce threads to make more optimal use of resources.");
             return message;
