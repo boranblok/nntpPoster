@@ -80,7 +80,7 @@ namespace nntpAutoposter
         {
             try
             {
-                if ((DateTime.Now - toPost.LastAccessTime).TotalMinutes > configuration.FilesystemCheckTesholdMinutes)
+                if ((DateTime.Now - toPost.LastAccessTime).TotalMinutes > configuration.FilesystemCheckTesholdMinutes && toPost.Size() > 0)
                 {
                     DirectoryInfo destination = new DirectoryInfo(
                         Path.Combine(configuration.QueueFolder.FullName, folderConfiguration.ShortName));
