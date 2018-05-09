@@ -89,7 +89,7 @@ namespace nntpPoster
                         log.DebugFormat("No message to post, checking cleanup.");
                         if (_client != null)         //If the queue runs dry we close the connection
                         {
-                            log.DebugFormat("The posting client is not null.");
+                            //log.DebugFormat("The posting client is not null.");
                             if ((DateTime.Now - lastMessage).TotalMilliseconds > 5000) //TODO: parametrize.
                             {                                
                                 log.Debug("Disposing client because of empty queue.");
@@ -98,36 +98,36 @@ namespace nntpPoster
                             }
                             else
                             {
-                                log.DebugFormat("Sleeping 100ms before next loop.");
+                                //log.DebugFormat("Sleeping 100ms before next loop.");
                                 Thread.Sleep(100);
                             }
                         }
                         if (StopRequested)
                         {
-                            log.Debug("Empty queue and stop requested, Finished = true.");
+                            //log.Debug("Empty queue and stop requested, Finished = true.");
                             Finished = true;
                         }
                         else
                         {
-                            log.Debug("Locking monitor.");
+                            //log.Debug("Locking monitor.");
                             lock (monitor)
                             {
-                                log.Debug("Locked monitor.");
+                                //log.Debug("Locked monitor.");
                                 if (Finished)
                                 {
-                                    log.Debug("Finished = true breaking out of loop.");
+                                    //.Debug("Finished = true breaking out of loop.");
                                     break;
                                 }
                                 if (StopRequested)
                                 {
-                                    log.Debug("Empty queue and stop requested, Finished = true.");
+                                    //log.Debug("Empty queue and stop requested, Finished = true.");
                                     Finished = true;
                                     break;
                                 }
-                                log.Debug("waiting 100 ms on monitor.");
+                                //log.Debug("waiting 100 ms on monitor.");
                                 Monitor.Wait(monitor, 100);     //TODO: BLB Possible cause of locking issue by UNI.
                             }
-                            log.Debug("Unlocked monitor.");
+                            //log.Debug("Unlocked monitor.");
                         }
                     }
                     log.DebugFormat("Finished cleanup.");
