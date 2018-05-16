@@ -178,10 +178,7 @@ namespace nntpAutoposter
                 if (configuration.NzbOutputFolder != null)
                 {
                     FileInfo file = new FileInfo(Path.Combine(configuration.NzbOutputFolder.FullName, nextUpload.CleanedName + ".nzb"));
-                    using (TextWriter tw = new StreamWriter(file.OpenWrite()))
-                    {
-                        tw.Write(nextUpload.NzbContents);
-                    }
+                    File.WriteAllText(file.FullName, nextUpload.NzbContents);
                 }
 
                 nextUpload.RarPassword = password;
