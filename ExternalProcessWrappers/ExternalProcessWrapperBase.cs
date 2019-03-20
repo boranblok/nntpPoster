@@ -49,7 +49,7 @@ namespace ExternalProcessWrappers
             ProcessLocation = processLocation;
         }
 
-        protected void ExecuteProcess(String parameters)
+        protected void ExecuteProcess(String parameters, String workingDirectory = null)
         {
             outDataTmp = new StringBuilder();
             errDataTmp = new StringBuilder();
@@ -65,6 +65,11 @@ namespace ExternalProcessWrappers
             {
                 process.StartInfo.Arguments = parameters;
                 process.StartInfo.FileName = ProcessLocation;
+                if (!String.IsNullOrWhiteSpace(workingDirectory))
+                {
+                    process.StartInfo.WorkingDirectory = workingDirectory;
+                    log.DebugFormat("Process working directory: [{0}]", workingDirectory);
+                }
 
                 log.DebugFormat("Executing process: [{0} {1}]", ProcessLocation, parameters);
 

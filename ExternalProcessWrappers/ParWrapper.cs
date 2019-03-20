@@ -36,14 +36,14 @@ namespace ExternalProcessWrappers
             String parParameters = String.Format(CommandFormat,
                blockSize,
                redundancyPercentage,
-               '"' + Path.Combine(workingFolder.FullName, nameWithoutExtension + ".par2") + '"',
+               String.Format("\"{0}.par2\"", nameWithoutExtension),
                GetFileList(workingFolder),
                extraParams
             );
 
             try
             {
-                this.ExecuteProcess(parParameters);
+                this.ExecuteProcess(parParameters, workingFolder.FullName);
             }
             catch(Exception ex)
             {
@@ -60,7 +60,7 @@ namespace ExternalProcessWrappers
             foreach (var file in allFiles)
             {
                 fileList.Append(" \"");
-                fileList.Append(file.FullName);
+                fileList.Append(file.Name);
                 fileList.Append("\"");
             }
 
