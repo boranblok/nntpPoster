@@ -96,7 +96,7 @@ namespace nntpAutoposter
                     configuration.GetWatchFolderSettings(nextUpload.WatchFolderShortName);
                 FileSystemInfo toUpload;
                 Boolean isDirectory;
-                String fullPath = nextUpload.GetCurrentPath(configuration);
+                String fullPath = nextUpload.GetCurrentPath(configuration, nextUpload.Name);
                 try
                 {
                     FileAttributes attributes = File.GetAttributes(fullPath);
@@ -171,7 +171,13 @@ namespace nntpAutoposter
                 if (folderConfiguration.ApplyRandomPassword)
                     password = Guid.NewGuid().ToString("N");
 
-                var nzbFile = poster.PostToUsenet(toPost, password, false);
+                FileInfo nfoFile = null;
+                if(nextUpload.HasNfo)
+                {
+                    nfoFile = new FileInfo(nextUpload.GetCurrentPath(configuration, toUpload.NameWithoutExtension() + ".nfo"));
+                }
+
+                var nzbFile = poster.PostToUsenet(toPost, password, false, nfoFile);
                 
                 nextUpload.NzbContents = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Environment.NewLine + nzbFile.ToString();
 

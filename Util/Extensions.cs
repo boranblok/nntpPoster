@@ -109,6 +109,7 @@ namespace Util
             {
                 movedFsi = MoveFile(fsi.FullName, destination);
             }
+            movedFsi.Refresh();
             return movedFsi;
         }
 

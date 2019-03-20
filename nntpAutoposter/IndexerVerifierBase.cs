@@ -99,7 +99,7 @@ namespace nntpAutoposter
             {
                 try
                 {
-                    String fullPath = upload.GetCurrentPath(Configuration);
+                    String fullPath = upload.GetCurrentPath(Configuration, upload.Name);
                     
                     Boolean backupExists = false;
                     backupExists = Directory.Exists(fullPath);

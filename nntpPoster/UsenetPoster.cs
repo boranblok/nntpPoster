@@ -34,12 +34,12 @@ namespace nntpPoster
         private Int64 TotalUploadedBytes { get; set; }
         private DateTime UploadStartTime { get; set; }
 
-        public XDocument PostToUsenet(FileSystemInfo toPost, String rarPassword, Boolean saveNzb = true)
+        public XDocument PostToUsenet(FileSystemInfo toPost, String rarPassword, Boolean saveNzb = true, FileInfo nfoFile = null)
         {
-            return PostToUsenet(toPost, toPost.NameWithoutExtension(), rarPassword, saveNzb);
+            return PostToUsenet(toPost, toPost.NameWithoutExtension(), rarPassword, saveNzb, nfoFile);
         }
 
-        public XDocument PostToUsenet(FileSystemInfo toPost, String title, String rarPassword, Boolean saveNzb = true)
+        public XDocument PostToUsenet(FileSystemInfo toPost, String title, String rarPassword, Boolean saveNzb = true, FileInfo nfoFile = null)
         {
             if(toPost.Size() == 0)
             {
@@ -55,6 +55,12 @@ namespace nntpPoster
                     DateTime StartTime = DateTime.Now;
                     processedFiles = MakeProcessingFolder(toPost.NameWithoutExtension());
                     MakeRarAndParFiles(toPost, toPost.NameWithoutExtension(), processedFiles, rarPassword);
+                    
+                    if(nfoFile != null && nfoFile.Exists)
+                    {
+                        String processedNfo = Path.Combine(processedFiles.FullName, toPost.NameWithoutExtension() + ".nfo");
+                        nfoFile.CopyTo(processedNfo);
+                    }
 
                     List<FileToPost> filesToPost = processedFiles.GetFiles()
                         .OrderBy(f => f.Name)

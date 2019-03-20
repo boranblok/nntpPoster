@@ -1,0 +1,22 @@
+﻿CREATE TABLE
+    UploadEntries_tmp(
+	RowIDAlias INTEGER PRIMARY KEY ASC,
+    Name TEXT NOT NULL, 
+    Size INTEGER NOT NULL,
+    CleanedName TEXT, 
+    ObscuredName TEXT, 
+    RemoveAfterVerify INTEGER,
+    CreatedAt TEXT NOT NULL,
+    UploadedAt TEXT,
+    NotifiedIndexerAt TEXT,
+    SeenOnIndexerAt TEXT,
+    Cancelled INTEGER,
+    WatchFolderShortName TEXT NOT NULL,
+	UploadAttempts INTEGER DEFAULT 0,
+	RarPassword TEXT,
+	PriorityNum INTEGER DEFAULT 0,
+	NzbContents TEXT,
+	IsRepost INTEGER DEFAULT 0,
+	NotificationCount INTEGER DEFAULT 0,
+	CurrentLocation INTEGER DEFAULT 0,
+	HasNfo INTEGER DEFAULT 0)

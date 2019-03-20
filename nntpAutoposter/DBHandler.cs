@@ -309,7 +309,8 @@ namespace nntpAutoposter
                                                             NzbContents,
                                                             IsRepost,
                                                             NotificationCount,
-                                                            CurrentLocation)
+                                                            CurrentLocation,
+                                                            HasNfo)
                                                     VALUES(
                                                             @name,
                                                             @size,
@@ -328,7 +329,8 @@ namespace nntpAutoposter
                                                             @nzbContents,
                                                             @isRepost,
                                                             @notificationCount,
-                                                            @currentLocation)";
+                                                            @currentLocation,
+                                                            @hasNfo)";
                         cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                         cmd.Parameters.Add(new SqliteParameter("@size", uploadEntry.Size));
                         cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
@@ -347,6 +349,7 @@ namespace nntpAutoposter
                         cmd.Parameters.Add(new SqliteParameter("@isRepost", GetDbValue(uploadEntry.IsRepost)));
                         cmd.Parameters.Add(new SqliteParameter("@notificationCount", uploadEntry.NotificationCount));
                         cmd.Parameters.Add(new SqliteParameter("@currentLocation", GetDbValue(uploadEntry.CurrentLocation)));
+                        cmd.Parameters.Add(new SqliteParameter("@hasNfo", GetDbValue(uploadEntry.HasNfo)));
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = "select last_insert_rowid()";
@@ -382,7 +385,8 @@ namespace nntpAutoposter
                                             NzbContents = @nzbContents,
                                             IsRepost = @isRepost,
                                             NotificationCount = @notificationCount,
-                                            CurrentLocation = @currentLocation
+                                            CurrentLocation = @currentLocation,
+                                            HasNfo = @hasNfo
                                         WHERE RowIDAlias = @rowIDAlias";
                     cmd.Parameters.Add(new SqliteParameter("@name", uploadEntry.Name));
                     cmd.Parameters.Add(new SqliteParameter("@cleanedName", uploadEntry.CleanedName));
@@ -400,6 +404,7 @@ namespace nntpAutoposter
                     cmd.Parameters.Add(new SqliteParameter("@isRepost", GetDbValue(uploadEntry.IsRepost)));
                     cmd.Parameters.Add(new SqliteParameter("@notificationCount", uploadEntry.NotificationCount));
                     cmd.Parameters.Add(new SqliteParameter("@currentLocation", GetDbValue(uploadEntry.CurrentLocation)));
+                    cmd.Parameters.Add(new SqliteParameter("@hasNfo", GetDbValue(uploadEntry.HasNfo)));
                     cmd.Parameters.Add(new SqliteParameter("@rowIDAlias", uploadEntry.ID));
                     
                     cmd.ExecuteNonQuery();                   
@@ -432,6 +437,7 @@ namespace nntpAutoposter
             uploadEntry.IsRepost = GetBoolean(reader["IsRepost"]);
             uploadEntry.NotificationCount = (Int64)reader["NotificationCount"];
             uploadEntry.CurrentLocation = GetLocation(reader["CurrentLocation"]);
+            uploadEntry.HasNfo = GetBoolean(reader["HasNfo"]);
 
             return uploadEntry;
         }

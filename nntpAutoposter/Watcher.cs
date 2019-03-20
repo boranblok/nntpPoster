@@ -37,7 +37,8 @@ namespace nntpAutoposter
                     foreach(WatchFolderSettings watchFolderSetting in configuration.WatchFolderSettings)
                         foreach (FileSystemInfo toPost in watchFolderSetting.Path.EnumerateFileSystemInfos())
                     {
-                        MoveToQueueFolderAndPost(toPost, watchFolderSetting);
+                        if(toPost.Extension != ".nfo")
+                            MoveToQueueFolderAndPost(toPost, watchFolderSetting);
                     }
                 }
                 catch(Exception ex)
@@ -82,11 +83,19 @@ namespace nntpAutoposter
             {
                 if ((DateTime.Now - toPost.LastAccessTime).TotalMinutes > configuration.FilesystemCheckTesholdMinutes && toPost.Size() > 0)
                 {
-                    DirectoryInfo destination = new DirectoryInfo(
-                        Path.Combine(configuration.QueueFolder.FullName, folderConfiguration.ShortName));
+                    DirectoryInfo destination = new DirectoryInfo(Path.Combine(configuration.QueueFolder.FullName, folderConfiguration.ShortName));
+
+                    FileInfo nfoFile = new FileInfo(Path.Combine(folderConfiguration.Path.FullName, toPost.NameWithoutExtension() + ".nfo"));
+                    FileSystemInfo queueNfo = null;
+                    if(nfoFile.Exists)
+                    {
+                        queueNfo = nfoFile.Move(destination);
+                    }
+
                     FileSystemInfo queue = toPost.Move(destination);
 
-                    AddItemToPostingDb(queue, folderConfiguration);
+
+                    AddItemToPostingDb(queue, queueNfo, folderConfiguration);
                 }
             }
             catch(Exception ex)
@@ -95,7 +104,7 @@ namespace nntpAutoposter
             }
         }
 
-        private void AddItemToPostingDb(FileSystemInfo toPost, WatchFolderSettings folderConfiguration)
+        private void AddItemToPostingDb(FileSystemInfo toPost, FileSystemInfo nfoFile, WatchFolderSettings folderConfiguration)
         {
 #pragma warning disable IDE0017 // Simplify object initialization
             UploadEntry newUploadentry = new UploadEntry();
@@ -108,6 +117,7 @@ namespace nntpAutoposter
             newUploadentry.Size = toPost.Size();
             newUploadentry.PriorityNum = folderConfiguration.Priority;
             newUploadentry.CurrentLocation = Location.Queue;
+            newUploadentry.HasNfo = nfoFile != null && nfoFile.Exists;
             if (newUploadentry.Size == 0)
             {
                 log.ErrorFormat("File added with a size of 0 bytes, This cannot be uploaded! File name: [{0}]",
