@@ -185,6 +185,7 @@ namespace Util.Configuration
             settings.QueueFolder = GetSettingDirectoryInfo(baseConfig, FoldersSection, "Queue");
             settings.PostFailedFolder = GetSettingDirectoryInfo(baseConfig, FoldersSection, "UploadFailed");
             settings.NzbOutputFolder = GetSettingDirectoryInfo(baseConfig, FoldersSection, "NzbOutput", true);
+            settings.KeepProcessingFolderAfterError = GetSettingBoolean(baseConfig, FoldersSection, "KeepProcessingFolderAfterError", true);
 
             const string PostingSection = "Posting";
             settings.MaxRepostCount = GetSettingInt(baseConfig, PostingSection, "MaxRepostCount");
@@ -411,7 +412,7 @@ namespace Util.Configuration
             }
         }
 
-        private static Boolean GetSettingBoolean(IConfigSource config, String section, String key)
+        private static Boolean GetSettingBoolean(IConfigSource config, String section, String key, Boolean allowEmpty = false, Boolean defaultValue = false)
         {
             if (config.Configs[section] == null)
             {
@@ -424,8 +425,15 @@ namespace Util.Configuration
 
             if (String.IsNullOrWhiteSpace(configValue))
             {
-                log.FatalFormat("Config is missing key [{0}] in section [{1}].", key, section);
-                throw new Exception(String.Format("Config is missing key [{0}] in section [{1}].", key, section));
+                if (allowEmpty)
+                {
+                    return defaultValue;
+                }
+                else
+                {
+                    log.FatalFormat("Config is missing key [{0}] in section [{1}].", key, section);
+                    throw new Exception(String.Format("Config is missing key [{0}] in section [{1}].", key, section));
+                }
             }
 
             try

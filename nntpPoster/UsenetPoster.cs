@@ -34,12 +34,12 @@ namespace nntpPoster
         private Int64 TotalUploadedBytes { get; set; }
         private DateTime UploadStartTime { get; set; }
 
-        public XDocument PostToUsenet(FileSystemInfo toPost, String rarPassword, Boolean saveNzb = true, FileInfo nfoFile = null)
+        public XDocument PostToUsenet(FileSystemInfo toPost, String rarPassword, Boolean saveNzb = true, FileInfo nfoFile = null, Boolean keepProcessingFolderAfterError = false)
         {
-            return PostToUsenet(toPost, toPost.NameWithoutExtension(), rarPassword, saveNzb, nfoFile);
+            return PostToUsenet(toPost, toPost.NameWithoutExtension(), rarPassword, saveNzb, nfoFile, keepProcessingFolderAfterError);
         }
 
-        public XDocument PostToUsenet(FileSystemInfo toPost, String title, String rarPassword, Boolean saveNzb = true, FileInfo nfoFile = null)
+        public XDocument PostToUsenet(FileSystemInfo toPost, String title, String rarPassword, Boolean saveNzb = true, FileInfo nfoFile = null, Boolean keepProcessingFolderAfterError = false)
         {
             if(toPost.Size() == 0)
             {
@@ -50,6 +50,7 @@ namespace nntpPoster
             {
                 poster.PartPosted += Poster_PartPosted;
                 DirectoryInfo processedFiles = null;
+                Boolean hasError = true;
                 try
                 {
                     DateTime StartTime = DateTime.Now;
@@ -104,14 +105,22 @@ namespace nntpPoster
                     XDocument nzbDoc = GenerateNzbFromPostInfo(toPost.Name, postedFiles, rarPassword);
                     if (saveNzb && configuration.NzbOutputFolder != null)
                         nzbDoc.Save(Path.Combine(configuration.NzbOutputFolder.FullName, toPost.NameWithoutExtension() + ".nzb"));
+                    hasError = false;
                     return nzbDoc;
                 }
                 finally
                 {
-                    if (processedFiles != null && processedFiles.Exists)
+                    if (keepProcessingFolderAfterError && hasError)
                     {
-                        log.Info("Deleting processed folder");
-                        processedFiles.Delete(true);
+                        log.Info("Keeping processed folder after error.");
+                    }
+                    else
+                    {
+                        if (processedFiles != null && processedFiles.Exists)
+                        {
+                            log.Info("Deleting processed folder");
+                            processedFiles.Delete(true);
+                        }
                     }
                 }
             }

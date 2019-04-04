@@ -100,5 +100,6 @@ namespace Util.Configuration
         public Int32 YEncLinesPerMessage { get; set; }
         public List<RarNParSetting> RarNParSettings { get; set; }
         public String ParCommandFormat { get; set; }
+        public Boolean KeepProcessingFolderAfterError { get; set; }
     }
 }

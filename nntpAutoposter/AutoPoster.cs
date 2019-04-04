@@ -177,7 +177,7 @@ namespace nntpAutoposter
                     nfoFile = new FileInfo(nextUpload.GetCurrentPath(configuration, toUpload.NameWithoutExtension() + ".nfo"));
                 }
 
-                var nzbFile = poster.PostToUsenet(toPost, password, false, nfoFile);
+                var nzbFile = poster.PostToUsenet(toPost, password, false, nfoFile, configuration.KeepProcessingFolderAfterError);
                 
                 nextUpload.NzbContents = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Environment.NewLine + nzbFile.ToString();
 
