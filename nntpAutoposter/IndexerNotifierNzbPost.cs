@@ -29,7 +29,20 @@ namespace nntpAutoposter
                 HttpClient httpClient = new HttpClient();
 
                 MultipartFormDataContent form = new MultipartFormDataContent();
-                form.Add(new ByteArrayContent(nzbFileArray), "file", upload.CleanedName + ".nzb");
+                form.Add(new ByteArrayContent(nzbFileArray), Configuration.NzbPostFilenameParam, upload.CleanedName + ".nzb");
+                
+                if(!String.IsNullOrWhiteSpace(Configuration.NzbPostExtraParams))
+                {
+                    var extraParams = Configuration.NzbPostExtraParams.Split(new Char[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach(var extraParam in extraParams)
+                    {
+                        var keyAndValue = extraParam.Split(new Char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                        if(keyAndValue.Length != 2)
+                            throw new Exception("Configuration error, NzbPostExtraParams is specified, but not in key=value&key2=value2 format.");
+                        form.Add(new StringContent(keyAndValue[1]), keyAndValue[0]);
+                    }
+                }
+
                 HttpResponseMessage response = httpClient.PostAsync(notificationUrl, form).Result;
 
                 HttpContent content = response.Content;
