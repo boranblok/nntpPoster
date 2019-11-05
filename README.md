@@ -12,7 +12,7 @@ In order to run this utility you need the following on your system:
 
 * .Net 4.5+ or the latest version of mono
 * The [rar commandline utility](http://www.rarlab.com/download.htm)
-* The [par2 commandline utility](http://sourceforge.net/projects/parchive/files/par2cmdline/0.4/)
+* The [par2 commandline utility](https://github.com/Parchive/par2cmdline/)
 
 On non windows systems you will also need [sqlite3](https://www.sqlite.org/) installed.
 
