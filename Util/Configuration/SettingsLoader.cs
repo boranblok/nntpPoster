@@ -173,8 +173,8 @@ namespace Util.Configuration
             settings.NotificationType = GetSettingString(baseConfig, IndexerSection, "NotificationType");
             settings.MaxNotificationAttempts = GetSettingInt(baseConfig, IndexerSection, "MaxNotificationAttempts");
             settings.ObfuscatedNotificationUrl = GetSettingString(baseConfig, IndexerSection, "ObfuscatedNotificationUrl");
-            settings.NzbPostFilenameParam = GetSettingString(baseConfig, IndexerSection, "NzbPostFilenameParam");
-            settings.NzbPostExtraParams = GetSettingString(baseConfig, IndexerSection, "NzbPostExtraParams");
+            settings.NzbPostFilenameParam = GetSettingString(baseConfig, IndexerSection, "NzbPostFilenameParam", true, "file");
+            settings.NzbPostExtraParams = GetSettingString(baseConfig, IndexerSection, "NzbPostExtraParams", true);
             settings.VerificationType = GetSettingString(baseConfig, IndexerSection, "VerificationType");
             settings.SearchUrl = GetSettingString(baseConfig, IndexerSection, "SearchUrl");
             settings.IndexerRenameMapSource = GetSettingString(baseConfig, IndexerSection, "IndexerRenameMapSource");
