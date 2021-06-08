@@ -319,6 +319,7 @@ namespace Util.Configuration
             settings.ApplyRandomPassword = GetSettingBoolean(config, WatchfolderSection, "ApplyRandomPassword");
             settings.RarPassword = GetSettingString(config, WatchfolderSection, "RarPassword", true);
             settings.Priority = GetSettingInt(config, WatchfolderSection, "Priority");
+            settings.UseRandomMssageSubjects = GetSettingBoolean(config, WatchfolderSection, "UseRandomMessageSubjects", true);
 
             return settings;
         }

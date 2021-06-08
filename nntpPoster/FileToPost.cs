@@ -38,11 +38,23 @@ namespace nntpPoster
             StringBuilder subject = new StringBuilder();
             if (!String.IsNullOrWhiteSpace(prefix))
                 subject.Append(prefix + " ");
-            subject.AppendFormat("\"" + File.Name + "\"");
-            subject.Append(" yEnc ");
-            subject.Append("({0}/");    //The {0}  placeholder here is for the format statement later.
-            subject.Append(TotalParts);
-            subject.Append(")");
+
+            if (folderConfiguration.UseRandomMssageSubjects)
+            {
+                var r = new Random();
+                var randomTotalcount = r.Next(40) + 1;
+                var randomCount = r.Next(randomTotalcount) + 1;
+                subject.AppendFormat($"\"{RandomStringGenerator.GetRandomString(15, 30)}\" yEnc ({randomCount}/{randomTotalcount})");
+            }
+            else
+            {
+                subject.AppendFormat("\"" + File.Name + "\"");
+                subject.Append(" yEnc ");
+                subject.Append("({0}/");    //The {0}  placeholder here is for the format statement later.
+                subject.Append(TotalParts);
+                subject.Append(")");
+            }
+
             if (!String.IsNullOrWhiteSpace(suffix))
                 subject.Append(" " + suffix);
 
@@ -121,7 +133,15 @@ namespace nntpPoster
         {
             var message = new NntpMessage();
             message.FromAddress = postedFileInfo.FromAddress;
-            message.Subject = String.Format(subjectNameBase, part.Number);
+            if (folderConfiguration.UseRandomMssageSubjects)
+            {
+                message.Subject = subjectNameBase;
+            }
+            else
+            {
+                message.Subject = String.Format(subjectNameBase, part.Number);
+            }
+
 
             message.YEncFilePart = part;
             message.PostInfo = postedFileInfo;

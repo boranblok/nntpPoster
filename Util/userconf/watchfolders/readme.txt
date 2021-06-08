@@ -55,3 +55,8 @@ RarPassword=
 # even if they are added to the queue at a later time.
 # This can be negative as well (a valid Int32 value)
 Priority=0
+
+# Use a random usenet message subject instead of the filename
+# this extra obfuscation method makes it harder to reconstruct a message from usenet posts
+# but might introduce issues with less advanced downloaders that check the message headers instead of the yenc headers.
+UseRandomMessageSubjects=no

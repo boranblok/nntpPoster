@@ -26,6 +26,7 @@ namespace Util.Configuration
         public Boolean ApplyRandomPassword { get; set; }
         public String RarPassword { get; set; }
         public Int32 Priority { get; set; }
+        public Boolean UseRandomMssageSubjects { get; set; }
 
 
         private String previousNewsGroup;

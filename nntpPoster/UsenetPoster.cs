@@ -74,10 +74,23 @@ namespace nntpPoster
                     UploadStartTime = DateTime.Now;
 
                     Int32 fileCount = 1;
+                    var r = new Random();
                     foreach (var fileToPost in filesToPost)
                     {
                         DateTime filestartTime = DateTime.Now;
-                        String comment1 = String.Format("{0} [{1}/{2}]", title, fileCount++, filesToPost.Count);
+                        String comment1;
+                        if (folderConfiguration.UseRandomMssageSubjects)
+                        {
+                            var randomTotalcount = r.Next(40) +1;
+                            var randomCount = r.Next(randomTotalcount) + 1;
+                            var randomTitle = RandomStringGenerator.GetRandomString(15, 30);
+                            comment1 = String.Format("{0} [{1}/{2}]", randomTitle, randomCount, randomTotalcount);
+                        }
+                        else
+                        {
+                            comment1 = String.Format("{0} [{1}/{2}]", title, fileCount++, filesToPost.Count);
+                        }
+                        
                         PostedFileInfo postInfo = fileToPost.PostYEncFile(poster, comment1, "");
                         if (log.IsInfoEnabled)
                         {
