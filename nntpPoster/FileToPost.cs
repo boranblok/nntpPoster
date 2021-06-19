@@ -42,7 +42,7 @@ namespace nntpPoster
             if (folderConfiguration.UseRandomMssageSubjects)
             {
                 var r = new Random();
-                var randomTotalcount = r.Next(40) + 1;
+                var randomTotalcount = r.Next(TotalParts, TotalParts + 30);
                 var randomCount = r.Next(randomTotalcount) + 1;
                 subject.AppendFormat($"\"{RandomStringGenerator.GetRandomString(15, 30)}\" yEnc ({randomCount}/{randomTotalcount})");
             }
