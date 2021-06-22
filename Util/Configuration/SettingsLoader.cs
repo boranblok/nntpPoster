@@ -320,6 +320,7 @@ namespace Util.Configuration
             settings.RarPassword = GetSettingString(config, WatchfolderSection, "RarPassword", true);
             settings.Priority = GetSettingInt(config, WatchfolderSection, "Priority");
             settings.UseRandomMssageSubjects = GetSettingBoolean(config, WatchfolderSection, "UseRandomMessageSubjects", true);
+            settings.ForceIncludeExtensionsInSubject = new List<String>(GetSettingString(config, WatchfolderSection, "ForceIncludeExtensionsInSubject").Split('|'));
 
             return settings;
         }

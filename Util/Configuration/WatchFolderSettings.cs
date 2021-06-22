@@ -27,6 +27,7 @@ namespace Util.Configuration
         public String RarPassword { get; set; }
         public Int32 Priority { get; set; }
         public Boolean UseRandomMssageSubjects { get; set; }
+        public List<String> ForceIncludeExtensionsInSubject { get; set; }
 
 
         private String previousNewsGroup;

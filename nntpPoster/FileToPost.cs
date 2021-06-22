@@ -41,10 +41,20 @@ namespace nntpPoster
 
             if (folderConfiguration.UseRandomMssageSubjects)
             {
+                var fileName = File.Name;
+                var extensionPart = "";
+                foreach(var extensionToKeep in folderConfiguration.ForceIncludeExtensionsInSubject)
+                {
+                    if(fileName.EndsWith(extensionToKeep, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        extensionPart = extensionToKeep;
+                    }
+                }
+
                 var r = new Random();
                 var randomTotalcount = r.Next(TotalParts, TotalParts + 30);
                 var randomCount = r.Next(randomTotalcount) + 1;
-                subject.AppendFormat($"\"{RandomStringGenerator.GetRandomString(15, 30)}\" yEnc ({randomCount}/{randomTotalcount})");
+                subject.AppendFormat($"\"{RandomStringGenerator.GetRandomString(15, 30)}{extensionPart}\" yEnc ({randomCount}/{randomTotalcount})");
             }
             else
             {
