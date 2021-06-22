@@ -32,6 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Releases", "Releases", "{41
 		Releases\0.12.1.0.zip = Releases\0.12.1.0.zip
 		Releases\0.12.2.0.zip = Releases\0.12.2.0.zip
 		Releases\0.12.3.0.zip = Releases\0.12.3.0.zip
+		Releases\0.12.4.0.zip = Releases\0.12.4.0.zip
 		Releases\0.7.0.zip = Releases\0.7.0.zip
 		Releases\0.7.1.zip = Releases\0.7.1.zip
 		Releases\0.7.2.zip = Releases\0.7.2.zip
