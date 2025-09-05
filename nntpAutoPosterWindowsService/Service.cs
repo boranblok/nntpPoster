@@ -47,15 +47,20 @@ namespace nntpAutoPosterWindowsService
                 poster.Start();
                 log.Info("Autoposter started");
 
-                notifier = IndexerNotifierBase.GetActiveNotifier(configuration);
-                if (notifier != null)
+                if (configuration.NotificationEnabled) { 
+                    notifier = IndexerNotifierBase.GetActiveNotifier(configuration);
+                    if (notifier != null)
+                    {
+                        notifier.Start();
+                        log.Info("Notifier started");
+                    }
+                    else
+                    {
+                        log.Info("No notifier");
+                    }
+                } else
                 {
-                    notifier.Start();
-                    log.Info("Notifier started");
-                }
-                else
-                {
-                    log.Info("No notifier");
+                    log.Info("Notifications disabled");
                 }
 
                 verifier = IndexerVerifierBase.GetActiveVerifier(configuration);

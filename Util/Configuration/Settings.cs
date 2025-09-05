@@ -74,6 +74,7 @@ namespace Util.Configuration
         public String ParExtraParameters { get; set; }
         public String MkvPropEditLocation { get; set; }
         public String FFmpegLocation { get; set; }
+        public Boolean NotificationEnabled { get; set; }
         public String NotificationType { get; set; }
         public String NzbPostFilenameParam { get; set; }
         public String NzbPostExtraParams { get; set; }

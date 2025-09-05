@@ -170,6 +170,7 @@ namespace Util.Configuration
             settings.MaxConnectionCount = GetSettingInt(baseConfig, NewsHostSection, "MaxConnectionCount");
 
             const string IndexerSection = "Indexer";
+            settings.NotificationEnabled = GetSettingBoolean(baseConfig, IndexerSection, "NotificationEnabled");
             settings.NotificationType = GetSettingString(baseConfig, IndexerSection, "NotificationType");
             settings.MaxNotificationAttempts = GetSettingInt(baseConfig, IndexerSection, "MaxNotificationAttempts");
             settings.ObfuscatedNotificationUrl = GetSettingString(baseConfig, IndexerSection, "ObfuscatedNotificationUrl");
